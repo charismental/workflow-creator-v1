@@ -12,7 +12,7 @@ import StateNode from "./StateNode";
 import FloatingEdge from "./FloatingEdge";
 import CustomConnectionLine from "./CustomConnectionLine";
 import Sidebar from "./Sidebar";
-import { StateList, RoleList } from "./enums";
+import { StateList, RoleList, roleColors } from "./data";
 import isEqual from "lodash.isequal";
 
 import "reactflow/dist/style.css";
@@ -276,16 +276,6 @@ const defaultEdgeOptions = {
   }
 };
 
-const roleColors = {
-  "Intake-Specialist": "#4672C4",
-  "Intake-Specialist Manager": "#90AADB",
-  Caseworker: "#A8D08D",
-  "Caseworker Manager": "#70AD47",
-  "Partner Final Reviewer": "#007F7F",
-  "Partner Reviewer": "#F4B183",
-  "Customer-Support": "#305497"
-};
-
 let id = 11;
 const getId = () => `dndnode_${++id}`;
 
@@ -310,25 +300,33 @@ const WorkflowCreator = () => {
   const [roles, setRoles] = useState(RoleList);
 
   const addNewStateOrRole = (value) => {
-    let newRoleOrState = value;
     const newStateOrRoleName = window.prompt(
       `Please enter name of the new ${value}`
     );
-    if (newStateOrRoleName !== null) {
-      switch (newRoleOrState) {
+
+    if (newStateOrRoleName) {
+      let newId = Math.max(...Object.values(states)) + 1;
+
+      switch (value) {
         case "state":
           const newStatesObj = {
             ...states,
-            [newStateOrRoleName]: Math.floor(Math.random())
+            [newStateOrRoleName]: newId,
           };
+
           setState(newStatesObj);
           break;
         case "role":
+          newId = Math.max(...Object.values(roles)) + 1;
+
           const newRolesObj = {
-            ...states,
-            [newStateOrRoleName]: Math.floor(Math.random())
+            ...roles,
+            [newStateOrRoleName]: newId
           };
+
           setRoles(newRolesObj);
+          setAllEdges({ ...allEdges, [newStateOrRoleName]: [] });
+          setAllCanSeeStates({ ...allCanSeeStates, [newStateOrRoleName]: [] });
           break;
         default:
           return;
@@ -369,16 +367,11 @@ const WorkflowCreator = () => {
         }));
 
         return addEdge({ ...params, data: { setEdges } }, updatedEdges);
-        // return addEdge(params, updatedEdges);
       });
     },
     [setEdges, allEdges, activeRole]
   );
 
-  // const onConnect = useCallback(
-  //   (params) => setEdges((eds) => addEdge(params, eds)),
-  //   []
-  // );
   useEffect(() => {
     if (
       nodes.length &&
@@ -387,16 +380,15 @@ const WorkflowCreator = () => {
       setNodes(
         nodes.map((n) => ({
           ...n,
-          data: { ...n?.data, color: roleColors[activeRole] }
+          data: { ...n?.data, color: roleColors?.[activeRole] || '#d4d4d4' }
         }))
       );
     }
+
     setEdges(() => allEdges?.[activeRole] || []);
-    // console.log("nodes", JSON.stringify(nodes, null, 2));
   }, [activeRole, nodes]);
 
   useEffect(() => {
-    console.log("fire 2");
     const uniqueEdges = (arr) => {
       return arr.filter(
         (v, i, a) =>
