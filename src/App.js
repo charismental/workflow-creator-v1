@@ -9,14 +9,14 @@ import ReactFlow, {
 } from "reactflow";
 
 import isEqual from "lodash.isequal";
-import CustomConnectionLine from "./CustomConnectionLine";
-import FloatingEdge from "./FloatingEdge";
-import Sidebar from "./Sidebar";
-import StateNode from "./StateNode";
-import { RoleList, StateList, roleColors } from "./data";
+import CustomConnectionLine from "./components/CustomConnectionLine";
+import FloatingEdge from "./components/FloatingEdge";
+import Sidebar from "./components/Sidebar";
+import StateNode from "./components/StateNode";
+import { RoleList, StateList, roleColors } from "./data/data";
 
 import "reactflow/dist/style.css";
-import "./style.css";
+import "./css/style.css";
 
 const initialNodes = [
   {
@@ -472,6 +472,10 @@ const WorkflowCreator = () => {
   };
 
   return (
+    <>
+    <header>
+      hello
+    </header>
     <div className="dndflow">
       <ReactFlowProvider>
         <div className="reactflow-wrapper" ref={reactFlowWrapper}>
@@ -510,6 +514,7 @@ const WorkflowCreator = () => {
         />
       </ReactFlowProvider>
     </div>
+    </>
   );
 };
 
