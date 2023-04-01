@@ -1,3 +1,6 @@
+import { makeStyles, shorthands } from '@fluentui/react-components';
+import defaultEdgeOptions from "data/defaultEdgeOptions";
+import isEqual from "lodash.isequal";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
   Controls,
@@ -6,9 +9,6 @@ import ReactFlow, {
   useEdgesState,
   useNodesState
 } from "reactflow";
-
-import defaultEdgeOptions from "data/defaultEdgeOptions";
-import isEqual from "lodash.isequal";
 import "reactflow/dist/style.css";
 import getId from "utils/getId";
 import CustomConnectionLine from "./components/CustomConnectionLine";
@@ -20,6 +20,19 @@ import { RoleList, StateList, roleColors } from "./data/data";
 import initialNodes from './data/initialNodes';
 
 const initialEdges = [];
+
+const useStyles = makeStyles({
+  header: {
+    width: '100%',
+    height: '10%',
+    ...shorthands.borderBottom('1px', 'solid', 'black')
+  },
+  headerText: {
+    textAlign: 'center',
+    fontSize: '20px',
+    fontWeight: 'bold'
+  }
+})
 
 const connectionLineStyle = {
   strokeWidth: 1.5,
@@ -48,6 +61,7 @@ Object.keys(RoleList).forEach((role) => {
 });
 
 const WorkflowCreator = () => {
+  const style = useStyles();
   const reactFlowWrapper = useRef(null);
   const [activeRole, setActiveRole] = useState(initialRole);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -232,12 +246,12 @@ const WorkflowCreator = () => {
 
   return (
     <>
-    <header>
-      hello
-    </header>
     <div className="dndflow">
       <ReactFlowProvider>
         <div className="reactflow-wrapper" ref={reactFlowWrapper}>
+    <header className={style.header}>
+      <p className={style.headerText}>{activeRole}</p>
+    </header>
           <ReactFlow
             nodes={nodes.map((node) => ({
               ...node,
