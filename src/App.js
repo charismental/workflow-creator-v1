@@ -73,11 +73,7 @@ const WorkflowCreator = () => {
   const [roles, setRoles] = useState(RoleList);
   const [roleColor, setRoleColor] = useState(roleColors)
 
-  const addNewStateOrRole = (value, color) => {
-    console.log(value, color)
-    const newStateOrRoleName = window.prompt(
-      `Please enter name of the new ${value}`
-    );
+  const addNewStateOrRole = (value, color, newStateOrRoleName) => {
 
     if (newStateOrRoleName) {
       let newId = Math.max(...Object.values(states)) + 1;
@@ -275,8 +271,8 @@ const WorkflowCreator = () => {
             connectionLineComponent={CustomConnectionLine}
             connectionLineStyle={connectionLineStyle}
           >
-            <Controls />
           </ReactFlow>
+            <Controls />
         </div>
         <Sidebar
           stateList={filteredStates}
