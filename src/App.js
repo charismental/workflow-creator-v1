@@ -9,17 +9,15 @@ import ReactFlow, {
 
 import defaultEdgeOptions from "data/defaultEdgeOptions";
 import isEqual from "lodash.isequal";
+import "reactflow/dist/style.css";
+import getId from "utils/getId";
 import CustomConnectionLine from "./components/CustomConnectionLine";
 import FloatingEdge from "./components/FloatingEdge";
 import Sidebar from "./components/Sidebar";
 import StateNode from "./components/StateNode";
+import "./css/style.css";
 import { RoleList, StateList, roleColors } from "./data/data";
 import initialNodes from './data/initialNodes';
-
-import "reactflow/dist/style.css";
-import "./css/style.css";
-
-
 
 const initialEdges = [];
 
@@ -39,7 +37,6 @@ const edgeTypes = {
 
 
 let id = 11;
-const getId = () => `dndnode_${++id}`;
 
 // don't do this
 const initialRole = "Intake-Specialist";
