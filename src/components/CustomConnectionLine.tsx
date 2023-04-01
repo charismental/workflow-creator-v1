@@ -1,15 +1,15 @@
-import { FC } from "react";
-import { getStraightPath } from "reactflow";
+import { FunctionComponent } from "react";
+import { ConnectionLineComponentProps, getStraightPath } from "reactflow";
 
-interface CustomConnectionLineProps {
-  fromX: number;
-  fromY: number;
-  toX: number;
-  toY: number;
-  connectionLineStyle: any;
-}
+// interface CustomConnectionLineProps {
+//   fromX: number;
+//   fromY: number;
+//   toX: number;
+//   toY: number;
+//   connectionLineStyle: any;
+// }
 
-const CustomConnectionLine: FC<CustomConnectionLineProps> = ({ fromX, fromY, toX, toY, connectionLineStyle }): JSX.Element => {
+const CustomConnectionLine: FunctionComponent<ConnectionLineComponentProps> = ({ fromX, fromY, toX, toY, connectionLineStyle }): JSX.Element => {
   const [edgePath] = getStraightPath({
     sourceX: fromX,
     sourceY: fromY,

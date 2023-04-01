@@ -1,20 +1,20 @@
-import { CSSProperties, FC, useCallback } from "react";
-import { getStraightPath, useStore } from "reactflow";
+import { FunctionComponent, useCallback } from "react";
+import { EdgeProps, getStraightPath, useStore } from "reactflow";
 
 import { getEdgeParams } from "../utils";
 
 const foreignObjectSize = 40;
 
-interface FloatingEdgeProps {
-  id: string;
-  source: string;
-  target: string;
-  markerEnd: string;
-  style: CSSProperties;
-  data: any;
-}
+// interface FloatingEdgeProps {
+//   id: string;
+//   source: string;
+//   target: string;
+//   markerEnd: string;
+//   style: CSSProperties;
+//   data: any;
+// }
 
-const FloatingEdge: FC<FloatingEdgeProps> = ({ id, source, target, markerEnd, style, data }): JSX.Element | null => {
+const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd, style, data }) => {
   const onEdgeClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: string) => {
     event.stopPropagation();
     if (data?.setEdges)
