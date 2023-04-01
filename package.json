@@ -9,6 +9,7 @@
   },
   "main": "/index.js",
   "devDependencies": {
+    "@types/react": "^18.0.31",
     "eslint-plugin-react-hooks": "experimental",
     "react-scripts": "1.0.0"
   },

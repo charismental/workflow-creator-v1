@@ -1,19 +1,19 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
+  Controls,
+  MarkerType,
   ReactFlowProvider,
   addEdge,
-  useNodesState,
   useEdgesState,
-  MarkerType,
-  Controls
+  useNodesState
 } from "reactflow";
 
-import StateNode from "./StateNode";
-import FloatingEdge from "./FloatingEdge";
-import CustomConnectionLine from "./CustomConnectionLine";
-import Sidebar from "./Sidebar";
-import { StateList, RoleList, roleColors } from "./data";
 import isEqual from "lodash.isequal";
+import CustomConnectionLine from "./CustomConnectionLine";
+import FloatingEdge from "./FloatingEdge";
+import Sidebar from "./Sidebar";
+import StateNode from "./StateNode";
+import { RoleList, StateList, roleColors } from "./data";
 
 import "reactflow/dist/style.css";
 import "./style.css";
@@ -298,8 +298,10 @@ const WorkflowCreator = () => {
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
   const [states, setState] = useState(StateList);
   const [roles, setRoles] = useState(RoleList);
+  const [roleColor, setRoleColor] = useState(roleColors)
 
-  const addNewStateOrRole = (value) => {
+  const addNewStateOrRole = (value, color) => {
+    console.log(value, color)
     const newStateOrRoleName = window.prompt(
       `Please enter name of the new ${value}`
     );
@@ -325,6 +327,8 @@ const WorkflowCreator = () => {
           };
 
           setRoles(newRolesObj);
+          setRoleColor({...roleColor, [newStateOrRoleName]: color})
+          console.log(roleColor)
           setAllEdges({ ...allEdges, [newStateOrRoleName]: [] });
           setAllCanSeeStates({ ...allCanSeeStates, [newStateOrRoleName]: [] });
           break;
@@ -375,12 +379,12 @@ const WorkflowCreator = () => {
   useEffect(() => {
     if (
       nodes.length &&
-      nodes.some((n) => n?.data.color !== roleColors[activeRole])
+      nodes.some((n) => n?.data.color !== roleColor[activeRole])
     ) {
       setNodes(
         nodes.map((n) => ({
           ...n,
-          data: { ...n?.data, color: roleColors?.[activeRole] || '#d4d4d4' }
+          data: { ...n?.data, color: roleColor?.[activeRole] || '#d4d4d4' }
         }))
       );
     }
@@ -435,7 +439,7 @@ const WorkflowCreator = () => {
         id: getId(),
         type: "custom",
         position,
-        data: { label: type, color: roleColors[activeRole], toggleCanSeeState }
+        data: { label: type, color: roleColor[activeRole], toggleCanSeeState }
       };
 
       setNodes((nds) => nds.concat(newNode));
