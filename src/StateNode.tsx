@@ -1,17 +1,21 @@
+import { FC } from 'react';
 import {
   Handle,
   Position,
-  useStore,
+  getConnectedEdges,
   useReactFlow,
-  getIncomers,
-  getOutgoers,
-  getConnectedEdges
+  useStore
 } from "reactflow";
 
-const connectionNodeIdSelector = (state) => state.connectionNodeId;
+interface StateNodeProps {
+  id: string;
+  isConnectable: boolean;
+  data: any;
+}
 
-export default function StateNode(props) {
-  const { id, isConnectable, data } = props;
+const connectionNodeIdSelector = (state:any) => state.connectionNodeId;
+
+const StateNode: FC<StateNodeProps> = ({ id, isConnectable, data }): JSX.Element => {
 
   const { toggleCanSeeState, isCanSee = false } = data;
 
@@ -87,3 +91,5 @@ export default function StateNode(props) {
     </div>
   );
 }
+
+export default StateNode;
