@@ -1,7 +1,7 @@
 import { CSSProperties, FC, useCallback } from "react";
 import { getStraightPath, useStore } from "reactflow";
 
-import { getEdgeParams } from "./utils.js";
+import { getEdgeParams } from "../utils";
 
 const foreignObjectSize = 40;
 
