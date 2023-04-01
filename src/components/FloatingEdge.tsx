@@ -1,18 +1,11 @@
+import { Button } from '@fluentui/react-components';
+import { DismissCircle24Regular } from '@fluentui/react-icons';
 import { FunctionComponent, useCallback } from "react";
-import { EdgeProps, getStraightPath, useStore } from "reactflow";
-
+import { EdgeProps, getStraightPath, useStore as useReactFlowStore } from "reactflow";
 import { getEdgeParams } from "../utils";
 
 const foreignObjectSize = 40;
 
-// interface FloatingEdgeProps {
-//   id: string;
-//   source: string;
-//   target: string;
-//   markerEnd: string;
-//   style: CSSProperties;
-//   data: any;
-// }
 
 const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd, style, data }) => {
   const onEdgeClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: string) => {
@@ -22,11 +15,11 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
       data.setEdges((edges:any) => edges.filter((ed:any) => ed.id !== id));
   };
 
-  const sourceNode = useStore(
+  const sourceNode = useReactFlowStore(
     useCallback((store) => store.nodeInternals.get(source), [source])
   );
 
-  const targetNode = useStore(
+  const targetNode = useReactFlowStore(
     useCallback((store) => store.nodeInternals.get(target), [target])
   );
 
@@ -61,12 +54,11 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
         requiredExtensions="http://www.w3.org/1999/xhtml"
       >
         <div>
-          <button
+          <Button
             className="edgebutton"
             onClick={(event) => onEdgeClick(event, id)}
-          >
-            ×
-          </button>
+            icon={<DismissCircle24Regular />}
+         />
         </div>
       </foreignObject>
     </>

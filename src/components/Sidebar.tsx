@@ -4,18 +4,21 @@ import {
   Input,
   Label,
   Select,
+  Switch,
+  Text,
   makeStyles,
   shorthands,
-  useId,
+  useId
 } from "@fluentui/react-components";
 import { AddSquare24Regular } from "@fluentui/react-icons";
 import { FC, FormEventHandler, useState } from "react";
+import { useMainStore } from "store";
 
 const useStyles = makeStyles({
   roleFormContainer: {
     ...shorthands.border("1px", "solid", "black"),
     ...shorthands.borderRadius("20px"),
-    ...shorthands.padding('4px', '5%'),
+    ...shorthands.padding("4px", "5%"),
     ...shorthands.margin("20px"),
   },
   roleNameInput: {
@@ -23,12 +26,12 @@ const useStyles = makeStyles({
     ...shorthands.margin(0, "auto"),
   },
   formTitleBar: {
-    textAlign: 'center',
-    fontSize: '18px',
-    fontWeight: 'bold',
-    ...shorthands.borderBottom('1px', 'solid', 'black'),
-    ...shorthands.margin(0, 0, '20px', 0)
-  }
+    textAlign: "center",
+    fontSize: "18px",
+    fontWeight: "bold",
+    ...shorthands.borderBottom("1px", "solid", "black"),
+    ...shorthands.margin(0, 0, "20px", 0),
+  },
 });
 interface SideBarProps {
   stateList: string[];
@@ -73,12 +76,13 @@ const Sidebar: FC<SideBarProps> = ({
     addNewStateOrRole("role", color, roleName),
     setRoleName("")
   );
+  const updatedarkmode = useMainStore((state) => state.updateDarkMode)
   return (
     <aside>
+      <Switch onChange={updatedarkmode} />
+
       <div className={style.roleFormContainer}>
-        <div className={style.formTitleBar}>
-          Add a role
-        </div>
+        <Text className={style.formTitleBar}>Add a role</Text>
         <form onSubmit={submitForm}>
           <div
             style={{
@@ -112,9 +116,7 @@ const Sidebar: FC<SideBarProps> = ({
         </form>
       </div>
       <div className={style.roleFormContainer}>
-        <div className={style.formTitleBar}>
-          Add State
-        </div>
+        <Text className={style.formTitleBar}>Add State</Text>
         <form
           onSubmit={(e) => (
             e.preventDefault(),
@@ -122,32 +124,31 @@ const Sidebar: FC<SideBarProps> = ({
             setStateName("")
           )}
         >
-          <div style={{marginBottom: '10px'}}>
-
-          <Label htmlFor={stateNameId}>State Name: </Label>
-          <Input
-            className={style.roleNameInput}
-            type="text"
-            appearance="outline"
-            id={stateNameId}
-            value={stateName}
-            onChange={(e) => setStateName(e.target.value)}
-            contentAfter={<AddButton type="submit" />}
+          <div style={{ marginBottom: "10px" }}>
+            <Label htmlFor={stateNameId}>State Name: </Label>
+            <Input
+              className={style.roleNameInput}
+              type="text"
+              appearance="outline"
+              id={stateNameId}
+              value={stateName}
+              onChange={(e) => setStateName(e.target.value)}
+              contentAfter={<AddButton type="submit" />}
             />
-            </div>
+          </div>
         </form>
       </div>
-      <div className="description">States:</div>
+      <Text className="description">States:</Text>
       {stateList.map((state) => {
         return (
-          <div
+          <Text
             key={state}
             className="dndnode"
             onDragStart={(event) => onDragStart(event, state)}
             draggable
           >
             {state}
-          </div>
+          </Text>
         );
       })}
       <Select

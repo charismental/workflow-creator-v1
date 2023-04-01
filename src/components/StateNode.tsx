@@ -1,27 +1,38 @@
-import { FC } from 'react';
+import { Checkbox, makeStyles } from '@fluentui/react-components';
+import { FunctionComponent } from "react";
 import {
   Handle,
+  NodeProps,
   Position,
   getConnectedEdges,
   useReactFlow,
-  useStore
+  useStore as useReactFlowStore,
 } from "reactflow";
 
-interface StateNodeProps {
-  id: string;
-  isConnectable: boolean;
-  data: any;
-}
+const useStyles = makeStyles({
+  checkboxStyle: {
+    position: "absolute",
+    zIndex: 100,
+    cursor: "pointer",
+    width: "20px",
+    height: "20px",
+    left: "85%",
+  }
+})
 
-const connectionNodeIdSelector = (state:any) => state.connectionNodeId;
+const connectionNodeIdSelector = (state: any) => state.connectionNodeId;
 
-const StateNode: FC<StateNodeProps> = ({ id, isConnectable, data }): JSX.Element => {
-
+const StateNode: FunctionComponent<NodeProps> = ({
+  id,
+  isConnectable,
+  data,
+}): JSX.Element => {
+  const style = useStyles();
   const { toggleCanSeeState, isCanSee = false } = data;
 
   const { getNode, getEdges, deleteElements } = useReactFlow();
 
-  const connectionNodeId = useStore(connectionNodeIdSelector);
+  const connectionNodeId = useReactFlowStore(connectionNodeIdSelector);
   const isTarget = connectionNodeId && connectionNodeId !== id;
 
   const targetHandleStyle = { zIndex: isTarget ? 3 : 1 };
@@ -50,21 +61,13 @@ const StateNode: FC<StateNodeProps> = ({ id, isConnectable, data }): JSX.Element
         className="stateNodeBody"
         style={{
           borderStyle: isTarget ? "dashed" : "solid",
-          backgroundColor: isTarget ? "#ffcce3" : data?.color || "#ccd9f6"
+          backgroundColor: isTarget ? "#ffcce3" : data?.color || "#ccd9f6",
         }}
       >
         {!isTarget && (
           <>
-            <input
-              style={{
-                position: "absolute",
-                zIndex: 100,
-                cursor: "pointer",
-                width: "20px",
-                height: "20px",
-                left: "85%"
-              }}
-              type="checkbox"
+            <Checkbox
+              className={style.checkboxStyle}
               checked={isCanSee}
               onChange={() => toggleCanSeeState(id)}
             />
@@ -90,6 +93,6 @@ const StateNode: FC<StateNodeProps> = ({ id, isConnectable, data }): JSX.Element
       </div>
     </div>
   );
-}
+};
 
 export default StateNode;

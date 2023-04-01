@@ -1,4 +1,4 @@
-import { makeStyles, shorthands } from '@fluentui/react-components';
+import { FluentProvider, Text, makeStyles, shorthands, teamsHighContrastTheme, teamsLightTheme } from '@fluentui/react-components';
 import defaultEdgeOptions from "data/defaultEdgeOptions";
 import isEqual from "lodash.isequal";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -10,6 +10,7 @@ import ReactFlow, {
   useNodesState
 } from "reactflow";
 import "reactflow/dist/style.css";
+import { useMainStore } from 'store';
 import getId from "utils/getId";
 import CustomConnectionLine from "./components/CustomConnectionLine";
 import FloatingEdge from "./components/FloatingEdge";
@@ -20,6 +21,7 @@ import { RoleList, StateList, roleColors } from "./data/data";
 import initialNodes from './data/initialNodes';
 
 const initialEdges = [];
+// const initialEdges: Edge[]= [];
 
 const useStyles = makeStyles({
   header: {
@@ -61,6 +63,7 @@ Object.keys(RoleList).forEach((role) => {
 });
 
 const WorkflowCreator = () => {
+  const {darkMode} = useMainStore();
   const style = useStyles();
   const reactFlowWrapper = useRef(null);
   const [activeRole, setActiveRole] = useState(initialRole);
@@ -242,11 +245,12 @@ const WorkflowCreator = () => {
 
   return (
     <>
+      <FluentProvider theme={darkMode ? teamsHighContrastTheme : teamsLightTheme} style={{width: '100%', height: '100%'}}>
     <div className="dndflow">
       <ReactFlowProvider>
         <div className="reactflow-wrapper" ref={reactFlowWrapper}>
     <header className={style.header}>
-      <p className={style.headerText}>{activeRole}</p>
+      <Text className={style.headerText}>{activeRole}</Text>
     </header>
           <ReactFlow
             nodes={nodes.map((node) => ({
@@ -283,6 +287,7 @@ const WorkflowCreator = () => {
         />
       </ReactFlowProvider>
     </div>
+      </FluentProvider>
     </>
   );
 };
