@@ -1,235 +1,258 @@
-// import { FC, useCallback, useEffect, useRef, useState } from "react";
-// import ReactFlow, {
-//   Controls,
-//   Edge,
-//   EdgeTypes,
-//   ReactFlowInstance,
-//   addEdge,
-//   useEdgesState,
-//   useNodesState
-// } from "reactflow";
+import { Text, makeStyles, shorthands } from '@fluentui/react-components';
+import { FC, useCallback, useEffect, useRef, useState } from "react";
+import ReactFlow, {
+  Controls,
+  Edge,
+  EdgeTypes,
+  ReactFlowInstance,
+  addEdge,
+  useEdgesState
+} from "reactflow";
 
-// import defaultEdgeOptions from "data/defaultEdgeOptions";
-// import isEqual from "lodash.isequal";
-// import "reactflow/dist/style.css";
-// import getId from "utils/getId";
-// import CustomConnectionLine from "../components/CustomConnectionLine";
-// import FloatingEdge from "../components/FloatingEdge";
-// import StateNode from "../components/StateNode";
-// import "../css/style.css";
-// import { RoleList, roleColors } from "../data/data";
-// import initialNodes from "../data/initialNodes";
+import defaultEdgeOptions from "data/defaultEdgeOptions";
+import isEqual from "lodash.isequal";
+import "reactflow/dist/style.css";
+import getId from "utils/getId";
+import CustomConnectionLine from "../components/CustomConnectionLine";
+import FloatingEdge from "../components/FloatingEdge";
+import StateNode from "../components/StateNode";
+import "../css/style.css";
 
-// const initialEdges: Edge[] = [];
+const useStyles = makeStyles({
+    header: {
+      width: "100%",
+      height: "10%",
+      ...shorthands.borderBottom("1px", "solid", "black"),
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    headerText: {
+      textAlign: "center",
+      fontSize: "20px",
+      fontWeight: "bold",
+    },
+  });
 
-// const connectionLineStyle = {
-//   strokeWidth: 1.5,
-//   stroke: "black",
-// };
+const initialEdges: Edge[] = [];
 
-// const nodeTypes = {
-//   custom: StateNode,
-// };
+const connectionLineStyle = {
+  strokeWidth: 1.5,
+  stroke: "black",
+};
 
-// const edgeTypes: EdgeTypes = {
-//   floating: FloatingEdge,
-// };
+const nodeTypes = {
+  custom: StateNode,
+};
 
-// let id = 11;
+const edgeTypes: EdgeTypes = {
+  floating: FloatingEdge,
+};
 
-// // don't do this
-// const initialRole = "Intake-Specialist";
-// const initialAllEdges: any = {};
-// const initialAllStates: any = {};
-// Object.keys(RoleList).forEach((role) => {
-//   initialAllEdges[role] = [];
-//   initialAllStates[role] = [];
-// });
+let id = 11;
 
-// const ReactFlowBase: FC = (props: any): JSX.Element => {
-//   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-//   const [activeRole, setActiveRole] = useState(initialRole);
-//   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-//   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>(initialEdges);
-//   const [allEdges, setAllEdges] = useState(initialAllEdges);
-//   const [allCanSeeStates, setAllCanSeeStates] = useState(initialAllStates);
-//   const [reactFlowInstance, setReactFlowInstance] =
-//     useState<ReactFlowInstance>();
-//   const [roles, setRoles] = useState(RoleList);
-//   const [roleColor, setRoleColor] = useState(roleColors);
+interface ReactFlowBaseProps {
+  allCanSeeStates: any;
+  setAllCanSeeStates: any;
+  allEdges: any;
+  setAllEdges: any;
+  roleColor: any;
+  activeRole: any;
+  nodes: any;
+  setNodes: any;
+  onNodesChange: any;
+}
 
-//   const toggleCanSeeState = useCallback(
-//     (stateId: string) => {
-//       let activeRoleCanSee = allCanSeeStates[activeRole];
 
-//       if (activeRoleCanSee.includes(stateId)) {
-//         activeRoleCanSee = activeRoleCanSee.filter(
-//           (state: string) => state !== stateId
-//         );
-//       } else {
-//         activeRoleCanSee.push(stateId);
-//       }
 
-//       setAllCanSeeStates({
-//         ...allCanSeeStates,
-//         [activeRole]: activeRoleCanSee,
-//       });
-//     },
-//     [activeRole, allCanSeeStates, setAllCanSeeStates]
-//   );
+const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
+    const style = useStyles()
+  const reactFlowWrapper = useRef<HTMLDivElement>(null);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>(initialEdges);
+  const [reactFlowInstance, setReactFlowInstance] =
+    useState<ReactFlowInstance>();
 
-//   const onConnect = useCallback(
-//     (params: any) => {
-//       setEdges((eds) => {
-//         const updatedEdges = [
-//           ...(allEdges?.[activeRole] || []),
-//           ...eds.slice(-1),
-//         ].map((edg, i) => ({
-//           ...edg,
-//           id: `${edg.id + i}`,
-//           // type: "smoothstep"
-//         }));
+  const toggleCanSeeState = useCallback(
+    (stateId: string) => {
+      let activeRoleCanSee = props.allCanSeeStates[props.activeRole];
 
-//         return addEdge({ ...params, data: { setEdges } }, updatedEdges);
-//       });
-//     },
-//     [setEdges, allEdges, activeRole]
-//   );
+      if (activeRoleCanSee.includes(stateId)) {
+        activeRoleCanSee = activeRoleCanSee.filter(
+          (state: string) => state !== stateId
+        );
+      } else {
+        activeRoleCanSee.push(stateId);
+      }
 
-//   useEffect(() => {
-//     if (
-//       nodes.length &&
-//       nodes.some(
-//         (n) => n?.data.color !== roleColor[activeRole]
-//       )
-//     ) {
-//       setNodes(
-//         nodes.map((n) => ({
-//           ...n,
-//           data: {
-//             ...n?.data,
-//             color: roleColor?.[activeRole] || "#d4d4d4",
-//           },
-//         }))
-//       );
-//     }
+      props.setAllCanSeeStates({
+        ...props.allCanSeeStates,
+        [props.activeRole]: activeRoleCanSee,
+      });
+    },
+    [props.activeRole, props.allCanSeeStates, props.setAllCanSeeStates]
+  );
 
-//     setEdges(() => allEdges?.[activeRole] || []);
-//   }, [activeRole, nodes]);
+  const onConnect = useCallback(
+    (params: any) => {
+      setEdges((eds) => {
+        const updatedEdges = [
+          ...(props.allEdges?.[props.activeRole] || []),
+          ...eds.slice(-1),
+        ].map((edg, i) => ({
+          ...edg,
+          id: `${edg.id + i}`,
+          // type: "smoothstep"
+        }));
 
-//   useEffect(() => {
-//     const uniqueEdges = (arr: any) => {
-//       return arr.filter(
-//         (v: any, i: any, a: any) =>
-//           a.findIndex((v2: any) =>
-//             ["target", "source"].every((k) => v2[k] === v[k])
-//           ) === i
-//       );
-//     };
+        return addEdge({ ...params, data: { setEdges } }, updatedEdges);
+      });
+    },
+    [setEdges, props.allEdges, props.activeRole]
+  );
 
-//     const updatedEdges = {
-//       ...allEdges,
-//       [activeRole]: uniqueEdges(edges),
-//     };
+  useEffect(() => {
+    if (
+      props.nodes.length &&
+      props.nodes.some(
+        (n: any) => n?.data.color !== props.roleColor[props.activeRole]
+      )
+    ) {
+      props.setNodes(
+        props.nodes.map((n: any) => ({
+          ...n,
+          data: {
+            ...n?.data,
+            color: props.roleColor?.[props.activeRole] || "#d4d4d4",
+          },
+        }))
+      );
+    }
 
-//     if (!isEqual(allEdges, updatedEdges)) {
-//       setAllEdges(updatedEdges);
-//       // console.log(JSON.stringify(allEdges, null, 2));
-//     }
-//   }, [edges]);
+    setEdges(() => props.allEdges?.[props.activeRole] || []);
+  }, [props.activeRole, props.nodes]);
 
-//   const onDragOver = useCallback((event: any) => {
-//     event.preventDefault();
-//     event.dataTransfer.dropEffect = "move";
-//   }, []);
+  useEffect(() => {
+    const uniqueEdges = (arr: any) => {
+      return arr.filter(
+        (v: any, i: any, a: any) =>
+          a.findIndex((v2: any) =>
+            ["target", "source"].every((k) => v2[k] === v[k])
+          ) === i
+      );
+    };
 
-//   const onDrop = useCallback(
-//     (event: React.DragEvent<HTMLDivElement>) => {
-//       event.preventDefault();
-//       // don't do this...
-//       const reactFlowBounds =
-//         reactFlowWrapper.current?.getBoundingClientRect();
+    const updatedEdges = {
+      ...props.allEdges,
+      [props.activeRole]: uniqueEdges(edges),
+    };
 
-//       const type = event.dataTransfer.getData("application/reactflow");
+    if (!isEqual(props.allEdges, updatedEdges)) {
+      props.setAllEdges(updatedEdges);
+      // console.log(JSON.stringify(allEdges, null, 2));
+    }
+  }, [edges]);
 
-//       // check if the dropped element is valid
-//       if (typeof type === "undefined" || !type) {
-//         return;
-//       }
+  const onDragOver = useCallback((event: any) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+  }, []);
 
-//       // don't do this either
-//       const position = reactFlowInstance.project({
-//         x: event.clientX - reactFlowBounds.left,
-//         y: event.clientY - reactFlowBounds.top,
-//       });
+  const onDrop = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      // don't do this...
+      const reactFlowBounds =
+        reactFlowWrapper.current?.getBoundingClientRect();
 
-//       const newNode = {
-//         id: getId(id),
-//         type: "custom",
-//         position,
-//         data: {
-//           label: type,
-//           color: roleColor[activeRole],
-//           toggleCanSeeState,
-//         },
-//       };
+      const type = event.dataTransfer.getData("application/reactflow");
 
-//       setNodes((nds) => nds.concat(newNode));
-//     },
-//     [reactFlowInstance, setNodes, activeRole]
-//   );
+      // check if the dropped element is valid
+      if (typeof type === "undefined" || !type) {
+        return;
+      }
 
-//   return (
-//     <>
-//       <div className="reactflow-wrapper" ref={reactFlowWrapper}>
-//         <ReactFlow
-//           nodes={nodes.map((node) => ({
-//             ...node,
-//             data: {
-//               ...node.data,
-//               toggleCanSeeState,
-//               isCanSee: allCanSeeStates?.[activeRole]?.includes(node.id),
-//             },
-//           }))}
-//           edges={allEdges?.[activeRole] || []}
-//           onNodesChange={onNodesChange}
-//           onEdgesChange={onEdgesChange}
-//           onConnect={onConnect}
-//           onInit={setReactFlowInstance}
-//           onDrop={onDrop}
-//           onDragOver={onDragOver}
-//           fitView
-//           nodeTypes={nodeTypes}
-//           edgeTypes={edgeTypes}
-//           defaultEdgeOptions={defaultEdgeOptions}
-//           connectionLineComponent={CustomConnectionLine}
-//           connectionLineStyle={connectionLineStyle}
-//         >
-//           <Controls />
-//         </ReactFlow>
-//       </div>
-//     </>
-//   );
-// };
+      if (!reactFlowInstance || !reactFlowBounds) {
+        return;
+      }
+      // don't do this either
+      const position = reactFlowInstance.project({
+        x: event.clientX - reactFlowBounds.left,
+        y: event.clientY - reactFlowBounds.top,
+      });
 
-// document.addEventListener("keydown", function (e) {
-//   if (e.key === "Shift") {
-//     const elements = document.querySelectorAll(".stateNodeBody");
+      const newNode = {
+        id: getId(id),
+        type: "custom",
+        position,
+        data: {
+          label: type,
+          color: props.roleColor[props.activeRole],
+          toggleCanSeeState,
+        },
+      };
 
-//     elements.forEach(function (element) {
-//       element.classList.add("drag-handle");
-//     });
-//   }
-// });
+      props.setNodes((nds: any) => nds.concat(newNode));
+    },
+    [reactFlowInstance, props.setNodes, props.activeRole]
+  );
 
-// document.addEventListener("keyup", function (e) {
-//   if (e.key === "Shift") {
-//     const elements = document.querySelectorAll(".stateNodeBody");
+  return (
+    <>
+      <div className="reactflow-wrapper" ref={reactFlowWrapper}>
+      <header className={style.header}>
+                  <Text size={600} weight="bold" align="center">
+                    {props.activeRole}
+                  </Text>
+              </header>
+        <ReactFlow
+          nodes={props.nodes.map((node: any) => ({
+            ...node,
+            data: {
+              ...node.data,
+              toggleCanSeeState,
+              isCanSee: props.allCanSeeStates?.[props.activeRole]?.includes(node.id),
+            },
+          }))}
+          edges={props.allEdges?.[props.activeRole] || []}
+          onNodesChange={props.onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onInit={setReactFlowInstance}
+          onDrop={onDrop}
+          onDragOver={onDragOver}
+          fitView
+          nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
+          defaultEdgeOptions={defaultEdgeOptions}
+          connectionLineComponent={CustomConnectionLine}
+          connectionLineStyle={connectionLineStyle}
+        >
+          <Controls />
+        </ReactFlow>
+      </div>
+    </>
+  );
+};
 
-//     elements.forEach(function (element) {
-//       element.classList.remove("drag-handle");
-//     });
-//   }
-// });
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Shift") {
+    const elements = document.querySelectorAll(".stateNodeBody");
 
-// export default ReactFlowBase;
+    elements.forEach(function (element) {
+      element.classList.add("drag-handle");
+    });
+  }
+});
+
+document.addEventListener("keyup", function (e) {
+  if (e.key === "Shift") {
+    const elements = document.querySelectorAll(".stateNodeBody");
+
+    elements.forEach(function (element) {
+      element.classList.remove("drag-handle");
+    });
+  }
+});
+
+export default ReactFlowBase;
