@@ -1,6 +1,9 @@
 import {
   Button,
   ButtonProps,
+  Card,
+  CardHeader,
+  CardPreview,
   Input,
   Label,
   Select,
@@ -8,18 +11,17 @@ import {
   Text,
   makeStyles,
   shorthands,
-  useId
+  useId,
 } from "@fluentui/react-components";
 import { AddSquare24Regular } from "@fluentui/react-icons";
 import { FC, FormEventHandler, useState } from "react";
 import { useMainStore } from "store";
 
 const useStyles = makeStyles({
-  roleFormContainer: {
+  card: {
     ...shorthands.border("1px", "solid", "black"),
     ...shorthands.borderRadius("20px"),
-    ...shorthands.padding("4px", "5%"),
-    ...shorthands.margin("20px"),
+    ...shorthands.margin('20px', 0)
   },
   roleNameInput: {
     maxWidth: "90%",
@@ -76,68 +78,78 @@ const Sidebar: FC<SideBarProps> = ({
     addNewStateOrRole("role", color, roleName),
     setRoleName("")
   );
-  const updatedarkmode = useMainStore((state) => state.updateDarkMode)
+  const {darkMode} = useMainStore()
+  const updatedarkmode = useMainStore((state) => state.updateDarkMode);
   return (
     <aside>
       <Switch onChange={updatedarkmode} />
 
-      <div className={style.roleFormContainer}>
-        <Text className={style.formTitleBar}>Add a role</Text>
-        <form onSubmit={submitForm}>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-evenly",
-            }}
+      <Card className={style.card}>
+        <CardHeader
+          header={<Text className={style.formTitleBar}>Add a role</Text>}
+        />
+        <CardPreview style={{ marginLeft: "auto", marginRight: "auto" }}>
+          <form onSubmit={submitForm}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-evenly",
+              }}
+            >
+              <div style={{ marginBottom: "10px" }}>
+                <Label htmlFor={colorId}>Choose Color: </Label>
+                <input
+                  id={colorId}
+                  type="color"
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                />
+              </div>
+              <div style={{ marginBottom: "10px" }}>
+                <Label htmlFor={roleNameId}>Role Name: </Label>
+                <Input
+                  className={style.roleNameInput}
+                  type="text"
+                  appearance="outline"
+                  id={roleNameId}
+                  value={roleName}
+                  onChange={(e) => setRoleName(e.target.value)}
+                  contentAfter={<AddButton type="submit" />}
+                />
+              </div>
+            </div>
+          </form>
+        </CardPreview>
+      </Card>
+      <Card className={style.card}>
+        <CardHeader
+          header={<Text className={style.formTitleBar}>Add State</Text>}
+        />
+        <CardPreview style={{ marginLeft: "auto", marginRight: "auto" }}>
+          <form
+            onSubmit={(e) => (
+              e.preventDefault(),
+              addNewStateOrRole("state", "", stateName),
+              setStateName("")
+            )}
           >
             <div style={{ marginBottom: "10px" }}>
-              <Label htmlFor={colorId}>Choose Color: </Label>
-              <input
-                id={colorId}
-                type="color"
-                value={color}
-                onChange={(e) => setColor(e.target.value)}
-              />
-            </div>
-            <div style={{ marginBottom: "10px" }}>
-              <Label htmlFor={roleNameId}>Role Name: </Label>
+              <Label htmlFor={stateNameId}>State Name: </Label>
               <Input
                 className={style.roleNameInput}
                 type="text"
                 appearance="outline"
-                id={roleNameId}
-                value={roleName}
-                onChange={(e) => setRoleName(e.target.value)}
+                id={stateNameId}
+                value={stateName}
+                onChange={(e) => setStateName(e.target.value)}
                 contentAfter={<AddButton type="submit" />}
               />
             </div>
-          </div>
-        </form>
-      </div>
-      <div className={style.roleFormContainer}>
-        <Text className={style.formTitleBar}>Add State</Text>
-        <form
-          onSubmit={(e) => (
-            e.preventDefault(),
-            addNewStateOrRole("state", "", stateName),
-            setStateName("")
-          )}
-        >
-          <div style={{ marginBottom: "10px" }}>
-            <Label htmlFor={stateNameId}>State Name: </Label>
-            <Input
-              className={style.roleNameInput}
-              type="text"
-              appearance="outline"
-              id={stateNameId}
-              value={stateName}
-              onChange={(e) => setStateName(e.target.value)}
-              contentAfter={<AddButton type="submit" />}
-            />
-          </div>
-        </form>
-      </div>
+          </form>
+        </CardPreview>
+      </Card>
+
       <Text className="description">States:</Text>
       {stateList.map((state) => {
         return (
@@ -163,10 +175,12 @@ const Sidebar: FC<SideBarProps> = ({
           );
         })}
       </Select>
-
-      <pre>{JSON.stringify(output, null, 2)}</pre>
+      
+      <pre style={darkMode ? {backgroundColor: 'darkblue'}: {backgroundColor: 'beige', color:'green'}} >{JSON.stringify(output, null, 2)}</pre>
     </aside>
   );
 };
 
 export default Sidebar;
+
+

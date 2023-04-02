@@ -1,4 +1,11 @@
-import { FluentProvider, Text, makeStyles, shorthands, teamsHighContrastTheme, teamsLightTheme } from '@fluentui/react-components';
+import {
+  FluentProvider,
+  Text,
+  makeStyles,
+  shorthands,
+  teamsHighContrastTheme,
+  teamsLightTheme,
+} from "@fluentui/react-components";
 import defaultEdgeOptions from "data/defaultEdgeOptions";
 import isEqual from "lodash.isequal";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -7,10 +14,10 @@ import ReactFlow, {
   ReactFlowProvider,
   addEdge,
   useEdgesState,
-  useNodesState
+  useNodesState,
 } from "reactflow";
 import "reactflow/dist/style.css";
-import { useMainStore } from 'store';
+import { useMainStore } from "store";
 import getId from "utils/getId";
 import CustomConnectionLine from "./components/CustomConnectionLine";
 import FloatingEdge from "./components/FloatingEdge";
@@ -18,38 +25,40 @@ import Sidebar from "./components/Sidebar";
 import StateNode from "./components/StateNode";
 import "./css/style.css";
 import { RoleList, StateList, roleColors } from "./data/data";
-import initialNodes from './data/initialNodes';
+import initialNodes from "./data/initialNodes";
 
 const initialEdges = [];
 // const initialEdges: Edge[]= [];
 
 const useStyles = makeStyles({
   header: {
-    width: '100%',
-    height: '10%',
-    ...shorthands.borderBottom('1px', 'solid', 'black')
+    width: "100%",
+    height: "10%",
+    ...shorthands.borderBottom("1px", "solid", "black"),
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: "center",
+    justifyContent: "center",
   },
   headerText: {
-    textAlign: 'center',
-    fontSize: '20px',
-    fontWeight: 'bold'
-  }
-})
+    textAlign: "center",
+    fontSize: "20px",
+    fontWeight: "bold",
+  },
+});
 
 const connectionLineStyle = {
   strokeWidth: 1.5,
-  stroke: "black"
+  stroke: "black",
 };
 
 const nodeTypes = {
-  custom: StateNode
+  custom: StateNode,
 };
 
 const edgeTypes = {
-  floating: FloatingEdge
+  floating: FloatingEdge,
 };
-
-
 
 let id = 11;
 
@@ -63,7 +72,7 @@ Object.keys(RoleList).forEach((role) => {
 });
 
 const WorkflowCreator = () => {
-  const {darkMode} = useMainStore();
+  const { darkMode } = useMainStore();
   const style = useStyles();
   const reactFlowWrapper = useRef(null);
   const [activeRole, setActiveRole] = useState(initialRole);
@@ -74,10 +83,9 @@ const WorkflowCreator = () => {
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
   const [states, setState] = useState(StateList);
   const [roles, setRoles] = useState(RoleList);
-  const [roleColor, setRoleColor] = useState(roleColors)
+  const [roleColor, setRoleColor] = useState(roleColors);
 
   const addNewStateOrRole = (value, color, newStateOrRoleName) => {
-
     if (newStateOrRoleName) {
       let newId = Math.max(...Object.values(states)) + 1;
 
@@ -95,12 +103,12 @@ const WorkflowCreator = () => {
 
           const newRolesObj = {
             ...roles,
-            [newStateOrRoleName]: newId
+            [newStateOrRoleName]: newId,
           };
 
           setRoles(newRolesObj);
-          setRoleColor({...roleColor, [newStateOrRoleName]: color})
-          console.log(roleColor)
+          setRoleColor({ ...roleColor, [newStateOrRoleName]: color });
+          console.log(roleColor);
           setAllEdges({ ...allEdges, [newStateOrRoleName]: [] });
           setAllCanSeeStates({ ...allCanSeeStates, [newStateOrRoleName]: [] });
           break;
@@ -124,7 +132,7 @@ const WorkflowCreator = () => {
 
       setAllCanSeeStates({
         ...allCanSeeStates,
-        [activeRole]: activeRoleCanSee
+        [activeRole]: activeRoleCanSee,
       });
     },
     [activeRole, allCanSeeStates, setAllCanSeeStates]
@@ -135,10 +143,10 @@ const WorkflowCreator = () => {
       setEdges((eds) => {
         const updatedEdges = [
           ...(allEdges?.[activeRole] || []),
-          ...eds.slice(-1)
+          ...eds.slice(-1),
         ].map((edg, i) => ({
           ...edg,
-          id: `${edg.id + i}`
+          id: `${edg.id + i}`,
           // type: "smoothstep"
         }));
 
@@ -156,7 +164,7 @@ const WorkflowCreator = () => {
       setNodes(
         nodes.map((n) => ({
           ...n,
-          data: { ...n?.data, color: roleColor?.[activeRole] || '#d4d4d4' }
+          data: { ...n?.data, color: roleColor?.[activeRole] || "#d4d4d4" },
         }))
       );
     }
@@ -176,7 +184,7 @@ const WorkflowCreator = () => {
 
     const updatedEdges = {
       ...allEdges,
-      [activeRole]: uniqueEdges(edges)
+      [activeRole]: uniqueEdges(edges),
     };
 
     if (!isEqual(allEdges, updatedEdges)) {
@@ -204,14 +212,14 @@ const WorkflowCreator = () => {
 
       const position = reactFlowInstance.project({
         x: event.clientX - reactFlowBounds.left,
-        y: event.clientY - reactFlowBounds.top
+        y: event.clientY - reactFlowBounds.top,
       });
 
       const newNode = {
         id: getId(),
         type: "custom",
         position,
-        data: { label: type, color: roleColor[activeRole], toggleCanSeeState }
+        data: { label: type, color: roleColor[activeRole], toggleCanSeeState },
       };
 
       setNodes((nds) => nds.concat(newNode));
@@ -236,57 +244,61 @@ const WorkflowCreator = () => {
         ({ source, target }) => {
           return {
             source: findStateNameByNode(source),
-            target: findStateNameByNode(target)
+            target: findStateNameByNode(target),
           };
         }
-      )
-    }
+      ),
+    },
   };
 
   return (
     <>
-      <FluentProvider theme={darkMode ? teamsHighContrastTheme : teamsLightTheme} style={{width: '100%', height: '100%'}}>
-    <div className="dndflow">
-      <ReactFlowProvider>
-        <div className="reactflow-wrapper" ref={reactFlowWrapper}>
-    <header className={style.header}>
-      <Text className={style.headerText}>{activeRole}</Text>
-    </header>
-          <ReactFlow
-            nodes={nodes.map((node) => ({
-              ...node,
-              data: {
-                ...node.data,
-                toggleCanSeeState,
-                isCanSee: allCanSeeStates?.[activeRole]?.includes(node.id)
-              }
-            }))}
-            edges={allEdges?.[activeRole] || []}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            onInit={setReactFlowInstance}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            fitView
-            nodeTypes={nodeTypes}
-            edgeTypes={edgeTypes}
-            defaultEdgeOptions={defaultEdgeOptions}
-            connectionLineComponent={CustomConnectionLine}
-            connectionLineStyle={connectionLineStyle}
-          >
-          </ReactFlow>
-            <Controls />
+      <FluentProvider
+        theme={darkMode ? teamsHighContrastTheme : teamsLightTheme}
+        style={{ width: "100%", height: "100%" }}
+      >
+        <div className="dndflow">
+          <ReactFlowProvider>
+            <div className="reactflow-wrapper" ref={reactFlowWrapper}>
+              <header className={style.header}>
+                  <Text size={600} weight="bold" align="center">
+                    {activeRole}
+                  </Text>
+              </header>
+              <ReactFlow
+                nodes={nodes.map((node) => ({
+                  ...node,
+                  data: {
+                    ...node.data,
+                    toggleCanSeeState,
+                    isCanSee: allCanSeeStates?.[activeRole]?.includes(node.id),
+                  },
+                }))}
+                edges={allEdges?.[activeRole] || []}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
+                onConnect={onConnect}
+                onInit={setReactFlowInstance}
+                onDrop={onDrop}
+                onDragOver={onDragOver}
+                fitView
+                nodeTypes={nodeTypes}
+                edgeTypes={edgeTypes}
+                defaultEdgeOptions={defaultEdgeOptions}
+                connectionLineComponent={CustomConnectionLine}
+                connectionLineStyle={connectionLineStyle}
+              ></ReactFlow>
+              <Controls />
+            </div>
+            <Sidebar
+              stateList={filteredStates}
+              roleList={Object.keys(roles)}
+              setActiveRole={setActiveRole}
+              output={outputJSON}
+              addNewStateOrRole={addNewStateOrRole}
+            />
+          </ReactFlowProvider>
         </div>
-        <Sidebar
-          stateList={filteredStates}
-          roleList={Object.keys(roles)}
-          setActiveRole={setActiveRole}
-          output={outputJSON}
-          addNewStateOrRole={addNewStateOrRole}
-        />
-      </ReactFlowProvider>
-    </div>
       </FluentProvider>
     </>
   );
