@@ -13,10 +13,10 @@ import "./css/style.css";
 import { RoleList, StateList, roleColors } from "./data/data";
 import initialNodes from "./data/initialNodes";
 
-// don't do this
 const initialRole = "Intake-Specialist";
 const initialAllEdges: any = {};
 const initialAllStates: any = {};
+
 Object.keys(RoleList).forEach((role) => {
   initialAllEdges[role] = [];
   initialAllStates[role] = [];

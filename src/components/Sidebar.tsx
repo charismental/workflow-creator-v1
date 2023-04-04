@@ -35,6 +35,7 @@ const useStyles = makeStyles({
     ...shorthands.margin(0, 0, "20px", 0),
   },
 });
+
 interface SideBarProps {
   stateList: string[];
   roleList: string[];

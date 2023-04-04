@@ -12,7 +12,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
     event.stopPropagation();
     if (data?.setEdges)
       // not sure if need/want to type edges
-      data.setEdges((edges:any) => edges.filter((ed:any) => ed.id !== id));
+      data.setEdges((edges: any) => edges.filter((ed: any) => ed.id !== id));
   };
 
   const sourceNode = useReactFlowStore(
@@ -58,7 +58,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
             className="edgebutton"
             onClick={(event) => onEdgeClick(event, id)}
             icon={<DismissCircle24Regular />}
-         />
+          />
         </div>
       </foreignObject>
     </>
@@ -66,40 +66,3 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 }
 
 export default FloatingEdge;
-
-// import React from "react";
-// import { getBezierPath } from "reactflow";
-
-// export default function CustomEdge({
-//   id,
-//   sourceX,
-//   sourceY,
-//   targetX,
-//   targetY,
-//   sourcePosition,
-//   targetPosition,
-//   style = {},
-//   data,
-//   markerEnd
-// }) {
-//   const [edgePath] = getBezierPath({
-//     sourceX,
-//     sourceY,
-//     sourcePosition,
-//     targetX,
-//     targetY,
-//     targetPosition
-//   });
-
-//   return (
-//     <>
-//       <path
-//         id={id}
-//         style={style}
-//         className="react-flow__edge-path"
-//         d={edgePath}
-//         markerEnd={markerEnd}
-//       />
-//     </>
-//   );
-// }
