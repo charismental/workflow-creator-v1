@@ -6,13 +6,14 @@ import ReactFlow, {
   EdgeTypes,
   ReactFlowInstance,
   addEdge,
-  useEdgesState
+  useEdgesState,
+  Background,
+  BackgroundVariant,
 } from "reactflow";
 
 import defaultEdgeOptions from "data/defaultEdgeOptions";
 import isEqual from "lodash.isequal";
 import "reactflow/dist/style.css";
-import getId from "utils/getId";
 import CustomConnectionLine from "../components/CustomConnectionLine";
 import FloatingEdge from "../components/FloatingEdge";
 import StateNode from "../components/StateNode";
@@ -51,6 +52,8 @@ const edgeTypes: EdgeTypes = {
 };
 
 let id = 11;
+
+const getId = () => `dndnode_${++id}`
 
 interface ReactFlowBaseProps {
   allCanSeeStates: any;
@@ -178,7 +181,8 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
       });
 
       const newNode = {
-        id: getId(id),
+        id: getId(),
+        dragHandle: ".drag-handle",
         type: "custom",
         position,
         data: {
@@ -224,6 +228,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
           connectionLineComponent={CustomConnectionLine}
           connectionLineStyle={connectionLineStyle}
         >
+          <Background variant={BackgroundVariant.Dots} />
           <Controls />
         </ReactFlow>
       </div>

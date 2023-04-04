@@ -1,5 +1,5 @@
 import { Checkbox, makeStyles } from '@fluentui/react-components';
-import { FunctionComponent } from "react";
+import { FunctionComponent, useState } from "react";
 import {
   Handle,
   NodeProps,
@@ -17,7 +17,9 @@ const useStyles = makeStyles({
     cursor: "pointer",
     width: "20px",
     height: "20px",
-    left: "85%",
+    right: "10px",
+    top: "10px",
+    transform: "translateY(-50%)",
   }
 })
 
@@ -28,6 +30,7 @@ const StateNode: FunctionComponent<NodeProps> = ({
   isConnectable,
   data,
 }): JSX.Element => {
+  const [isMouseOver, setIsMouseOver] = useState(false);
   const style = useStyles();
   const { toggleCanSeeState, isCanSee = false } = data;
 
@@ -56,44 +59,44 @@ const StateNode: FunctionComponent<NodeProps> = ({
     deleteElements({ nodes: [node], edges: connectedEdges });
   };
 
-  return (
-      <div className="stateNode">
-        <div
-          className="stateNodeBody"
-          style={{
-            borderStyle: isTarget ? "dashed" : "solid",
-            backgroundColor: isTarget ? "#ffcce3" : data?.color || "#ccd9f6",
-          }}
-        >
-          <NodeResizer isVisible={true} minWidth={180} minHeight={100} />
-          {!isTarget && (
-            <>
-              <Checkbox
-                className={style.checkboxStyle}
-                checked={isCanSee}
-                onChange={() => toggleCanSeeState(id)}
-              />
-              <div className="state-delete-button" onClick={removeNode} />
-            </>
-          )}
+  const minWidth = 200;
+  const minHeight = 30;
 
-          <Handle
-            className="targetHandle"
-            style={{ zIndex: 2 }}
-            position={Position.Top}
-            type="source"
-            isConnectable={isConnectable}
+  return (
+    <div className="stateNodeBody" onMouseOver={() => setIsMouseOver(true)} onMouseOut={() => setIsMouseOver(false)} style={{
+      minHeight,
+      minWidth,
+      borderStyle: isTarget ? "dashed" : "solid",
+      backgroundColor: isTarget ? "#ffcce3" : data?.color || "#ccd9f6",
+    }}>
+      <NodeResizer isVisible={true} minWidth={200} minHeight={30} handleStyle={{ zIndex: 400 }} />
+      {!isTarget && isMouseOver && (
+        <>
+          <Checkbox
+            className={style.checkboxStyle}
+            checked={isCanSee}
+            onChange={() => toggleCanSeeState(id)}
           />
-          <Handle
-            className="targetHandle"
-            style={targetHandleStyle}
-            position={Position.Bottom}
-            type="target"
-            isConnectable={isConnectable}
-          />
-          {updatedLabel}
-        </div>
-      </div>
+          <div className="state-delete-button" onClick={removeNode} />
+        </>
+      )}
+
+      <Handle
+        className="targetHandle"
+        style={{ zIndex: 2 }}
+        position={Position.Top}
+        type="source"
+        isConnectable={isConnectable}
+      />
+      <Handle
+        className="targetHandle"
+        style={targetHandleStyle}
+        position={Position.Bottom}
+        type="target"
+        isConnectable={isConnectable}
+      />
+      {updatedLabel}
+    </div>
   );
 };
 

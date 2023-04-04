@@ -60,7 +60,6 @@ const WorkflowCreator = () => {
 
           setRoles(newRolesObj);
           setRoleColor({ ...roleColor, [newStateOrRoleName]: color });
-          console.log(roleColor);
           setAllEdges({ ...allEdges, [newStateOrRoleName]: [] });
           setAllCanSeeStates({ ...allCanSeeStates, [newStateOrRoleName]: [] });
           break;

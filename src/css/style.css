@@ -5,8 +5,7 @@
 }
 
 .stateNodeBody {
-  width: 220px;
-  height: 30px;
+  height: 100%;
   border: 1px solid black;
   position: relative;
   overflow: hidden;
@@ -17,25 +16,14 @@
   color: #fff;
 }
 
-.stateNode {
-  position: unset;
-}
-
-/* corner dragger thingy */
-.stateNode .drag-handle:before {
+.stateNodeBody.drag-handle:before {
   content: "";
   position: absolute;
-  top: -8px;
-  left: -8px;
-  height: 16px;
-  width: 16px;
-  background: #d6d5e6;
+  height: 100%;
+  width: 100%;
   z-index: 1000;
   line-height: 1;
   border-radius: 4px;
-  color: #fff;
-  font-size: 9px;
-  border: 2px solid #222138;
 }
 
 div.sourceHandle {
