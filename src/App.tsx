@@ -25,7 +25,8 @@ Object.keys(RoleList).forEach((role) => {
 const WorkflowCreator = () => {
   const { darkMode } = useMainStore();
   const [activeRole, setActiveRole] = useState(initialRole);
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  // const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [allEdges, setAllEdges] = useState(initialAllEdges);
   const [allCanSeeStates, setAllCanSeeStates] = useState(initialAllStates);
   const [states, setState] = useState(StateList);

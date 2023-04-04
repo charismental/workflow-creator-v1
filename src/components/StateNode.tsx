@@ -7,6 +7,7 @@ import {
   getConnectedEdges,
   useReactFlow,
   useStore as useReactFlowStore,
+  NodeResizer
 } from "reactflow";
 
 const useStyles = makeStyles({
@@ -56,42 +57,43 @@ const StateNode: FunctionComponent<NodeProps> = ({
   };
 
   return (
-    <div className="stateNode">
-      <div
-        className="stateNodeBody"
-        style={{
-          borderStyle: isTarget ? "dashed" : "solid",
-          backgroundColor: isTarget ? "#ffcce3" : data?.color || "#ccd9f6",
-        }}
-      >
-        {!isTarget && (
-          <>
-            <Checkbox
-              className={style.checkboxStyle}
-              checked={isCanSee}
-              onChange={() => toggleCanSeeState(id)}
-            />
-            <div className="state-delete-button" onClick={removeNode} />
-          </>
-        )}
+      <div className="stateNode">
+        <div
+          className="stateNodeBody"
+          style={{
+            borderStyle: isTarget ? "dashed" : "solid",
+            backgroundColor: isTarget ? "#ffcce3" : data?.color || "#ccd9f6",
+          }}
+        >
+          <NodeResizer isVisible={true} minWidth={180} minHeight={100} />
+          {!isTarget && (
+            <>
+              <Checkbox
+                className={style.checkboxStyle}
+                checked={isCanSee}
+                onChange={() => toggleCanSeeState(id)}
+              />
+              <div className="state-delete-button" onClick={removeNode} />
+            </>
+          )}
 
-        <Handle
-          className="targetHandle"
-          style={{ zIndex: 2 }}
-          position={Position.Top}
-          type="source"
-          isConnectable={isConnectable}
-        />
-        <Handle
-          className="targetHandle"
-          style={targetHandleStyle}
-          position={Position.Bottom}
-          type="target"
-          isConnectable={isConnectable}
-        />
-        {updatedLabel}
+          <Handle
+            className="targetHandle"
+            style={{ zIndex: 2 }}
+            position={Position.Top}
+            type="source"
+            isConnectable={isConnectable}
+          />
+          <Handle
+            className="targetHandle"
+            style={targetHandleStyle}
+            position={Position.Bottom}
+            type="target"
+            isConnectable={isConnectable}
+          />
+          {updatedLabel}
+        </div>
       </div>
-    </div>
   );
 };
 
