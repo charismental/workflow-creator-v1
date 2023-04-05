@@ -1,4 +1,3 @@
-import { Text, makeStyles, shorthands } from '@fluentui/react-components';
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
   Controls,
@@ -18,23 +17,6 @@ import CustomConnectionLine from "../components/CustomConnectionLine";
 import FloatingEdge from "../components/FloatingEdge";
 import StateNode from "../components/StateNode";
 import "../css/style.css";
-
-const useStyles = makeStyles({
-  header: {
-    width: "100%",
-    height: "10%",
-    ...shorthands.borderBottom("1px", "solid", "black"),
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerText: {
-    textAlign: "center",
-    fontSize: "20px",
-    fontWeight: "bold",
-  },
-});
 
 const initialEdges: Edge[] = [];
 
@@ -70,7 +52,6 @@ interface ReactFlowBaseProps {
 
 
 const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
-  const style = useStyles()
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>(initialEdges);
   const [reactFlowInstance, setReactFlowInstance] =
@@ -200,11 +181,6 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   return (
     <>
       <div className="reactflow-wrapper" ref={reactFlowWrapper}>
-        <header className={style.header}>
-          <Text size={600} weight="bold" align="center">
-            {props.activeRole}
-          </Text>
-        </header>
         <ReactFlow
           nodes={props.nodes.map((node: any) => ({
             ...node,

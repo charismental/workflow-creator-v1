@@ -1,17 +1,13 @@
-import {
-  FluentProvider,
-  teamsHighContrastTheme,
-  teamsLightTheme,
-} from "@fluentui/react-components";
+import "reactflow/dist/style.css";
 import ReactFlowBase from "components/ReactFlowBase";
 import { useState } from "react";
 import { ReactFlowProvider, useNodesState } from "reactflow";
-import "reactflow/dist/style.css";
-import { useMainStore } from "store";
+import { Layout, Space, Typography } from 'antd';
 import Sidebar from "./components/Sidebar";
 import "./css/style.css";
 import { RoleList, StateList, roleColors } from "./data/data";
 import initialNodes from "./data/initialNodes";
+import ProcessSelector from "components/ProcessSelector";
 
 const initialRole = "Intake-Specialist";
 const initialAllEdges: any = {};
@@ -22,8 +18,10 @@ Object.keys(RoleList).forEach((role) => {
   initialAllStates[role] = [];
 });
 
+const { Header, Content } = Layout;
+const { Title } = Typography;
+
 const WorkflowCreator = () => {
-  const { darkMode } = useMainStore();
   const [activeRole, setActiveRole] = useState(initialRole);
   // const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -94,12 +92,15 @@ const WorkflowCreator = () => {
   };
 
   return (
-    <>
-      <FluentProvider
-        theme={darkMode ? teamsHighContrastTheme : teamsLightTheme}
-        style={{ width: "100%", height: "100%" }}
-      >
-        <div className="dndflow">
+    <Space direction="vertical" style={{ width: '100%' }}>
+      <Layout style={{ width: '100%', height: '100vh' }}>
+        <Header style={{ backgroundColor: '#fff', padding: '0 25px' }}>
+          <ProcessSelector useStyle={{ width: '300px' }} />
+          <Title level={2} style={{ textAlign: 'center', display: 'inline-block' }}>
+            {activeRole}
+          </Title>
+        </Header>
+        <Content className="dndflow">
           <ReactFlowProvider>
             <ReactFlowBase
               allCanSeeStates={allCanSeeStates}
@@ -120,9 +121,9 @@ const WorkflowCreator = () => {
               addNewStateOrRole={addNewStateOrRole}
             />
           </ReactFlowProvider>
-        </div>
-      </FluentProvider>
-    </>
+        </Content>
+      </Layout>
+    </Space>
   );
 };
 
