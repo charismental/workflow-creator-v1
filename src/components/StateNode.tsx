@@ -1,27 +1,25 @@
-import { Checkbox, makeStyles } from '@fluentui/react-components';
-import { FunctionComponent, useState } from "react";
+import { Checkbox } from "antd";
+import { CSSProperties, FunctionComponent, useState } from "react";
 import {
   Handle,
   NodeProps,
+  NodeResizer,
   Position,
   getConnectedEdges,
   useReactFlow,
   useStore as useReactFlowStore,
-  NodeResizer
 } from "reactflow";
 
-const useStyles = makeStyles({
-  checkboxStyle: {
-    position: "absolute",
-    zIndex: 100,
-    cursor: "pointer",
-    width: "20px",
-    height: "20px",
-    right: "10px",
-    top: "10px",
-    transform: "translateY(-50%)",
-  }
-})
+const checkboxStyle: CSSProperties = {
+  position: "absolute",
+  zIndex: 100,
+  cursor: "pointer",
+  width: "20px",
+  height: "20px",
+  right: "10px",
+  top: "10px",
+  transform: "translateY(-50%)",
+};
 
 const connectionNodeIdSelector = (state: any) => state.connectionNodeId;
 
@@ -31,7 +29,6 @@ const StateNode: FunctionComponent<NodeProps> = ({
   data,
 }): JSX.Element => {
   const [isMouseOver, setIsMouseOver] = useState(false);
-  const style = useStyles();
   const { toggleCanSeeState, isCanSee = false } = data;
 
   const { getNode, getEdges, deleteElements } = useReactFlow();
@@ -63,17 +60,27 @@ const StateNode: FunctionComponent<NodeProps> = ({
   const minHeight = 30;
 
   return (
-    <div className="stateNodeBody" onMouseOver={() => setIsMouseOver(true)} onMouseOut={() => setIsMouseOver(false)} style={{
-      minHeight,
-      minWidth,
-      borderStyle: isTarget ? "dashed" : "solid",
-      backgroundColor: isTarget ? "#ffcce3" : data?.color || "#ccd9f6",
-    }}>
-      <NodeResizer isVisible={true} minWidth={200} minHeight={30} handleStyle={{ zIndex: 400 }} />
+    <div
+      className="stateNodeBody"
+      onMouseOver={() => setIsMouseOver(true)}
+      onMouseOut={() => setIsMouseOver(false)}
+      style={{
+        minHeight,
+        minWidth,
+        borderStyle: isTarget ? "dashed" : "solid",
+        backgroundColor: isTarget ? "#ffcce3" : data?.color || "#ccd9f6",
+      }}
+    >
+      <NodeResizer
+        isVisible={true}
+        minWidth={200}
+        minHeight={30}
+        handleStyle={{ zIndex: 400 }}
+      />
       {!isTarget && isMouseOver && (
         <>
           <Checkbox
-            className={style.checkboxStyle}
+            style={checkboxStyle}
             checked={isCanSee}
             onChange={() => toggleCanSeeState(id)}
           />

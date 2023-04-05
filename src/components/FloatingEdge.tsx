@@ -1,5 +1,5 @@
-import { Button } from '@fluentui/react-components';
-import { DismissCircle24Regular } from '@fluentui/react-icons';
+import { CloseCircleOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
 import { FunctionComponent, useCallback } from "react";
 import { EdgeProps, getStraightPath, useStore as useReactFlowStore } from "reactflow";
 import { getEdgeParams } from "../utils";
@@ -8,7 +8,7 @@ const foreignObjectSize = 40;
 
 
 const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd, style, data }) => {
-  const onEdgeClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: string) => {
+  const onEdgeClick = (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>, id: string) => {
     event.stopPropagation();
     if (data?.setEdges)
       // not sure if need/want to type edges
@@ -57,7 +57,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
           <Button
             className="edgebutton"
             onClick={(event) => onEdgeClick(event, id)}
-            icon={<DismissCircle24Regular />}
+            icon={<CloseCircleOutlined />}
           />
         </div>
       </foreignObject>

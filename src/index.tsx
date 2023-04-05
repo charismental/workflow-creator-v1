@@ -1,4 +1,3 @@
-import { FluentProvider, webLightTheme } from "@fluentui/react-components";
 import { createRoot } from "react-dom/client";
 import "./css/styles.css";
 
@@ -9,12 +8,4 @@ if (!doc) throw new Error("Failed to find root element");
 
 const root = createRoot(doc);
 
-
-root.render(
-  <FluentProvider
-    theme={ webLightTheme }
-    style={{ height: "100%", width: "100%" }}
-  >
-    <App />
-  </FluentProvider>
-);
+root.render(<App />);

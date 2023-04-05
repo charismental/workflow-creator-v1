@@ -1,40 +1,9 @@
-import {
-  Button,
-  ButtonProps,
-  Card,
-  CardHeader,
-  CardPreview,
-  Input,
-  Label,
-  Select,
-  Switch,
-  Text,
-  makeStyles,
-  shorthands,
-  useId,
-} from "@fluentui/react-components";
-import { AddSquare24Regular } from "@fluentui/react-icons";
-import { FC, FormEventHandler, useState } from "react";
-import { useMainStore } from "store";
+import { Space, Typography } from "antd";
+import { FC } from "react";
+import SelectBox from "./SelectBox";
+import styles from "./Sidebar.module.css";
 
-const useStyles = makeStyles({
-  card: {
-    ...shorthands.border("1px", "solid", "black"),
-    ...shorthands.borderRadius("20px"),
-    ...shorthands.margin('20px', 0)
-  },
-  roleNameInput: {
-    maxWidth: "90%",
-    ...shorthands.margin(0, "auto"),
-  },
-  formTitleBar: {
-    textAlign: "center",
-    fontSize: "18px",
-    fontWeight: "bold",
-    ...shorthands.borderBottom("1px", "solid", "black"),
-    ...shorthands.margin(0, 0, "20px", 0),
-  },
-});
+const { Paragraph } = Typography;
 
 interface SideBarProps {
   stateList: string[];
@@ -44,144 +13,33 @@ interface SideBarProps {
   addNewStateOrRole: (value: string, color?: string, name?: string) => void;
 }
 
-const AddButton: FC<ButtonProps> = (props) => {
-  return (
-    <Button
-      {...props}
-      appearance={"transparent"}
-      icon={<AddSquare24Regular />}
-      size={"small"}
-    />
-  );
-};
-
 const Sidebar: FC<SideBarProps> = ({
   stateList,
   roleList,
   setActiveRole,
-  output,
   addNewStateOrRole,
+  output,
 }): JSX.Element => {
-  const style = useStyles();
-  const colorId = useId("input-color");
-  const roleNameId = useId("input-rolename");
-  const stateNameId = useId("input-statename");
-  const [color, setColor] = useState("#d4d4d4");
-  const [roleName, setRoleName] = useState("");
-  const [stateName, setStateName] = useState("");
-  const onDragStart = (event: any, nodeType: any) => {
-    event.dataTransfer.setData("application/reactflow", nodeType);
-    event.dataTransfer.effectAllowed = "move";
-  };
-
-  const submitForm: FormEventHandler<HTMLFormElement> = (e) => (
-    e.preventDefault(),
-    addNewStateOrRole("role", color, roleName),
-    setRoleName("")
-  );
-  const {darkMode} = useMainStore()
-  const updatedarkmode = useMainStore((state) => state.updateDarkMode);
   return (
     <aside>
-      <Switch onChange={updatedarkmode} />
-
-      <Card className={style.card}>
-        <CardHeader
-          header={<Text className={style.formTitleBar}>Add a role</Text>}
-        />
-        <CardPreview style={{ marginLeft: "auto", marginRight: "auto" }}>
-          <form onSubmit={submitForm}>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-evenly",
-              }}
-            >
-              <div style={{ marginBottom: "10px" }}>
-                <Label htmlFor={colorId}>Choose Color: </Label>
-                <input
-                  id={colorId}
-                  type="color"
-                  value={color}
-                  onChange={(e) => setColor(e.target.value)}
-                />
-              </div>
-              <div style={{ marginBottom: "10px" }}>
-                <Label htmlFor={roleNameId}>Role Name: </Label>
-                <Input
-                  className={style.roleNameInput}
-                  type="text"
-                  appearance="outline"
-                  id={roleNameId}
-                  value={roleName}
-                  onChange={(e) => setRoleName(e.target.value)}
-                  contentAfter={<AddButton type="submit" />}
-                />
-              </div>
-            </div>
-          </form>
-        </CardPreview>
-      </Card>
-      <Card className={style.card}>
-        <CardHeader
-          header={<Text className={style.formTitleBar}>Add State</Text>}
-        />
-        <CardPreview style={{ marginLeft: "auto", marginRight: "auto" }}>
-          <form
-            onSubmit={(e) => (
-              e.preventDefault(),
-              addNewStateOrRole("state", "", stateName),
-              setStateName("")
-            )}
-          >
-            <div style={{ marginBottom: "10px" }}>
-              <Label htmlFor={stateNameId}>State Name: </Label>
-              <Input
-                className={style.roleNameInput}
-                type="text"
-                appearance="outline"
-                id={stateNameId}
-                value={stateName}
-                onChange={(e) => setStateName(e.target.value)}
-                contentAfter={<AddButton type="submit" />}
-              />
-            </div>
-          </form>
-        </CardPreview>
-      </Card>
-
-      <Text className="description">States:</Text>
-      {stateList.map((state) => {
-        return (
-          <Text
-            key={state}
-            className="dndnode"
-            onDragStart={(event) => onDragStart(event, state)}
-            draggable
-          >
-            {state}
-          </Text>
-        );
-      })}
-      <Select
-        className="form-control"
-        onChange={(e) => setActiveRole(e.target.value)}
-      >
-        {roleList.map((roleKey) => {
-          return (
-            <option key={roleKey} value={roleKey}>
-              {roleKey}
-            </option>
-          );
-        })}
-      </Select>
-      
-      <pre style={darkMode ? {backgroundColor: 'darkblue'}: {backgroundColor: 'beige', color:'green'}} >{JSON.stringify(output, null, 2)}</pre>
+      <Space direction="vertical" size="small" style={{display: 'flex'}}>
+      <Paragraph className={styles.formTitleBar}>Add State</Paragraph>
+      <SelectBox
+        addNewStateOrRole={addNewStateOrRole}
+        items={stateList}
+        type={"state"}
+      />
+      <Paragraph className={styles.formTitleBar}>Add Role</Paragraph>
+      <SelectBox
+        addNewStateOrRole={addNewStateOrRole}
+        items={roleList}
+        type={"role"}
+        setActiveRole={setActiveRole}
+      />
+      <pre>{JSON.stringify(output, null, 2)}</pre>
+      </Space>
     </aside>
   );
 };
 
 export default Sidebar;
-
-
