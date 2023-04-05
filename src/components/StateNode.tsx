@@ -17,7 +17,7 @@ const checkboxStyle: CSSProperties = {
   width: "20px",
   height: "20px",
   right: "5px",
-  bottom: "5px"
+  top: "3px"
 };
 
 const connectionNodeIdSelector = (state: any) => state.connectionNodeId;
