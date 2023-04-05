@@ -94,16 +94,16 @@ const WorkflowCreator = () => {
 
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
-      <Layout style={{ width: '100%', height: '100vh' }}>
-        <Layout>
-          <Header style={{ backgroundColor: '#fff', padding: '25px', height: '80px', display: 'inline-flex', justifyContent: 'space-between' }}>
-            <SelectBox useStyle={{ width: '300px', display: 'inline-block' }} type="process" selectValue="Test Workflow" items={['Test Workflow']} placeholder="Select Process" />
-            <Title level={2} style={{ display: 'inline-block', marginTop: 0 }}>
-              {activeRole}
-            </Title>
-          </Header>
-          <Content className="dndflow">
-            <ReactFlowProvider>
+      <ReactFlowProvider>
+        <Layout style={{ width: '100%', height: '100vh' }}>
+          <Layout>
+            <Header style={{ backgroundColor: '#fff', padding: '25px', height: '80px', display: 'inline-flex', justifyContent: 'space-between' }}>
+              <SelectBox useStyle={{ width: '300px', display: 'inline-block' }} type="process" selectValue="Test Workflow" items={['Test Workflow']} placeholder="Select Process" />
+              <Title level={2} style={{ display: 'inline-block', marginTop: 0 }}>
+                {activeRole}
+              </Title>
+            </Header>
+            <Content className="dndflow">
               <ReactFlowBase
                 allCanSeeStates={allCanSeeStates}
                 setAllCanSeeStates={setAllCanSeeStates}
@@ -115,18 +115,18 @@ const WorkflowCreator = () => {
                 setNodes={setNodes}
                 onNodesChange={onNodesChange}
               />
-            </ReactFlowProvider>
-          </Content>
+            </Content>
+          </Layout>
+          <Sidebar
+            activeRole={activeRole}
+            stateList={filteredStates}
+            roleList={Object.keys(roles)}
+            setActiveRole={setActiveRole}
+            output={outputJSON}
+            addNewStateOrRole={addNewStateOrRole}
+          />
         </Layout>
-        <Sidebar
-          activeRole={activeRole}
-          stateList={filteredStates}
-          roleList={Object.keys(roles)}
-          setActiveRole={setActiveRole}
-          output={outputJSON}
-          addNewStateOrRole={addNewStateOrRole}
-        />
-      </Layout>
+      </ReactFlowProvider>
     </Space>
   );
 };

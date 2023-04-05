@@ -28,6 +28,7 @@ const Sidebar: FC<SideBarProps> = ({
         addNew={addNewStateOrRole}
         items={stateList}
         type={"state"}
+        isDraggable
         placeholder="Select State"
       />
       <SelectBox
@@ -36,6 +37,7 @@ const Sidebar: FC<SideBarProps> = ({
         selectValue={activeRole}
         items={roleList}
         type={"role"}
+        hasColorInput
         selectOnChange={setActiveRole}
       />
       <pre>{JSON.stringify(output, null, 2)}</pre>

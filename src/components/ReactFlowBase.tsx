@@ -129,7 +129,6 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
     if (!isEqual(props.allEdges, updatedEdges)) {
       props.setAllEdges(updatedEdges);
-      // console.log(JSON.stringify(allEdges, null, 2));
     }
   }, [edges]);
 

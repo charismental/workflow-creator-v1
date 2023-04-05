@@ -16,9 +16,8 @@ const checkboxStyle: CSSProperties = {
   cursor: "pointer",
   width: "20px",
   height: "20px",
-  right: "10px",
-  top: "10px",
-  transform: "translateY(-50%)",
+  right: "5px",
+  bottom: "5px"
 };
 
 const connectionNodeIdSelector = (state: any) => state.connectionNodeId;

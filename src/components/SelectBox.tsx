@@ -19,7 +19,9 @@ interface SelectBoxProps {
   useStyle?: any;
   selectOnChange?: (value: string) => void;
   addNew?: (type: string, color?: string, label?: string) => void;
+  isDraggable?: boolean;
   placeholder?: string;
+  hasColorInput?: boolean;
 }
 
 const SelectBox: React.FC<SelectBoxProps> = ({
@@ -30,9 +32,13 @@ const SelectBox: React.FC<SelectBoxProps> = ({
   useStyle = {},
   type,
   placeholder,
+  isDraggable = false,
+  hasColorInput = false,
 }) => {
   const [color, setColor] = useState("#d4d4d4");
   const [name, setName] = useState("");
+  const [resetKey, setResetKey] = useState(Math.random())
+  const [dragPreventBlur, setDragPreventBlur] = useState<boolean | undefined>(undefined);
   const inputRef = useRef<InputRef>(null);
 
   const onDragStart = (event: any, nodeType: any) => {
@@ -57,7 +63,9 @@ const SelectBox: React.FC<SelectBoxProps> = ({
 
   return (
     <Select
+      key={resetKey}
       value={selectValue}
+      open={dragPreventBlur}
       style={{ width: '100%', ...useStyle }}
       placeholder={placeholder}
       optionLabelProp="children"
@@ -74,51 +82,48 @@ const SelectBox: React.FC<SelectBoxProps> = ({
                   value={name}
                   onChange={onNameChange}
                 />
-                {type === "state" && (
-                  <Button
-                    type="text"
-                    icon={<PlusOutlined />}
-                    onClick={addNewItem}
-                  ></Button>
+                {hasColorInput && (
+                  <input
+                    type="color"
+                    name="color"
+                    id="colorRef"
+                    value={color}
+                    style={{ marginLeft: '8px' }}
+                    onChange={(e) => setColor(e.target.value)}
+                  />
                 )}
-                {type === "role" && (
-                  <>
-                    {" "}
-                    <input
-                      type="color"
-                      name="color"
-                      id="colorRef"
-                      value={color}
-                      onChange={(e) => setColor(e.target.value)}
-                    />
-                    <Button
-                      type="text"
-                      icon={<PlusOutlined />}
-                      onClick={addNewItem}
-                    ></Button>
-                  </>
-                )}
+                <Button
+                  type="text"
+                  icon={<PlusOutlined />}
+                  onClick={addNewItem}
+                />
               </Space>
             </>}
         </>
       )}
     >
       {items.map((item) => (
-        <Option key={item} value={item} label={item}>
-          {type !== "state" ? (
-            <div onClick={() => selectOnChange && selectOnChange(item)}>
-              {item}
-            </div>
-          ) : (
-            <Tag
+        <Option key={item} label={item}>
+          {isDraggable ? (
+            <div
+              // hacky
               onMouseDown={(e) => {
                 e.stopPropagation();
+                setDragPreventBlur(true);
+                setTimeout(() => {
+                  setDragPreventBlur(undefined)
+                  setResetKey(Math.random())
+                }, 200)
               }}
               draggable
               onDragStart={(event) => onDragStart(event, item)}
             >
               {item}
-            </Tag>
+            </div>
+          ) : (
+            <div onClick={() => selectOnChange && selectOnChange(item)}>
+              {item}
+            </div>
           )}
         </Option>
       ))}
