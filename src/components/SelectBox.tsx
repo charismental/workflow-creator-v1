@@ -6,7 +6,7 @@ import {
   InputRef,
   Select,
   Space,
-  Tag,
+  Checkbox,
 } from "antd";
 import React, { useRef, useState } from "react";
 
@@ -22,6 +22,7 @@ interface SelectBoxProps {
   isDraggable?: boolean;
   placeholder?: string;
   hasColorInput?: boolean;
+  multiselectHandler?: (el: any) => void;
 }
 
 const SelectBox: React.FC<SelectBoxProps> = ({
@@ -32,6 +33,7 @@ const SelectBox: React.FC<SelectBoxProps> = ({
   useStyle = {},
   type,
   placeholder,
+  multiselectHandler,
   isDraggable = false,
   hasColorInput = false,
 }) => {
@@ -68,7 +70,7 @@ const SelectBox: React.FC<SelectBoxProps> = ({
       open={dragPreventBlur}
       style={{ width: '100%', ...useStyle }}
       placeholder={placeholder}
-      optionLabelProp="children"
+      optionLabelProp="label"
       dropdownRender={(menu) => (
         <>
           {menu}
@@ -121,8 +123,12 @@ const SelectBox: React.FC<SelectBoxProps> = ({
               {item}
             </div>
           ) : (
-            <div onClick={() => selectOnChange && selectOnChange(item)}>
-              {item}
+            <div style={{ display: 'flex', justifyContent: 'space-between' }} onClick={() => selectOnChange && selectOnChange(item)}>
+              <div>{item}</div>
+              {multiselectHandler && <Checkbox onClick={(e: any) => {
+                e.stopPropagation()
+                multiselectHandler(item)
+              }} />}
             </div>
           )}
         </Option>

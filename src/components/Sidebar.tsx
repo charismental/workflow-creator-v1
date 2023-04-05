@@ -21,6 +21,10 @@ const Sidebar: FC<SideBarProps> = ({
 }): JSX.Element => {
   const { Sider } = Layout;
 
+  const toggleRoleForProcess = (role: string): void => {
+    console.log('addRoleToProcess', role)
+  };
+
   return (
     <Sider width="300" style={{ backgroundColor: '#fff', padding: '40px 25px' }}>
       <Space direction="vertical" size="small" style={{display: 'flex'}}>
@@ -38,6 +42,7 @@ const Sidebar: FC<SideBarProps> = ({
         items={roleList}
         type={"role"}
         hasColorInput
+        multiselectHandler={toggleRoleForProcess}
         selectOnChange={setActiveRole}
       />
       <pre>{JSON.stringify(output, null, 2)}</pre>

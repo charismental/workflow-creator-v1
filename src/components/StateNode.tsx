@@ -70,9 +70,9 @@ const StateNode: FunctionComponent<NodeProps> = ({
     >
       {isCanSee && <img src={selfArrow} height="20px" width="20px" style={{ position: 'absolute', top: '-20px', right: '20px' }} />}
       <NodeResizer
-        isVisible={true}
-        minWidth={200}
-        minHeight={30}
+        isVisible
+        minWidth={minWidth}
+        minHeight={minHeight}
         handleStyle={{ zIndex: 400 }}
       />
       {!isTarget && isMouseOver && (
