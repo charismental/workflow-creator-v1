@@ -8,7 +8,7 @@
   height: 100%;
   border: 1px solid black;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   justify-content: center;
   align-items: center;

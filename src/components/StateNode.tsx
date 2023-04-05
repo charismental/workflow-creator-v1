@@ -1,5 +1,7 @@
 import { Checkbox } from "antd";
 import { CSSProperties, FunctionComponent, useState } from "react";
+import selfArrow from '../assets/arrow.png';
+
 import {
   Handle,
   NodeProps,
@@ -66,6 +68,7 @@ const StateNode: FunctionComponent<NodeProps> = ({
         backgroundColor: isTarget ? "#ffcce3" : data?.color || "#ccd9f6",
       }}
     >
+      {isCanSee && <img src={selfArrow} height="20px" width="20px" style={{ position: 'absolute', top: '-20px', right: '20px' }} />}
       <NodeResizer
         isVisible={true}
         minWidth={200}
