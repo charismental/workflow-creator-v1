@@ -38,10 +38,6 @@ const StateNode: FunctionComponent<NodeProps> = ({
 
   const targetHandleStyle = { zIndex: isTarget ? 3 : 1 };
 
-  const updatedLabel = isTarget
-    ? "Drop here"
-    : data?.label || "Drag to connect";
-
   const removeNode = () => {
     const node = getNode(id);
 
@@ -102,7 +98,7 @@ const StateNode: FunctionComponent<NodeProps> = ({
         type="target"
         isConnectable={isConnectable}
       />
-      {updatedLabel}
+      {data?.label || 'Unknown State'}
     </div>
   );
 };
