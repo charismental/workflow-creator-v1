@@ -1,32 +1,35 @@
 import { PlusOutlined } from "@ant-design/icons";
 import {
-    Button,
-    Divider,
-    Input,
-    InputRef,
-    Select,
-    Space,
-    Tag,
-    Typography
+  Button,
+  Divider,
+  Input,
+  InputRef,
+  Select,
+  Space,
+  Tag,
 } from "antd";
 import React, { useRef, useState } from "react";
 
 const { Option } = Select;
-const { Text } = Typography;
-let index = 0;
 
 interface SelectBoxProps {
-  type: "role" | "state"; // add "process" later
+  type: 'role' | 'state' | 'process';
   items: string[];
-  setActiveRole?: (value: string) => void;
-  addNewStateOrRole: (value: string, color?: string, name?: string) => void;
+  selectValue?: string;
+  useStyle?: any;
+  selectOnChange?: (value: string) => void;
+  addNew?: (type: string, color?: string, label?: string) => void;
+  placeholder?: string;
 }
 
 const SelectBox: React.FC<SelectBoxProps> = ({
   items,
-  setActiveRole,
-  addNewStateOrRole,
+  selectOnChange,
+  addNew,
+  selectValue,
+  useStyle = {},
   type,
+  placeholder,
 }) => {
   const [color, setColor] = useState("#d4d4d4");
   const [name, setName] = useState("");
@@ -41,11 +44,11 @@ const SelectBox: React.FC<SelectBoxProps> = ({
     setName(event.target.value);
   };
 
-  const addNew = (
+  const addNewItem = (
     e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
   ) => {
     e.preventDefault();
-    addNewStateOrRole(type, color, name);
+    addNew && addNew(type, color, name);
     setName("");
     setTimeout(() => {
       inputRef.current?.focus();
@@ -54,62 +57,63 @@ const SelectBox: React.FC<SelectBoxProps> = ({
 
   return (
     <Select
-      style={{ width: 200 }}
-      placeholder="Add Role"
+      value={selectValue}
+      style={{ width: '100%', ...useStyle }}
+      placeholder={placeholder}
+      optionLabelProp="children"
       dropdownRender={(menu) => (
         <>
           {menu}
-          <Divider style={{ margin: "8px 0" }} />
-          <Space style={{ padding: "0 8px 4px" }}>
-            <Input
-              placeholder={`Add New ${type}`}
-              ref={inputRef}
-              value={name}
-              onChange={onNameChange}
-            />
-            {type === "state" && (
-              <Button
-                type="text"
-                icon={<PlusOutlined />}
-                onClick={addNew}
-              ></Button>
-            )}
-            {type === "role" && (
-              <>
-                {" "}
-                <input
-                  type="color"
-                  name="color"
-                  id="colorRef"
-                  value={color}
-                  onChange={(e) => setColor(e.target.value)}
+          {addNew &&
+            <>
+              <Divider style={{ margin: "8px 0" }} />
+              <Space style={{ padding: "0 8px 4px" }}>
+                <Input
+                  placeholder={`Add New ${type}`}
+                  ref={inputRef}
+                  value={name}
+                  onChange={onNameChange}
                 />
-                <Button
-                  type="text"
-                  icon={<PlusOutlined />}
-                  onClick={addNew}
-                ></Button>
-              </>
-            )}
-          </Space>
+                {type === "state" && (
+                  <Button
+                    type="text"
+                    icon={<PlusOutlined />}
+                    onClick={addNewItem}
+                  ></Button>
+                )}
+                {type === "role" && (
+                  <>
+                    {" "}
+                    <input
+                      type="color"
+                      name="color"
+                      id="colorRef"
+                      value={color}
+                      onChange={(e) => setColor(e.target.value)}
+                    />
+                    <Button
+                      type="text"
+                      icon={<PlusOutlined />}
+                      onClick={addNewItem}
+                    ></Button>
+                  </>
+                )}
+              </Space>
+            </>}
         </>
       )}
     >
       {items.map((item) => (
         <Option key={item} value={item} label={item}>
-          {type === "role" ? (
-            <div>
-              <Text onClick={() => setActiveRole && setActiveRole(item)}>
-                {item}
-              </Text>
+          {type !== "state" ? (
+            <div onClick={() => selectOnChange && selectOnChange(item)}>
+              {item}
             </div>
           ) : (
-            
             <Tag
               onMouseDown={(e) => {
                 e.stopPropagation();
               }}
-              onClick={() => setActiveRole && setActiveRole(item)}
               draggable
               onDragStart={(event) => onDragStart(event, item)}
             >

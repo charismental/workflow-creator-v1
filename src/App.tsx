@@ -8,6 +8,7 @@ import "./css/style.css";
 import { RoleList, StateList, roleColors } from "./data/data";
 import initialNodes from "./data/initialNodes";
 import ProcessSelector from "components/ProcessSelector";
+import SelectBox from "components/SelectBox";
 
 const initialRole = "Intake-Specialist";
 const initialAllEdges: any = {};
@@ -32,18 +33,18 @@ const WorkflowCreator = () => {
   const [roleColor, setRoleColor] = useState(roleColors);
 
   const addNewStateOrRole = (
-    value: string,
+    type: string,
     color: string | undefined,
-    newStateOrRoleName: string | undefined
+    label: string | undefined
   ) => {
-    if (newStateOrRoleName) {
+    if (label) {
       let newId = Math.max(...Object.values(states)) + 1;
 
-      switch (value) {
+      switch (type) {
         case "state":
           const newStatesObj = {
             ...states,
-            [newStateOrRoleName]: newId,
+            [label]: newId,
           };
 
           setState(newStatesObj);
@@ -53,13 +54,13 @@ const WorkflowCreator = () => {
 
           const newRolesObj = {
             ...roles,
-            [newStateOrRoleName]: newId,
+            [label]: newId,
           };
 
           setRoles(newRolesObj);
-          setRoleColor({ ...roleColor, [newStateOrRoleName]: color });
-          setAllEdges({ ...allEdges, [newStateOrRoleName]: [] });
-          setAllCanSeeStates({ ...allCanSeeStates, [newStateOrRoleName]: [] });
+          setRoleColor({ ...roleColor, [label]: color });
+          setAllEdges({ ...allEdges, [label]: [] });
+          setAllCanSeeStates({ ...allCanSeeStates, [label]: [] });
           break;
         default:
           return;
@@ -94,34 +95,37 @@ const WorkflowCreator = () => {
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
       <Layout style={{ width: '100%', height: '100vh' }}>
-        <Header style={{ backgroundColor: '#fff', padding: '0 25px' }}>
-          <ProcessSelector useStyle={{ width: '300px' }} />
-          <Title level={2} style={{ textAlign: 'center', display: 'inline-block' }}>
-            {activeRole}
-          </Title>
-        </Header>
-        <Content className="dndflow">
-          <ReactFlowProvider>
-            <ReactFlowBase
-              allCanSeeStates={allCanSeeStates}
-              setAllCanSeeStates={setAllCanSeeStates}
-              allEdges={allEdges}
-              setAllEdges={setAllEdges}
-              roleColor={roleColor}
-              activeRole={activeRole}
-              nodes={nodes}
-              setNodes={setNodes}
-              onNodesChange={onNodesChange}
-            />
-            <Sidebar
-              stateList={filteredStates}
-              roleList={Object.keys(roles)}
-              setActiveRole={setActiveRole}
-              output={outputJSON}
-              addNewStateOrRole={addNewStateOrRole}
-            />
-          </ReactFlowProvider>
-        </Content>
+        <Layout>
+          <Header style={{ backgroundColor: '#fff', padding: '25px', height: '80px', display: 'inline-flex', justifyContent: 'space-between' }}>
+            <SelectBox useStyle={{ width: '300px', display: 'inline-block' }} type="process" selectValue="Test Workflow" items={['Test Workflow']} placeholder="Select Process" />
+            <Title level={2} style={{ display: 'inline-block', marginTop: 0 }}>
+              {activeRole}
+            </Title>
+          </Header>
+          <Content className="dndflow">
+            <ReactFlowProvider>
+              <ReactFlowBase
+                allCanSeeStates={allCanSeeStates}
+                setAllCanSeeStates={setAllCanSeeStates}
+                allEdges={allEdges}
+                setAllEdges={setAllEdges}
+                roleColor={roleColor}
+                activeRole={activeRole}
+                nodes={nodes}
+                setNodes={setNodes}
+                onNodesChange={onNodesChange}
+              />
+            </ReactFlowProvider>
+          </Content>
+        </Layout>
+        <Sidebar
+          activeRole={activeRole}
+          stateList={filteredStates}
+          roleList={Object.keys(roles)}
+          setActiveRole={setActiveRole}
+          output={outputJSON}
+          addNewStateOrRole={addNewStateOrRole}
+        />
       </Layout>
     </Space>
   );

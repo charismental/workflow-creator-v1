@@ -1,14 +1,12 @@
-import { Space, Typography } from "antd";
+import { Space, Layout } from "antd";
 import { FC } from "react";
 import SelectBox from "./SelectBox";
-import styles from "./Sidebar.module.css";
-
-const { Paragraph } = Typography;
 
 interface SideBarProps {
   stateList: string[];
   roleList: string[];
   setActiveRole: (value: string) => void;
+  activeRole: string;
   output: {};
   addNewStateOrRole: (value: string, color?: string, name?: string) => void;
 }
@@ -18,27 +16,31 @@ const Sidebar: FC<SideBarProps> = ({
   roleList,
   setActiveRole,
   addNewStateOrRole,
+  activeRole,
   output,
 }): JSX.Element => {
+  const { Sider } = Layout;
+
   return (
-    <aside>
+    <Sider width="300" style={{ backgroundColor: '#fff', padding: '40px 25px' }}>
       <Space direction="vertical" size="small" style={{display: 'flex'}}>
-      <Paragraph className={styles.formTitleBar}>Add State</Paragraph>
       <SelectBox
-        addNewStateOrRole={addNewStateOrRole}
+        addNew={addNewStateOrRole}
         items={stateList}
         type={"state"}
+        placeholder="Select State"
       />
-      <Paragraph className={styles.formTitleBar}>Add Role</Paragraph>
       <SelectBox
-        addNewStateOrRole={addNewStateOrRole}
+        addNew={addNewStateOrRole}
+        placeholder="Select Role"
+        selectValue={activeRole}
         items={roleList}
         type={"role"}
-        setActiveRole={setActiveRole}
+        selectOnChange={setActiveRole}
       />
       <pre>{JSON.stringify(output, null, 2)}</pre>
       </Space>
-    </aside>
+    </Sider>
   );
 };
 
