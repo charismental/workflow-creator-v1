@@ -42,7 +42,7 @@ interface ReactFlowBaseProps {
   setAllCanSeeStates: any;
   allEdges: any;
   setAllEdges: any;
-  roleColor: any;
+  roleColors: any;
   activeRole: any;
   nodes: any;
   setNodes: any;
@@ -95,7 +95,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     if (
       props.nodes.length &&
       props.nodes.some(
-        (n: any) => n?.data.color !== props.roleColor[props.activeRole]
+        (n: any) => n?.data.color !== props.roleColors[props.activeRole]
       )
     ) {
       props.setNodes(
@@ -103,12 +103,12 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
           ...n,
           data: {
             ...n?.data,
-            color: props.roleColor?.[props.activeRole] || "#d4d4d4",
+            color: props.roleColors?.[props.activeRole] || "#d4d4d4",
           },
         }))
       );
     }
-
+    // compare edges before doing this?
     setEdges(() => props.allEdges?.[props.activeRole] || []);
   }, [props.activeRole, props.nodes]);
 
@@ -167,7 +167,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
         position,
         data: {
           label: type,
-          color: props.roleColor[props.activeRole],
+          color: props.roleColors[props.activeRole],
           toggleCanSeeState,
         },
       };
