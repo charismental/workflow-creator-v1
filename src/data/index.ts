@@ -22,7 +22,7 @@ export const RoleList = {
   "Customer-Support": 7
 };
 
-export const roleColors = {
+export const initialColors = {
   "Intake-Specialist": "#4672C4",
   "Intake-Specialist Manager": "#90AADB",
   Caseworker: "#A8D08D",

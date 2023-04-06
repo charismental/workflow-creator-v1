@@ -1,14 +1,15 @@
 import "reactflow/dist/style.css";
 import ReactFlowBase from "components/ReactFlowBase";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { ReactFlowProvider, useNodesState } from "reactflow";
 import { Layout, Space, Typography } from 'antd';
 import Sidebar from "./components/Sidebar";
 import "./css/style.css";
-import { RoleList, StateList, roleColors } from "./data/data";
+import { RoleList, StateList, initialColors } from "./data";
 import initialNodes from "./data/initialNodes";
 import ProcessSelector from "components/ProcessSelector";
 import SelectBox from "components/SelectBox";
+import ActiveRoleSettings from "components/ActiveRoleSettings";
 
 const initialRole = "Intake-Specialist";
 const initialAllEdges: any = {};
@@ -30,7 +31,7 @@ const WorkflowCreator = () => {
   const [allCanSeeStates, setAllCanSeeStates] = useState(initialAllStates);
   const [states, setState] = useState(StateList);
   const [roles, setRoles] = useState(RoleList);
-  const [roleColor, setRoleColor] = useState(roleColors);
+  const [roleColors, setRoleColors] = useState<any>(initialColors);
 
   const addNewStateOrRole = (
     type: string,
@@ -58,7 +59,7 @@ const WorkflowCreator = () => {
           };
 
           setRoles(newRolesObj);
-          setRoleColor({ ...roleColor, [label]: color });
+          setRoleColors({ ...roleColors, [label]: color });
           setAllEdges({ ...allEdges, [label]: [] });
           setAllCanSeeStates({ ...allCanSeeStates, [label]: [] });
           break;
@@ -92,16 +93,38 @@ const WorkflowCreator = () => {
     },
   };
 
+  const updateNodesColor = useCallback(() => {
+    setNodes(
+      nodes.map((n: any) => ({
+        ...n,
+        data: {
+          ...n?.data,
+          color: roleColors?.[activeRole] || "#d4d4d4",
+        },
+      }))
+    );
+  }, [activeRole, roleColors, setNodes, nodes])
+
+  const updateColor = useCallback(
+    (updatedColor: string) => {
+      setRoleColors({ ...roleColors, [activeRole]: updatedColor });
+      updateNodesColor();
+    },
+    [activeRole, setRoleColors, roleColors, updateNodesColor]
+  );
+
+
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
       <ReactFlowProvider>
         <Layout style={{ width: '100%', height: '100vh' }}>
           <Layout>
-            <Header style={{ backgroundColor: '#fff', padding: '25px', height: '80px', display: 'inline-flex', justifyContent: 'space-between' }}>
+            <Header style={{ backgroundColor: '#fff', padding: '25px', height: '80px', display: 'inline-flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <SelectBox useStyle={{ width: '300px', display: 'inline-block' }} type="process" selectValue="Test Workflow" items={['Test Workflow']} placeholder="Select Process" />
-              <Title level={2} style={{ display: 'inline-block', marginTop: 0 }}>
+              <Title level={2} style={{ display: 'inline-block', paddingBottom: '18px' }}>
                 {activeRole}
               </Title>
+              <ActiveRoleSettings roleIsToggled={true} updateColor={updateColor} color={roleColors[activeRole]} useStyle={{ lineHeight: 'normal', minWidth: '200px' }} />
             </Header>
             <Content className="dndflow">
               <ReactFlowBase
@@ -109,7 +132,7 @@ const WorkflowCreator = () => {
                 setAllCanSeeStates={setAllCanSeeStates}
                 allEdges={allEdges}
                 setAllEdges={setAllEdges}
-                roleColor={roleColor}
+                roleColors={roleColors}
                 activeRole={activeRole}
                 nodes={nodes}
                 setNodes={setNodes}
