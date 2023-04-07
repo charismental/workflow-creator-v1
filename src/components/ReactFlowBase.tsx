@@ -8,6 +8,7 @@ import ReactFlow, {
   ReactFlowInstance,
   addEdge,
   useEdgesState,
+  NodeTypes
 } from "reactflow";
 
 import defaultEdgeOptions from "data/defaultEdgeOptions";
@@ -25,7 +26,7 @@ const connectionLineStyle = {
   stroke: "black",
 };
 
-const nodeTypes = {
+const nodeTypes: NodeTypes = {
   custom: StateNode,
 };
 
