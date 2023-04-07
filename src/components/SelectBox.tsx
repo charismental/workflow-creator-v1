@@ -1,12 +1,12 @@
 import { PlusOutlined } from "@ant-design/icons";
 import {
   Button,
+  Checkbox,
   Divider,
   Input,
   InputRef,
   Select,
   Space,
-  Checkbox,
 } from "antd";
 import React, { useRef, useState } from "react";
 
@@ -42,6 +42,7 @@ const SelectBox: React.FC<SelectBoxProps> = ({
   const [resetKey, setResetKey] = useState(Math.random())
   const [dragPreventBlur, setDragPreventBlur] = useState<boolean | undefined>(undefined);
   const inputRef = useRef<InputRef>(null);
+  
 
   const onDragStart = (event: any, nodeType: any) => {
     event.dataTransfer.setData("application/reactflow", nodeType);

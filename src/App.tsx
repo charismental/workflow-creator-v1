@@ -1,37 +1,37 @@
-import "reactflow/dist/style.css";
+import { Layout, Space, Typography } from 'antd';
+import ActiveRoleSettings from "components/ActiveRoleSettings";
 import ReactFlowBase from "components/ReactFlowBase";
+import SelectBox from "components/SelectBox";
 import { useCallback, useState } from "react";
 import { ReactFlowProvider, useNodesState } from "reactflow";
-import { Layout, Space, Typography } from 'antd';
+import "reactflow/dist/style.css";
+import useMainStore from "store";
+import { shallow } from 'zustand/shallow';
 import Sidebar from "./components/Sidebar";
 import "./css/style.css";
-import { RoleList, StateList, initialColors } from "./data";
+import { RoleList } from "./data";
 import initialNodes from "./data/initialNodes";
-import ProcessSelector from "components/ProcessSelector";
-import SelectBox from "components/SelectBox";
-import ActiveRoleSettings from "components/ActiveRoleSettings";
-
-const initialRole = "Intake-Specialist";
-const initialAllEdges: any = {};
-const initialAllStates: any = {};
-
-Object.keys(RoleList).forEach((role) => {
-  initialAllEdges[role] = [];
-  initialAllStates[role] = [];
-});
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
 
 const WorkflowCreator = () => {
-  const [activeRole, setActiveRole] = useState(initialRole);
-  // const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const initialAllEdges = useMainStore(useCallback(state => state.initialAllEdges,[]))
+  const initialAllStates = useMainStore(useCallback(state => state.initialAllStates, []));
+  const [states, setState] = useMainStore(state => [state.states, state.setState], shallow)
+  const [activeRole, setActiveRole] = useMainStore(state => [state.activeRole, state.setActiveRole], shallow)
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [allEdges, setAllEdges] = useState(initialAllEdges);
+  const [allEdges, setAllEdges] = useMainStore(state => [state.allEdges, state.setAllEdges], shallow)
   const [allCanSeeStates, setAllCanSeeStates] = useState(initialAllStates);
-  const [states, setState] = useState(StateList);
-  const [roles, setRoles] = useState(RoleList);
-  const [roleColors, setRoleColors] = useState<any>(initialColors);
+  // const [allCanSeeStates, setAllCanSeeStates] = useMainStore(state => [state.allCanSeeStates, state.setAllCanSeeStates], shallow);
+  const [roles, setRoles] = useMainStore(state => [state.roles, state.setRoles], shallow)
+  const [roleColors, setRoleColors] = useMainStore(state => [state.roleColors, state.setRoleColors], shallow);
+
+  Object.keys(RoleList).forEach((role) => {
+    initialAllEdges[role] = [];
+    initialAllStates[role] = [];
+  });
+
 
   const addNewStateOrRole = (
     type: string,
@@ -59,7 +59,7 @@ const WorkflowCreator = () => {
           };
 
           setRoles(newRolesObj);
-          setRoleColors({ ...roleColors, [label]: color });
+          color && setRoleColors({ ...roleColors, [label]: color });
           setAllEdges({ ...allEdges, [label]: [] });
           setAllCanSeeStates({ ...allCanSeeStates, [label]: [] });
           break;
@@ -78,7 +78,7 @@ const WorkflowCreator = () => {
 
     return foundNode?.data?.label || nodeId;
   };
-
+  
   const outputJSON = {
     [activeRole]: {
       canSee: allCanSeeStates?.[activeRole].map(findStateNameByNode),

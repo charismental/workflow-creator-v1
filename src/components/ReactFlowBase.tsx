@@ -1,13 +1,14 @@
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
+  Background,
+  BackgroundVariant,
   Controls,
   Edge,
   EdgeTypes,
   ReactFlowInstance,
   addEdge,
   useEdgesState,
-  Background,
-  BackgroundVariant,
+  NodeTypes
 } from "reactflow";
 
 import defaultEdgeOptions from "data/defaultEdgeOptions";
@@ -25,7 +26,7 @@ const connectionLineStyle = {
   stroke: "black",
 };
 
-const nodeTypes = {
+const nodeTypes: NodeTypes = {
   custom: StateNode,
 };
 
