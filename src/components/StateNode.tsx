@@ -1,6 +1,7 @@
 import { Checkbox } from "antd";
 import { CSSProperties, FunctionComponent, useState } from "react";
 import selfArrow from '../assets/arrow.png';
+import {RollbackOutlined} from '@ant-design/icons'
 
 import {
   Handle,
@@ -68,7 +69,8 @@ const StateNode: FunctionComponent<NodeProps> = ({
         backgroundColor: isTarget ? "#ffcce3" : data?.color || "#ccd9f6",
       }}
     >
-      {isCanSee && <img src={selfArrow} height="20px" width="20px" style={{ position: 'absolute', top: '-20px', right: '20px' }} />}
+      {/* {isCanSee && <img src={selfArrow} height="20px" width="20px" style={{ position: 'absolute', top: '-20px', right: '20px' }} />} */}
+      {isCanSee && <RollbackOutlined rotate={270} style={{color: 'black', fontSize: '40px', position: 'absolute', top: '-35px', right: '20px' }} />}
       <NodeResizer
         isVisible
         minWidth={minWidth}
