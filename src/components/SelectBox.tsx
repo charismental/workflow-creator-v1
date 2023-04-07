@@ -18,7 +18,7 @@ interface SelectBoxProps {
   selectValue?: string;
   useStyle?: any;
   selectOnChange?: (value: string) => void;
-  addNew?: (type: string, color?: string, label?: string) => void;
+  addNew?: any;
   isDraggable?: boolean;
   placeholder?: string;
   hasColorInput?: boolean;
@@ -57,7 +57,7 @@ const SelectBox: React.FC<SelectBoxProps> = ({
     e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
   ) => {
     e.preventDefault();
-    addNew && addNew(type, color, name);
+    addNew && addNew({ type, color, name });
     setName("");
     setTimeout(() => {
       inputRef.current?.focus();

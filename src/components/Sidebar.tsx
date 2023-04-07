@@ -9,7 +9,7 @@ interface SideBarProps {
   setActiveRole: (value: string) => void;
   activeRole: string;
   output: {};
-  addNewStateOrRole: (value: string, color?: string, name?: string) => void;
+  addNewStateOrRole: any
 }
 
 const Sidebar: FC<SideBarProps> = ({

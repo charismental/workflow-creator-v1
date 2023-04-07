@@ -17,7 +17,7 @@ const { Panel } = Collapse;
 interface StateCollapsebox {
   items: string[];
   useStyle?: any;
-  addNew?: (type: string, color?: string, label?: string) => void;
+  addNew?: any
 }
 
 const StateCollapseBox: React.FC<StateCollapsebox> = ({
@@ -46,7 +46,7 @@ const StateCollapseBox: React.FC<StateCollapsebox> = ({
     e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
   ) => {
     e.preventDefault();
-    addNew && addNew('state', '', name);
+    addNew && addNew({ type: 'state', name });
     setName('');
     setTimeout(() => {
       inputRef.current?.focus();

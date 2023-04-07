@@ -33,17 +33,19 @@ export interface WorkflowRole {
 export interface WorkflowProcess {
     ProcessID: number;
     ProcessName: string;
-    CatID: number;
-    states: Array<WorkflowState>;
-    roles: Array<WorkflowRole>;
-    connections: Array<WorkflowConnection>;
+    CatID?: number;
+    states?: Array<WorkflowState>; //
+    roles?: Array<WorkflowRole>;
+    connections?: Array<WorkflowConnection>;
 }
 
 interface MainState {
+    activeProcessName: string;
     activeRole: string;
     initialAllEdges: any;
     initialAllStates: any;
     states: { [key: string]: number };
+    processes: Array<WorkflowProcess>;
     allEdges: any;
     allCanSeeStates: any;
     roleColors: { [key: string]: string };
@@ -51,16 +53,21 @@ interface MainState {
 }
 
 interface MainActions {
+    setActiveProcessName: (processName: string) => void;
     setActiveRole: (role: string) => void;
     setState: (el: { [key: string]: number }) => void;
+    addProcess: any;
+    deleteProcess: (processId: number) => void;
     setAllEdges: (el: { [key: string]: number }) => void;
     setAllCanSeeStates: (el: any) => void;
     setRoleColors: (el: { [key: string]: string }) => void;
-    setRoles: (el: { [key: string]: number }) => void
+    setRoles: (el: { [key: string]: number }) => void;
 }
 
 const useMainStore = create<MainState & MainActions>()(
     (set) => ({
+        activeProcessName: 'New Workflow',
+        setActiveProcessName: (processName) => set(() => ({ activeProcessName: processName })),
         activeRole: 'Intake-Specialist',
         setActiveRole: (role) => set(() => ({ activeRole: role })),
         initialAllEdges: {},
@@ -74,7 +81,17 @@ const useMainStore = create<MainState & MainActions>()(
         roleColors: { ...initialColors },
         setRoleColors: (el) => set(() => ({ roleColors: el })),
         roles: { ...RoleList },
-        setRoles: (el) => set(() => ({ roles: el }))
+        setRoles: (el) => set(() => ({ roles: el })),
+        processes: [{ ProcessID: 2373, ProcessName: 'New Workflow' }, { ProcessID: 2374, ProcessName: 'New Workflow 2' }],
+        addProcess: ({ name }: any) => set(({ processes }) => {
+            const newProcess = {
+                ProcessID: processes.length + 1,
+                ProcessName: name,
+            }
+
+            return { processes: processes.concat(newProcess) }
+        }),
+        deleteProcess: (processId) => set(({ processes }) => ({ processes: processes.filter(p => p.ProcessID !== processId) })),
     }))
 
 

@@ -37,7 +37,7 @@ const edgeTypes: EdgeTypes = {
 // TODO: nodes.length
 let id = 11;
 
-const getId = () => `dndnode_${++id}`
+const getId = () => `state_node_${++id}`
 
 interface ReactFlowBaseProps {
   allCanSeeStates: any;
@@ -49,6 +49,7 @@ interface ReactFlowBaseProps {
   nodes: any;
   setNodes: any;
   onNodesChange: any;
+  updateNodesColor: any;
 }
 
 
@@ -59,9 +60,22 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance>();
 
+  const {
+    allCanSeeStates,
+    setAllCanSeeStates,
+    allEdges,
+    setAllEdges,
+    roleColors,
+    activeRole,
+    nodes,
+    setNodes,
+    onNodesChange,
+    updateNodesColor,
+  } = props;
+
   const toggleCanSeeState = useCallback(
     (stateId: string) => {
-      let activeRoleCanSee = props.allCanSeeStates[props.activeRole];
+      let activeRoleCanSee = allCanSeeStates[activeRole];
 
       if (activeRoleCanSee.includes(stateId)) {
         activeRoleCanSee = activeRoleCanSee.filter(
@@ -71,49 +85,41 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
         activeRoleCanSee.push(stateId);
       }
 
-      props.setAllCanSeeStates({
-        ...props.allCanSeeStates,
-        [props.activeRole]: activeRoleCanSee,
+      setAllCanSeeStates({
+        ...allCanSeeStates,
+        [activeRole]: activeRoleCanSee,
       });
     },
-    [props.activeRole, props.allCanSeeStates, props.setAllCanSeeStates]
+    [activeRole, allCanSeeStates, setAllCanSeeStates]
   );
 
   const onConnect = useCallback(
     (params: any) => {
       setEdges((eds) => {
         const updatedEdges = [
-          ...(props.allEdges?.[props.activeRole] || []),
+          ...(allEdges?.[activeRole] || []),
           ...eds.slice(-1),
         ]
 
         return addEdge({ ...params, data: { setEdges } }, updatedEdges);
       });
     },
-    [setEdges, props.allEdges, props.activeRole]
+    [setEdges, allEdges, activeRole]
   );
 
   useEffect(() => {
     if (
-      props.nodes.length &&
-      props.nodes.some(
-        (n: any) => n?.data.color !== props.roleColors[props.activeRole]
+      nodes.length &&
+      nodes.some(
+        (n: any) => n?.data.color !== roleColors[activeRole]
       )
     ) {
-      props.setNodes(
-        props.nodes.map((n: any) => ({
-          ...n,
-          data: {
-            ...n?.data,
-            color: props.roleColors?.[props.activeRole] || "#d4d4d4",
-          },
-        }))
-      );
+      updateNodesColor();
     }
     // compare edges before doing this?
     // todo: filter invalid edges from missing nodes
-    setEdges(() => props.allEdges?.[props.activeRole] || []);
-  }, [props.activeRole, props.nodes, props.allEdges[props.activeRole]]);
+    setEdges(() => allEdges?.[activeRole] || []);
+  }, [activeRole, nodes, allEdges[activeRole]]);
 
   useEffect(() => {
     const uniqueEdges = (arr: any) => {
@@ -126,12 +132,12 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     };
 
     const updatedEdges = {
-      ...props.allEdges,
-      [props.activeRole]: uniqueEdges(edges),
+      ...allEdges,
+      [activeRole]: uniqueEdges(edges),
     };
 
-    if (!isEqual(props.allEdges, updatedEdges)) {
-      props.setAllEdges(updatedEdges);
+    if (!isEqual(allEdges, updatedEdges)) {
+      setAllEdges(updatedEdges);
     }
   }, [edges]);
 
@@ -170,30 +176,30 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
         position,
         data: {
           label: type,
-          color: props.roleColors[props.activeRole],
+          color: roleColors[activeRole],
           toggleCanSeeState,
         },
       };
 
-      props.setNodes((nds: any) => nds.concat(newNode));
+      setNodes((nds: any) => nds.concat(newNode));
     },
-    [reactFlowInstance, props.setNodes, props.activeRole]
+    [reactFlowInstance, setNodes, activeRole]
   );
 
   return (
     <>
       <div className="reactflow-wrapper" ref={reactFlowWrapper}>
         <ReactFlow
-          nodes={props.nodes.map((node: any) => ({
+          nodes={nodes.map((node: any) => ({
             ...node,
             data: {
               ...node.data,
               toggleCanSeeState,
-              isCanSee: props.allCanSeeStates?.[props.activeRole]?.includes(node.id),
+              isCanSee: allCanSeeStates?.[activeRole]?.includes(node.id),
             },
           }))}
-          edges={props.allEdges?.[props.activeRole] || []}
-          onNodesChange={props.onNodesChange}
+          edges={allEdges?.[activeRole] || []}
+          onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onInit={setReactFlowInstance}

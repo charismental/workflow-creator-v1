@@ -18,6 +18,10 @@ const { Title } = Typography;
 const WorkflowCreator = () => {
   const initialAllEdges = useMainStore(useCallback(state => state.initialAllEdges, []))
   const initialAllStates = useMainStore(useCallback(state => state.initialAllStates, []));
+  const processes = useMainStore(state => state.processes);
+  const deleteProcess = useMainStore(state => state.deleteProcess);
+  const addProcess = useMainStore(state => state.addProcess);
+  const [activeProcessName, setActiveProcessName] = useMainStore(state => [state.activeProcessName, state.setActiveProcessName], shallow)
   const [states, setState] = useMainStore(state => [state.states, state.setState], shallow)
   const [activeRole, setActiveRole] = useMainStore(state => [state.activeRole, state.setActiveRole], shallow)
   const [allEdges, setAllEdges] = useMainStore(state => [state.allEdges, state.setAllEdges], shallow)
@@ -33,19 +37,20 @@ const WorkflowCreator = () => {
   });
 
 
-  const addNewStateOrRole = (
-    type: string,
-    color: string | undefined,
-    label: string | undefined
-  ) => {
-    if (label) {
+  const addNewStateOrRole = ({
+    type,
+    color,
+    name,
+  }: { type: string; color?: string; name?: string }) => {
+    console.log(type, color, name)
+    if (name) {
       let newId = Math.max(...Object.values(states)) + 1;
 
       switch (type) {
         case "state":
           const newStatesObj = {
             ...states,
-            [label]: newId,
+            [name]: newId,
           };
 
           setState(newStatesObj);
@@ -55,13 +60,13 @@ const WorkflowCreator = () => {
 
           const newRolesObj = {
             ...roles,
-            [label]: newId,
+            [name]: newId,
           };
 
           setRoles(newRolesObj);
-          color && setRoleColors({ ...roleColors, [label]: color });
-          setAllEdges({ ...allEdges, [label]: [] });
-          setAllCanSeeStates({ ...allCanSeeStates, [label]: [] });
+          color && setRoleColors({ ...roleColors, [name]: color });
+          setAllEdges({ ...allEdges, [name]: [] });
+          setAllCanSeeStates({ ...allCanSeeStates, [name]: [] });
           break;
         default:
           return;
@@ -115,6 +120,7 @@ const WorkflowCreator = () => {
     [activeRole, setRoleColors, roleColors, updateNodesColor]
   );
 
+  const availableProcesses = processes.map(p => p.ProcessName);
 
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
@@ -122,7 +128,7 @@ const WorkflowCreator = () => {
         <Layout style={{ width: '100%', height: '100vh' }}>
           <Layout>
             <Header style={{ backgroundColor: '#fff', padding: '25px', height: '80px', display: 'inline-flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <SelectBox useStyle={{ width: '300px', display: 'inline-block' }} type="process" selectValue="Test Workflow" items={['Test Workflow']} placeholder="Select Process" />
+              <SelectBox useStyle={{ width: '300px', display: 'inline-block' }} selectOnChange={setActiveProcessName} addNew={addProcess} type="process" selectValue={activeProcessName} items={availableProcesses} placeholder="Select Process" />
               <Title level={2} style={{ display: 'inline-block', paddingBottom: '18px' }}>
                 {activeRole}
               </Title>
@@ -135,6 +141,7 @@ const WorkflowCreator = () => {
                 allEdges={allEdges}
                 setAllEdges={setAllEdges}
                 roleColors={roleColors}
+                updateNodesColor={updateNodesColor}
                 activeRole={activeRole}
                 nodes={nodes}
                 setNodes={setNodes}
