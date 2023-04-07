@@ -34,6 +34,7 @@ const edgeTypes: EdgeTypes = {
   floating: FloatingEdge,
 };
 
+// TODO: nodes.length
 let id = 11;
 
 const getId = () => `dndnode_${++id}`

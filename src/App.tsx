@@ -16,16 +16,16 @@ const { Header, Content } = Layout;
 const { Title } = Typography;
 
 const WorkflowCreator = () => {
-  const initialAllEdges = useMainStore(useCallback(state => state.initialAllEdges,[]))
+  const initialAllEdges = useMainStore(useCallback(state => state.initialAllEdges, []))
   const initialAllStates = useMainStore(useCallback(state => state.initialAllStates, []));
   const [states, setState] = useMainStore(state => [state.states, state.setState], shallow)
   const [activeRole, setActiveRole] = useMainStore(state => [state.activeRole, state.setActiveRole], shallow)
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [allEdges, setAllEdges] = useMainStore(state => [state.allEdges, state.setAllEdges], shallow)
-  const [allCanSeeStates, setAllCanSeeStates] = useState(initialAllStates);
   // const [allCanSeeStates, setAllCanSeeStates] = useMainStore(state => [state.allCanSeeStates, state.setAllCanSeeStates], shallow);
   const [roles, setRoles] = useMainStore(state => [state.roles, state.setRoles], shallow)
   const [roleColors, setRoleColors] = useMainStore(state => [state.roleColors, state.setRoleColors], shallow);
+  const [allCanSeeStates, setAllCanSeeStates] = useState(initialAllStates);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
 
   Object.keys(RoleList).forEach((role) => {
     initialAllEdges[role] = [];
@@ -73,15 +73,17 @@ const WorkflowCreator = () => {
     return !nodes.some((n) => n?.data?.label === state);
   });
 
-  const findStateNameByNode = (nodeId: string) => {
+  const findStateNameByNode = useCallback((nodeId: string): string | undefined => {
     const foundNode = nodes.find((node) => node.id === nodeId);
 
-    return foundNode?.data?.label || nodeId;
-  };
-  
+    return foundNode?.data?.label;
+  }, [nodes]);
+
+  // only 'hides' the issue of non-activeRole edges still appearing for missing nodes
+  // reduce function to avoid .filter().map()
   const outputJSON = {
     [activeRole]: {
-      canSee: allCanSeeStates?.[activeRole].map(findStateNameByNode),
+      canSee: allCanSeeStates?.[activeRole].map(findStateNameByNode).filter((el: any) => el),
       canTransition: (allEdges?.[activeRole] || []).map(
         ({ source, target }: { source: string; target: string }) => {
           return {
@@ -89,7 +91,7 @@ const WorkflowCreator = () => {
             target: findStateNameByNode(target),
           };
         }
-      ),
+      ).filter((el: any) => ['source', 'target'].every((key: string) => el[key]))
     },
   };
 
