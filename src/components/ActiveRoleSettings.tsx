@@ -22,17 +22,17 @@ const ActiveRoleSettings: React.FC<ActiveRoleSettingsProps> = ({
   useStyle = {},
   color,
   // roleIsToggled,
-  updateColor = (updatedColor: string) => console.log(updatedColor),
+  updateColor,
 }) => {
   return (
-    <div style={{ display: 'inline-flex', justifyContent: 'end' , ...useStyle }}>
-      <input
+    <div style={{ display: 'inline-flex', justifyContent: 'end', ...useStyle }}>
+      {updateColor && <input
         type="color"
         name="color"
         id="colorRef"
         value={color}
         onChange={(e) => updateColor(e.target.value)}
-      />
+      />}
     </div>
   );
 };

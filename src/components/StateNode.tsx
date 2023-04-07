@@ -42,14 +42,13 @@ const StateNode: FunctionComponent<NodeProps> = ({
   const removeNode = () => {
     const node = getNode(id);
 
-    if (!node) {
-      return;
-    }
+    if (!node) return;
 
     const edges = getEdges();
 
     const connectedEdges = getConnectedEdges([node], edges);
 
+    // TODO: should also delete edges/allEdges for this node with other roles
     deleteElements({ nodes: [node], edges: connectedEdges });
   };
 

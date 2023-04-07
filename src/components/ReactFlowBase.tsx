@@ -110,8 +110,9 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
       );
     }
     // compare edges before doing this?
+    // todo: filter invalid edges from missing nodes
     setEdges(() => props.allEdges?.[props.activeRole] || []);
-  }, [props.activeRole, props.nodes]);
+  }, [props.activeRole, props.nodes, props.allEdges[props.activeRole]]);
 
   useEffect(() => {
     const uniqueEdges = (arr: any) => {

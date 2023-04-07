@@ -14,18 +14,16 @@ import { shallow } from 'zustand/shallow';
 
 const { Panel } = Collapse;
 
-interface CollapseBoxProps {
-  type: 'role' | 'state' | 'process';
+interface StateCollapsebox {
   items: string[];
   useStyle?: any;
   addNew?: (type: string, color?: string, label?: string) => void;
 }
 
-const CollapseBox: React.FC<CollapseBoxProps> = ({
+const StateCollapseBox: React.FC<StateCollapsebox> = ({
   items,
   addNew,
   useStyle = {},
-  type,
 }) => {
   const [name, setName] = useState('');
   const inputRef = useRef<InputRef>(null);
@@ -48,7 +46,7 @@ const CollapseBox: React.FC<CollapseBoxProps> = ({
     e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
   ) => {
     e.preventDefault();
-    addNew && addNew(type, '', name);
+    addNew && addNew('state', '', name);
     setName('');
     setTimeout(() => {
       inputRef.current?.focus();
@@ -56,10 +54,11 @@ const CollapseBox: React.FC<CollapseBoxProps> = ({
   };
 
   return (
-    <Collapse accordion style={{ width: '100%', ...useStyle }} size={'small'} expandIconPosition='end'>
+    <Collapse accordion style={{ width: '100%', ...useStyle }} size="small" expandIconPosition='end'>
       <Panel header={'Add/Select State'} key="1">
         {items.map((item) => (
           <div
+            key={item}
             className={styles.stateItem}
             style={{backgroundColor: itemColor()}}
             onMouseDown={(e) => {
@@ -75,7 +74,7 @@ const CollapseBox: React.FC<CollapseBoxProps> = ({
           <Divider style={{ margin: '8px 0' }} />
           <Space style={{ padding: '0 8px 4px' }}>
             <Input
-              placeholder={`Add New ${type}`}
+              placeholder={`Add New State`}
               ref={inputRef}
               value={name}
               onChange={onNameChange}
@@ -104,4 +103,4 @@ const CollapseBox: React.FC<CollapseBoxProps> = ({
   );
 };
 
-export default CollapseBox;
+export default StateCollapseBox;
