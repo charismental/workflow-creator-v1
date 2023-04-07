@@ -1,13 +1,13 @@
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
+  Background,
+  BackgroundVariant,
   Controls,
   Edge,
   EdgeTypes,
   ReactFlowInstance,
   addEdge,
   useEdgesState,
-  Background,
-  BackgroundVariant,
 } from "reactflow";
 
 import defaultEdgeOptions from "data/defaultEdgeOptions";
