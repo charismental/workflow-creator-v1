@@ -2,81 +2,59 @@
 import { RoleList, StateList, initialColors } from 'data';
 import { Node } from 'reactflow';
 import { create } from 'zustand';
-
-function returnObjectMap(list: any, initial: any) {
-    return Object.keys(list).forEach(el => {
-        initial[el] = [];
-    })
-}
-
-type BooleanNumber = 0 | 1;
-
-export interface WorkflowConnection {
-    source: string;
-    target: string;
-}
-
-export interface WorkflowState {
-    StateID: number;
-    StateName: string;
-    RequiresUserAssignment: BooleanNumber | number;
-    RequiresRoleAssignment: BooleanNumber | number;
-    DisplayOrder: number;
-}
-
-export interface WorkflowRole {
-    RoleID: number;
-    RoleName: string;
-    IsUniversal: BooleanNumber | number;
-    isCluster: BooleanNumber | number;
-}
-
-export interface WorkflowProcess {
-    ProcessID: number;
-    ProcessName: string;
-    CatID?: number;
-    states?: Array<WorkflowState>; //
-    roles?: Array<WorkflowRole>;
-    connections?: Array<WorkflowConnection>;
-}
+import { persist } from 'zustand/middleware';
+import { WorkflowProcess } from './types';
 
 interface MainState {
     activeProcessName: string;
     activeRole: string;
     initialAllEdges: any;
-    initialAllStates: {[key: string]: Array<any>};
+    initialAllState: { [key: string]: Array<any> };
     states: { [key: string]: number };
     processes: Array<WorkflowProcess>;
     allEdges: any;
     roleColors: { [key: string]: string };
     roles: { [key: string]: number };
+    _hasHydrated: boolean;
 }
 
 interface MainActions {
     setActiveProcessName: (processName: string) => void;
     setActiveRole: (role: string) => void;
-    setState: (el: { [key: string]: number }) => void;
+    setState: (el: any) => void;
     addProcess: any;
     deleteProcess: (processId: number) => void;
-    setAllEdges: (el: { [key: string]: number }) => void;
+    // setAllEdges: (el: { [key: string]: number }) => void;
+    setAllEdges: (el: any) => void;
     setRoleColors: (el: { [key: string]: string }) => void;
     setRoles: (el: { [key: string]: number }) => void;
     toggleRoleForProcess: (role: string) => void;
     filteredStates: (nodes: Node[]) => string[];
-    findStateNameByNode: (nodeId: string, nodes: Node[]) => string | undefined;
     addNewStateItem: (name: string) => void;
+    // setAllCanSeeStates: (name: string) => void;
+    setHasHydrated: (state: boolean) => void;
 }
 
 const useMainStore = create<MainState & MainActions>()(
+    persist(
     (set, get) => ({
+        _hasHydrated: false,
+        setHasHydrated: (state) => set(({_hasHydrated: state})),
         activeProcessName: 'New Workflow',
         setActiveProcessName: (processName) => set(() => ({ activeProcessName: processName })),
         activeRole: 'Intake-Specialist',
         setActiveRole: (role) => set(() => ({ activeRole: role })),
-        initialAllEdges: {},
-        initialAllStates: {}, // cannot Object.keys() it....
+        initialAllEdges: { "Intake-Specialist": [], "Intake-Specialist Manager": [], "Caseworker": [], "Caseworker Manager": [], "Partner Final Reviewer": [], "Partner Reviewer": [], "Customer-Support": [] },
+        initialAllState: { "Intake-Specialist": [], "Intake-Specialist Manager": [], "Caseworker": [], "Caseworker Manager": [], "Partner Final Reviewer": [], "Partner Reviewer": [], "Customer-Support": [] },
+        // setAllCanSeeStates: (name) => set(({allCanSeeStates}) => ({allCanSeeStates: {...allCanSeeStates, [name]: []}})),
         states: { ...StateList },
-        setState: (el) => set(() => ({ states: el })),
+        setState: (el) => set(({states}) => {
+            const newStateObj = {
+                ...states,
+                el
+            }
+            return {states: newStateObj}
+        }),
         allEdges: [],
         setAllEdges: (el) => set(() => ({ allEdges: el })),
         roleColors: { ...initialColors },
@@ -122,20 +100,20 @@ const useMainStore = create<MainState & MainActions>()(
         filteredStates: (nodes) => (Object.keys(get().states).filter((state) => {
             return !nodes.some((n) => n?.data?.label === state);
         })),
-        findStateNameByNode: (nodeId, nodes) => {
-            const foundNode = nodes.find((node) => node.id === nodeId);
-      
-            return foundNode?.data?.label;
-        },
-        addNewStateItem: (name) => set(({states}) => {
+        addNewStateItem: (name) => set(({ states }) => {
             const newId = Math.max(...Object.values(get().states)) + 1;
             const newStatesObj = {
                 ...states,
                 [name]: newId,
-              };
-            return {states: newStatesObj}
+            };
+            return { states: newStatesObj }
         })
 
+    }), {
+        name: 'main-store',
+        onRehydrateStorage: () => (state) => {
+            state?.setHasHydrated(true)
+        }
     }))
 
 

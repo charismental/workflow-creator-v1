@@ -1,16 +1,16 @@
-import { Layout, Space, Typography } from "antd";
+import { Layout, Space, Spin, Typography } from "antd";
 import ActiveRoleSettings from "components/ActiveRoleSettings";
 import ReactFlowBase from "components/ReactFlowBase";
 import SelectBox from "components/SelectBox";
 import StateCollapseBox from "components/StateCollapseBox";
-import { CSSProperties, useCallback, useMemo, useState } from "react";
+import { CSSProperties, useCallback, useState } from "react";
 import { ReactFlowProvider, useNodesState } from "reactflow";
 import "reactflow/dist/style.css";
-import useMainStore, { WorkflowProcess } from "store";
+import useMainStore from "store";
+import { WorkflowProcess } from "store/types";
 import { shallow } from "zustand/shallow";
 import Sidebar from "./components/Sidebar";
 import "./css/style.css";
-import { RoleList } from "./data";
 import initialNodes from "./data/initialNodes";
 
 const { Header, Content } = Layout;
@@ -35,11 +35,12 @@ const activeRoleTitleStyle: CSSProperties = {
 const layoutContainer: CSSProperties = { width: "100%", height: "100vh" };
 
 const WorkflowCreator = () => {
+  const hasHydrated = useMainStore((state) => state._hasHydrated);
   const initialAllEdges = useMainStore(
     useCallback((state) => state.initialAllEdges, [])
   );
-  const initialAllStates = useMainStore(
-    useCallback((state) => state.initialAllStates, [])
+  const initialAllState = useMainStore(
+    useCallback((state) => state.initialAllState, [])
   );
   const processes = useMainStore((state) => state.processes);
   const deleteProcess = useMainStore((state) => state.deleteProcess);
@@ -67,22 +68,12 @@ const WorkflowCreator = () => {
     (state) => [state.roleColors, state.setRoleColors],
     shallow
   );
-  const [allCanSeeStates, setAllCanSeeStates] = useState(initialAllStates);
+  // const [allCanSeeStates, setAllCanSeeStates] = useMainStore((state) => [state.allCanSeeStates, state.setAllCanSeeStates], shallow);
+  const [allCanSeeStates, setAllCanSeeStates] = useState(initialAllState);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const filteredStates = useMainStore((state) => state.filteredStates);
-  const findStateNameByNode = useMainStore(
-    useCallback((state) => state.findStateNameByNode, [nodes])
-  );
+  const [currentStates, setCurrentStates] = useMainStore((state) => [state.states, state.setState], shallow)
+  const filteredStates = useMainStore(useCallback((state) => state.filteredStates, [currentStates]));
   const addNewStateItem = useMainStore((state) => state.addNewStateItem);
-
-  useMemo(
-    () =>
-      Object.keys(RoleList).forEach((role) => {
-        initialAllEdges[role] = [];
-        initialAllStates[role] = [];
-      }),
-    []
-  );
 
   const addNewStateOrRole = ({
     type,
@@ -93,7 +84,6 @@ const WorkflowCreator = () => {
     color?: string;
     name?: string;
   }) => {
-    console.log(type, color, name);
     if (name) {
       let newId = Math.max(...Object.values(roles)) + 1;
 
@@ -109,21 +99,29 @@ const WorkflowCreator = () => {
     }
   };
 
+  const findStateNameByNode = useCallback(
+    (nodeId: string): string | undefined => {
+      const foundNode = nodes.find((node) => node.id === nodeId);
+
+    return foundNode?.data?.label;
+  }, [nodes]);
+
   // only 'hides' the issue of non-activeRole edges still appearing for missing nodes
   // reduce function to avoid .filter().map()
   const outputJSON = {
     [activeRole]: {
-      canSee: allCanSeeStates?.[activeRole].filter((el: any) => el),
+      canSee: allCanSeeStates?.[activeRole].map(findStateNameByNode).filter((el: any) => el),
       canTransition: (allEdges?.[activeRole] || [])
         .map(({ source, target }: { source: string; target: string }) => {
           return {
-            source: findStateNameByNode(source, nodes),
-            target: findStateNameByNode(target, nodes),
+            source: findStateNameByNode(source),
+            target: findStateNameByNode(target),
           };
         })
-        .filter((el: any) =>
-          ["source", "target"].every((key: string) => el[key])
-        ),
+        // Modified StateNode file to update Edges... seems to work???
+        // .filter((el: any) =>
+        //   ["source", "target"].every((key: string) => el[key])
+        // ),
     },
   };
 
@@ -159,6 +157,10 @@ const WorkflowCreator = () => {
       value: activeProcess?.roles?.some((r) => r.RoleName === role) || false,
     };
   });
+
+  if (!hasHydrated) {
+    return <Spin size="large" style={{position: 'absolute', top: '50%', left: '50%'}} tip={<Title level={4} style={{color:'blue'}}>...Loading State</Title>}/>
+  }
 
   return (
     <Space direction="vertical" style={spaceContainer}>

@@ -1,6 +1,6 @@
+import { RollbackOutlined } from '@ant-design/icons';
 import { Checkbox } from "antd";
-import { CSSProperties, FunctionComponent, useState } from "react";
-import {RollbackOutlined} from '@ant-design/icons'
+import { CSSProperties, FunctionComponent, useCallback, useState } from "react";
 
 import {
   Handle,
@@ -11,6 +11,8 @@ import {
   useReactFlow,
   useStore as useReactFlowStore,
 } from "reactflow";
+import useMainStore from "store";
+import { shallow } from "zustand/shallow";
 
 const checkboxStyle: CSSProperties = {
   position: "absolute",
@@ -30,6 +32,7 @@ const StateNode: FunctionComponent<NodeProps> = ({
   data,
 }): JSX.Element => {
   const [isMouseOver, setIsMouseOver] = useState(false);
+  const [allEdges, setAlledges] = useMainStore((state) => [state.allEdges, state.setAllEdges], shallow)
   const { toggleCanSeeState, isCanSee = false } = data;
 
   const { getNode, getEdges, deleteElements } = useReactFlow();
@@ -39,7 +42,7 @@ const StateNode: FunctionComponent<NodeProps> = ({
 
   const targetHandleStyle = { zIndex: isTarget ? 3 : 1 };
 
-  const removeNode = () => {
+  const removeNode = useCallback(() => {
     const node = getNode(id);
 
     if (!node) return;
@@ -47,10 +50,14 @@ const StateNode: FunctionComponent<NodeProps> = ({
     const edges = getEdges();
 
     const connectedEdges = getConnectedEdges([node], edges);
-
+    const removedNode = { nodes: [node], edges: connectedEdges }
     // TODO: should also delete edges/allEdges for this node with other roles
-    deleteElements({ nodes: [node], edges: connectedEdges });
-  };
+
+    // trying this...
+    setAlledges(connectedEdges)
+    
+    deleteElements(removedNode);
+  }, [allEdges, setAlledges]);
 
   const minWidth = 200;
   const minHeight = 30;

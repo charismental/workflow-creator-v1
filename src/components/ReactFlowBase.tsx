@@ -5,10 +5,10 @@ import ReactFlow, {
   Controls,
   Edge,
   EdgeTypes,
+  NodeTypes,
   ReactFlowInstance,
   addEdge,
-  useEdgesState,
-  NodeTypes
+  useEdgesState
 } from "reactflow";
 
 import defaultEdgeOptions from "data/defaultEdgeOptions";
