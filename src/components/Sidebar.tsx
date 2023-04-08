@@ -1,44 +1,29 @@
-import { Space, Layout } from "antd";
-import { FC } from "react";
-import SelectBox from "./SelectBox";
-import StateCollapseBox from "./StateCollapseBox";
+import { Layout, Space } from "antd";
+import { CSSProperties, FC } from "react";
 
+const sidebar: CSSProperties = {
+  backgroundColor: "#fff",
+  padding: "40px 25px",
+};
+const sidebarSpacer: CSSProperties = {
+  display: "flex",
+};
 interface SideBarProps {
-  stateList: string[];
-  roleList: string[] | { label: string; value: boolean }[];
-  setActiveRole: (value: string) => void;
-  toggleRoleForProcess: (role: string) => void;
-  activeRole: string;
-  output: {};
-  addNewStateOrRole: any
+  output: any;
+  children: React.ReactNode
 }
 
-const Sidebar: FC<SideBarProps> = ({
-  stateList,
-  roleList,
-  setActiveRole,
-  addNewStateOrRole,
-  activeRole,
-  output,
-  toggleRoleForProcess,
-}): JSX.Element => {
+const Sidebar: FC<SideBarProps> = (props): JSX.Element => {
   const { Sider } = Layout;
+  const { output, children } = props;
 
   return (
-    <Sider width="300" style={{ backgroundColor: '#fff', padding: '40px 25px' }}>
-      <Space direction="vertical" size="small" style={{display: 'flex'}}>
-      <StateCollapseBox items={stateList} addNew={addNewStateOrRole}  />
-      <SelectBox
-        addNew={addNewStateOrRole}
-        placeholder="Select Role"
-        selectValue={activeRole}
-        items={roleList}
-        type={"role"}
-        hasColorInput
-        multiselectHandler={el => toggleRoleForProcess(el.label)}
-        selectOnChange={setActiveRole}
-      />
-      <pre>{JSON.stringify(output, null, 2)}</pre>
+    // supposed to show tab on breakpoint if collapseWidth is 0
+    <Sider width="min-content" style={sidebar} breakpoint="lg"
+    collapsedWidth="0">
+      <Space direction="vertical" size="small" style={sidebarSpacer}>
+        {children}
+        {output && <pre>{JSON.stringify(output, null, 2)}</pre>}
       </Space>
     </Sider>
   );

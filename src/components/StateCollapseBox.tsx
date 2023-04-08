@@ -1,23 +1,17 @@
-import { PlusCircleTwoTone, ExclamationCircleFilled } from '@ant-design/icons';
-import {
-  Button,
-  Divider,
-  Input,
-  InputRef,
-  Space,
-  Collapse,
-} from 'antd';
-import React, { useRef, useState } from 'react';
-import styles from './CollapseBox.module.css';
-import useMainStore from 'store';
-import { shallow } from 'zustand/shallow';
+import { PlusCircleOutlined, PlusCircleTwoTone } from "@ant-design/icons";
+import { Collapse, Divider, InputRef, Space } from "antd";
+import React, { useRef, useState } from "react";
+import useMainStore from "store";
+import { shallow } from "zustand/shallow";
+import AddNewButton from "./AddNewButton";
+import styles from "./StateCollapseBox.module.css";
 
 const { Panel } = Collapse;
 
 interface StateCollapsebox {
   items: string[];
   useStyle?: any;
-  addNew?: any
+  addNew?: any;
 }
 
 const StateCollapseBox: React.FC<StateCollapsebox> = ({
@@ -25,13 +19,16 @@ const StateCollapseBox: React.FC<StateCollapsebox> = ({
   addNew,
   useStyle = {},
 }) => {
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
   const inputRef = useRef<InputRef>(null);
-  const [activeRole, roleColors] = useMainStore(state => [state.activeRole, state.roleColors], shallow)
+  const [activeRole, roleColors] = useMainStore(
+    (state) => [state.activeRole, state.roleColors],
+    shallow
+  );
 
   const onDragStart = (event: any, nodeType: any) => {
-    event.dataTransfer.setData('application/reactflow', nodeType);
-    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData("application/reactflow", nodeType);
+    event.dataTransfer.effectAllowed = "move";
   };
 
   const onNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,27 +37,32 @@ const StateCollapseBox: React.FC<StateCollapsebox> = ({
 
   const itemColor = () => {
     return roleColors[activeRole];
-  }
+  };
 
   const addNewItem = (
     e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
   ) => {
     e.preventDefault();
-    addNew && addNew({ type: 'state', name });
-    setName('');
+    addNew && addNew({ type: "state", name });
+    setName("");
     setTimeout(() => {
       inputRef.current?.focus();
     }, 0);
   };
 
   return (
-    <Collapse accordion style={{ width: '100%', ...useStyle }} size="small" expandIconPosition='end'>
-      <Panel header={'Add/Select State'} key="1">
+    <Collapse
+      accordion
+      style={{ width: "100%", ...useStyle }}
+      size="small"
+      expandIconPosition="end"
+    >
+      <Panel header={"Add/Select State"} key="1">
         {items.map((item) => (
           <div
             key={item}
             className={styles.stateItem}
-            style={{backgroundColor: itemColor()}}
+            style={{ backgroundColor: itemColor() }}
             onMouseDown={(e) => {
               e.stopPropagation();
             }}
@@ -71,31 +73,25 @@ const StateCollapseBox: React.FC<StateCollapsebox> = ({
           </div>
         ))}
         <>
-          <Divider style={{ margin: '8px 0' }} />
-          <Space style={{ padding: '0 8px 4px' }}>
-            <Input
-              placeholder={`Add New State`}
-              ref={inputRef}
-              value={name}
-              onChange={onNameChange}
+          {items.length > 0 && <Divider style={{ margin: "8px 0" }} />}
+          <Space style={{ padding: "0 8px 4px" }}>
+            <AddNewButton
+              hasColorInput={false}
+              changeEvent={onNameChange}
+              placeholder="Add New State"
+              inputValue={name}
+              buttonShape="circle"
+              buttonType="text"
+              disabledState={!name.length}
+              addNew={addNewItem}
+              icon={
+                !name.length ? (
+                  <PlusCircleOutlined style={{ fontSize: "20px" }} />
+                ) : (
+                  <PlusCircleTwoTone style={{ fontSize: "20px" }} />
+                )
+              }
             />
-              <Button
-                shape={"circle"}
-                type="text"
-                disabled={!name.length}
-                // danger={!name.length}
-                icon={
-                  !name.length ? (
-                    <ExclamationCircleFilled
-   
-                      style={{ fontSize: '20px', color: 'red' }}
-                    />
-                  ) : (
-                    <PlusCircleTwoTone style={{ fontSize: '20px' }} />
-                  )
-                }
-                onClick={addNewItem}
-              />
           </Space>
         </>
       </Panel>
