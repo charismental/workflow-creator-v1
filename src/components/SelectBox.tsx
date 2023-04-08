@@ -1,19 +1,18 @@
 import { PlusOutlined } from "@ant-design/icons";
 import {
-  Button,
   Checkbox,
   Divider,
-  Input,
   InputRef,
   Select,
-  Space,
+  Space
 } from "antd";
 import React, { useRef, useState } from "react";
+import AddNewButton from "./AddNewButton";
 
 const { Option } = Select;
 
 interface SelectBoxProps {
-  type: 'role' | 'state' | 'process';
+  type: "role" | "state" | "process";
   items: string[];
   selectValue?: string;
   useStyle?: any;
@@ -39,10 +38,11 @@ const SelectBox: React.FC<SelectBoxProps> = ({
 }) => {
   const [color, setColor] = useState("#d4d4d4");
   const [name, setName] = useState("");
-  const [resetKey, setResetKey] = useState(Math.random())
-  const [dragPreventBlur, setDragPreventBlur] = useState<boolean | undefined>(undefined);
+  const [resetKey, setResetKey] = useState(Math.random());
+  const [dragPreventBlur, setDragPreventBlur] = useState<boolean | undefined>(
+    undefined
+  );
   const inputRef = useRef<InputRef>(null);
-  
 
   const onDragStart = (event: any, nodeType: any) => {
     event.dataTransfer.setData("application/reactflow", nodeType);
@@ -69,39 +69,32 @@ const SelectBox: React.FC<SelectBoxProps> = ({
       key={resetKey}
       value={selectValue}
       open={dragPreventBlur}
-      style={{ width: '100%', ...useStyle }}
+      style={{ width: "100%", ...useStyle }}
       placeholder={placeholder}
       optionLabelProp="label"
       dropdownRender={(menu) => (
         <>
           {menu}
-          {addNew &&
+          {addNew && (
             <>
               <Divider style={{ margin: "8px 0" }} />
               <Space style={{ padding: "0 8px 4px" }}>
-                <Input
-                  placeholder={`Add New ${type}`}
-                  ref={inputRef}
-                  value={name}
-                  onChange={onNameChange}
-                />
-                {hasColorInput && (
-                  <input
-                    type="color"
-                    name="color"
-                    id="colorRef"
-                    value={color}
-                    style={{ marginLeft: '8px' }}
-                    onChange={(e) => setColor(e.target.value)}
-                  />
-                )}
-                <Button
-                  type="text"
+                <AddNewButton
+                disabledState={false}
+                buttonShape="default"
+                  buttonType="text"
+                  addNew={addNewItem}
                   icon={<PlusOutlined />}
-                  onClick={addNewItem}
+                  hasColorInput={true}
+                  colorInputValue={color}
+                  onColorChange={(e: any) => setColor(e.target.value)}
+                  placeholder={`Add New ${type}`}
+                  inputValue={name}
+                  changeEvent={onNameChange}
                 />
               </Space>
-            </>}
+            </>
+          )}
         </>
       )}
     >
@@ -114,9 +107,9 @@ const SelectBox: React.FC<SelectBoxProps> = ({
                 e.stopPropagation();
                 setDragPreventBlur(true);
                 setTimeout(() => {
-                  setDragPreventBlur(undefined)
-                  setResetKey(Math.random())
-                }, 200)
+                  setDragPreventBlur(undefined);
+                  setResetKey(Math.random());
+                }, 200);
               }}
               draggable
               onDragStart={(event) => onDragStart(event, item)}
@@ -124,12 +117,20 @@ const SelectBox: React.FC<SelectBoxProps> = ({
               {item}
             </div>
           ) : (
-            <div style={{ display: 'flex', justifyContent: 'space-between' }} onClick={() => selectOnChange && selectOnChange(item)}>
-              <div>{item}</div>
-              {multiselectHandler && <Checkbox onClick={(e: any) => {
-                e.stopPropagation()
-                multiselectHandler(item)
-              }} />}
+            <div
+              style={{ display: "flex", justifyContent: "space-between" }}
+              onClick={() => selectOnChange && selectOnChange(item)}
+            >
+              // max width here to prevent checkbox disappearing with text length longer than parent width
+              <div style={{maxWidth: '90%'}}>{item}</div>
+              {multiselectHandler && (
+                <Checkbox
+                  onClick={(e: any) => {
+                    e.stopPropagation();
+                    multiselectHandler(item);
+                  }}
+                />
+              )}
             </div>
           )}
         </Option>

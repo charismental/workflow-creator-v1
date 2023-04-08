@@ -1,12 +1,13 @@
-import { Layout, Space, Typography } from 'antd';
+import { Layout, Space, Typography } from "antd";
 import ActiveRoleSettings from "components/ActiveRoleSettings";
 import ReactFlowBase from "components/ReactFlowBase";
 import SelectBox from "components/SelectBox";
+import StateCollapseBox from "components/StateCollapseBox";
 import { useCallback, useState } from "react";
 import { ReactFlowProvider, useNodesState } from "reactflow";
 import "reactflow/dist/style.css";
 import useMainStore from "store";
-import { shallow } from 'zustand/shallow';
+import { shallow } from "zustand/shallow";
 import Sidebar from "./components/Sidebar";
 import "./css/style.css";
 import { RoleList } from "./data";
@@ -16,18 +17,40 @@ const { Header, Content } = Layout;
 const { Title } = Typography;
 
 const WorkflowCreator = () => {
-  const initialAllEdges = useMainStore(useCallback(state => state.initialAllEdges, []))
-  const initialAllStates = useMainStore(useCallback(state => state.initialAllStates, []));
-  const processes = useMainStore(state => state.processes);
-  const deleteProcess = useMainStore(state => state.deleteProcess);
-  const addProcess = useMainStore(state => state.addProcess);
-  const [activeProcessName, setActiveProcessName] = useMainStore(state => [state.activeProcessName, state.setActiveProcessName], shallow)
-  const [states, setState] = useMainStore(state => [state.states, state.setState], shallow)
-  const [activeRole, setActiveRole] = useMainStore(state => [state.activeRole, state.setActiveRole], shallow)
-  const [allEdges, setAllEdges] = useMainStore(state => [state.allEdges, state.setAllEdges], shallow)
+  const initialAllEdges = useMainStore(
+    useCallback((state) => state.initialAllEdges, [])
+  );
+  const initialAllStates = useMainStore(
+    useCallback((state) => state.initialAllStates, [])
+  );
+  const processes = useMainStore((state) => state.processes);
+  const deleteProcess = useMainStore((state) => state.deleteProcess);
+  const addProcess = useMainStore((state) => state.addProcess);
+  const [activeProcessName, setActiveProcessName] = useMainStore(
+    (state) => [state.activeProcessName, state.setActiveProcessName],
+    shallow
+  );
+  const [states, setState] = useMainStore(
+    (state) => [state.states, state.setState],
+    shallow
+  );
+  const [activeRole, setActiveRole] = useMainStore(
+    (state) => [state.activeRole, state.setActiveRole],
+    shallow
+  );
+  const [allEdges, setAllEdges] = useMainStore(
+    (state) => [state.allEdges, state.setAllEdges],
+    shallow
+  );
   // const [allCanSeeStates, setAllCanSeeStates] = useMainStore(state => [state.allCanSeeStates, state.setAllCanSeeStates], shallow);
-  const [roles, setRoles] = useMainStore(state => [state.roles, state.setRoles], shallow)
-  const [roleColors, setRoleColors] = useMainStore(state => [state.roleColors, state.setRoleColors], shallow);
+  const [roles, setRoles] = useMainStore(
+    (state) => [state.roles, state.setRoles],
+    shallow
+  );
+  const [roleColors, setRoleColors] = useMainStore(
+    (state) => [state.roleColors, state.setRoleColors],
+    shallow
+  );
   const [allCanSeeStates, setAllCanSeeStates] = useState(initialAllStates);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
 
@@ -36,13 +59,16 @@ const WorkflowCreator = () => {
     initialAllStates[role] = [];
   });
 
-
   const addNewStateOrRole = ({
     type,
     color,
     name,
-  }: { type: string; color?: string; name?: string }) => {
-    console.log(type, color, name)
+  }: {
+    type: string;
+    color?: string;
+    name?: string;
+  }) => {
+    console.log(type, color, name);
     if (name) {
       let newId = Math.max(...Object.values(states)) + 1;
 
@@ -78,25 +104,32 @@ const WorkflowCreator = () => {
     return !nodes.some((n) => n?.data?.label === state);
   });
 
-  const findStateNameByNode = useCallback((nodeId: string): string | undefined => {
-    const foundNode = nodes.find((node) => node.id === nodeId);
+  const findStateNameByNode = useCallback(
+    (nodeId: string): string | undefined => {
+      const foundNode = nodes.find((node) => node.id === nodeId);
 
-    return foundNode?.data?.label;
-  }, [nodes]);
+      return foundNode?.data?.label;
+    },
+    [nodes]
+  );
 
   // only 'hides' the issue of non-activeRole edges still appearing for missing nodes
   // reduce function to avoid .filter().map()
   const outputJSON = {
     [activeRole]: {
-      canSee: allCanSeeStates?.[activeRole].map(findStateNameByNode).filter((el: any) => el),
-      canTransition: (allEdges?.[activeRole] || []).map(
-        ({ source, target }: { source: string; target: string }) => {
+      canSee: allCanSeeStates?.[activeRole]
+        .map(findStateNameByNode)
+        .filter((el: any) => el),
+      canTransition: (allEdges?.[activeRole] || [])
+        .map(({ source, target }: { source: string; target: string }) => {
           return {
             source: findStateNameByNode(source),
             target: findStateNameByNode(target),
           };
-        }
-      ).filter((el: any) => ['source', 'target'].every((key: string) => el[key]))
+        })
+        .filter((el: any) =>
+          ["source", "target"].every((key: string) => el[key])
+        ),
     },
   };
 
@@ -110,7 +143,7 @@ const WorkflowCreator = () => {
         },
       }))
     );
-  }, [activeRole, roleColors, setNodes, nodes])
+  }, [activeRole, roleColors, setNodes, nodes]);
 
   const updateColor = useCallback(
     (updatedColor: string) => {
@@ -120,19 +153,48 @@ const WorkflowCreator = () => {
     [activeRole, setRoleColors, roleColors, updateNodesColor]
   );
 
-  const availableProcesses = processes.map(p => p.ProcessName);
+  const availableProcesses = processes.map((p) => p.ProcessName);
+
+    const toggleRoleForProcess = (role: string): void => {
+    console.log('addRoleToProcess', role)
+  };
 
   return (
-    <Space direction="vertical" style={{ width: '100%' }}>
+    <Space direction="vertical" style={{ width: "100%" }}>
       <ReactFlowProvider>
-        <Layout style={{ width: '100%', height: '100vh' }}>
+        <Layout style={{ width: "100%", height: "100vh" }}>
           <Layout>
-            <Header style={{ backgroundColor: '#fff', padding: '25px', height: '80px', display: 'inline-flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <SelectBox useStyle={{ width: '300px', display: 'inline-block' }} selectOnChange={setActiveProcessName} addNew={addProcess} type="process" selectValue={activeProcessName} items={availableProcesses} placeholder="Select Process" />
-              <Title level={2} style={{ display: 'inline-block', paddingBottom: '18px' }}>
+            <Header
+              style={{
+                backgroundColor: "#fff",
+                padding: "25px",
+                height: "80px",
+                display: "inline-flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <SelectBox
+                useStyle={{ width: "300px", display: "inline-block" }}
+                selectOnChange={setActiveProcessName}
+                addNew={addProcess}
+                type="process"
+                selectValue={activeProcessName}
+                items={availableProcesses}
+                placeholder="Select Process"
+              />
+              <Title
+                level={2}
+                style={{ display: "inline-block", paddingBottom: "18px" }}
+              >
                 {activeRole}
               </Title>
-              <ActiveRoleSettings roleIsToggled={true} updateColor={updateColor} color={roleColors[activeRole]} useStyle={{ lineHeight: 'normal', minWidth: '200px' }} />
+              <ActiveRoleSettings
+                roleIsToggled={true}
+                updateColor={updateColor}
+                color={roleColors[activeRole]}
+                useStyle={{ lineHeight: "normal", minWidth: "200px" }}
+              />
             </Header>
             <Content className="dndflow">
               <ReactFlowBase
@@ -150,12 +212,25 @@ const WorkflowCreator = () => {
             </Content>
           </Layout>
           <Sidebar
-            activeRole={activeRole}
-            stateList={filteredStates}
-            roleList={Object.keys(roles)}
-            setActiveRole={setActiveRole}
             output={outputJSON}
-            addNewStateOrRole={addNewStateOrRole}
+            children={
+              <>
+                <StateCollapseBox
+                  items={filteredStates}
+                  addNew={addNewStateOrRole}
+                />
+                <SelectBox
+                  addNew={addNewStateOrRole}
+                  placeholder="Select Role"
+                  selectValue={activeRole}
+                  items={Object.keys(roles)}
+                  type={"role"}
+                  hasColorInput
+                  multiselectHandler={toggleRoleForProcess}
+                  selectOnChange={setActiveRole}
+                />
+              </>
+            }
           />
         </Layout>
       </ReactFlowProvider>
