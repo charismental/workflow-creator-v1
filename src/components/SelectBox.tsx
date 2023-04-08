@@ -1,7 +1,7 @@
 import { PlusCircleOutlined, PlusCircleTwoTone } from "@ant-design/icons";
 import { Checkbox, Divider, InputRef, Select, Space } from "antd";
 import React, { useRef, useState } from "react";
-import AddNewButton from "./AddNewButton";
+import AddNewInput from "./AddNewInput";
 
 const { Option } = Select;
 
@@ -30,7 +30,8 @@ const SelectBox: React.FC<SelectBoxProps> = ({
   isDraggable = false,
   hasColorInput = false,
 }) => {
-  const [color, setColor] = useState("#d4d4d4");
+  const initialColor = "#d4d4d4";
+  const [color, setColor] = useState(initialColor);
   const [name, setName] = useState("");
   const [resetKey, setResetKey] = useState(Math.random());
   const [dragPreventBlur, setDragPreventBlur] = useState<boolean | undefined>(
@@ -52,10 +53,11 @@ const SelectBox: React.FC<SelectBoxProps> = ({
   ) => {
     e.preventDefault();
     addNew && addNew({ type, color, name });
-    setName("");
     setTimeout(() => {
       inputRef.current?.focus();
-    }, 0);
+      setName("");
+      setColor(initialColor);
+    }, 10);
   };
 
   return (
@@ -73,7 +75,7 @@ const SelectBox: React.FC<SelectBoxProps> = ({
             <>
               <Divider style={{ margin: "8px 0" }} />
               <Space style={{ padding: "0 8px 4px" }} >
-                <AddNewButton
+                <AddNewInput
                   disabledState={!name.length}
                   buttonShape="default"
                   buttonType="text"

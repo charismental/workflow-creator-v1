@@ -84,7 +84,7 @@ const WorkflowCreator = () => {
     []
   );
 
-  const addNewStateOrRole = ({
+  const addNewRole = ({
     type,
     color,
     name,
@@ -93,20 +93,19 @@ const WorkflowCreator = () => {
     color?: string;
     name?: string;
   }) => {
-    console.log(type, color, name);
-    if (name) {
-      let newId = Math.max(...Object.values(roles)) + 1;
+    if (!name) return
 
-      const newRolesObj = {
-        ...roles,
-        [name]: newId,
-      };
+    const newRolesObj = {
+      ...roles,
+      [name]: Math.max(...Object.values(roles)) + 1,
+    };
 
-      setRoles(newRolesObj);
-      color && setRoleColors({ ...roleColors, [name]: color });
-      setAllEdges({ ...allEdges, [name]: [] });
-      setAllCanSeeStates({ ...allCanSeeStates, [name]: [] });
-    }
+    setRoles(newRolesObj);
+    color && setRoleColors({ ...roleColors, [name]: color });
+    setAllEdges({ ...allEdges, [name]: [] });
+    setAllCanSeeStates({ ...allCanSeeStates, [name]: [] });
+    toggleRoleForProcess(name);
+    setActiveRole(name);
   };
 
   // only 'hides' the issue of non-activeRole edges still appearing for missing nodes
@@ -160,6 +159,11 @@ const WorkflowCreator = () => {
     };
   });
 
+  const addNewProcessAndSelect = ({ name }: { name: string }) => {
+    addProcess({ name });
+    setActiveProcessName(name);
+  }
+
   return (
     <Space direction="vertical" style={spaceContainer}>
       <ReactFlowProvider>
@@ -167,9 +171,9 @@ const WorkflowCreator = () => {
           <Layout>
             <Header style={headerStyle}>
               <SelectBox
-                useStyle={{ flexGrow: 1 }}
+                useStyle={{ flexGrow: 1, maxWidth: "360px" }}
                 selectOnChange={setActiveProcessName}
-                addNew={addProcess}
+                addNew={addNewProcessAndSelect}
                 type="process"
                 selectValue={activeProcessName}
                 items={availableProcesses}
@@ -180,9 +184,10 @@ const WorkflowCreator = () => {
                 {activeRole}
               </Title>
               <ActiveRoleSettings
-                roleIsToggled={true}
+                roleIsToggled={!!activeProcess?.roles?.some((r) => r.RoleName === activeRole)}
                 updateColor={updateColor}
                 color={roleColors[activeRole]}
+                toggleRole={() => toggleRoleForProcess(activeRole)}
                 useStyle={{ flexGrow: 1 }}
               />
             </Header>
@@ -210,7 +215,7 @@ const WorkflowCreator = () => {
                   addNew={addNewStateItem}
                 />
                 <SelectBox
-                  addNew={addNewStateOrRole}
+                  addNew={addNewRole}
                   placeholder="Select Role"
                   selectValue={activeRole}
                   items={roleList}
