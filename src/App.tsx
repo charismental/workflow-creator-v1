@@ -5,7 +5,7 @@ import SelectBox from "components/SelectBox";
 import { useCallback, useState } from "react";
 import { ReactFlowProvider, useNodesState } from "reactflow";
 import "reactflow/dist/style.css";
-import useMainStore from "store";
+import useMainStore, { WorkflowProcess } from "store";
 import { shallow } from 'zustand/shallow';
 import Sidebar from "./components/Sidebar";
 import "./css/style.css";
@@ -21,6 +21,7 @@ const WorkflowCreator = () => {
   const processes = useMainStore(state => state.processes);
   const deleteProcess = useMainStore(state => state.deleteProcess);
   const addProcess = useMainStore(state => state.addProcess);
+  const toggleRoleForProcess = useMainStore(state => state.toggleRoleForProcess);
   const [activeProcessName, setActiveProcessName] = useMainStore(state => [state.activeProcessName, state.setActiveProcessName], shallow)
   const [states, setState] = useMainStore(state => [state.states, state.setState], shallow)
   const [activeRole, setActiveRole] = useMainStore(state => [state.activeRole, state.setActiveRole], shallow)
@@ -122,6 +123,15 @@ const WorkflowCreator = () => {
 
   const availableProcesses = processes.map(p => p.ProcessName);
 
+  const activeProcess = processes.find((process: WorkflowProcess) => process.ProcessName === activeProcessName);
+
+  const roleList = Object.keys(roles).map(role => {
+    return {
+      label: role,
+      value: activeProcess?.roles?.some(r => r.RoleName === role) || false,
+    }
+  });
+
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
       <ReactFlowProvider>
@@ -152,8 +162,9 @@ const WorkflowCreator = () => {
           <Sidebar
             activeRole={activeRole}
             stateList={filteredStates}
-            roleList={Object.keys(roles)}
+            roleList={roleList}
             setActiveRole={setActiveRole}
+            toggleRoleForProcess={toggleRoleForProcess}
             output={outputJSON}
             addNewStateOrRole={addNewStateOrRole}
           />

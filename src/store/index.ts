@@ -18,16 +18,16 @@ export interface WorkflowConnection {
 export interface WorkflowState {
     StateID: number;
     StateName: string;
-    RequiresUserAssignment: BooleanNumber;
-    RequiresRoleAssignment: BooleanNumber;
+    RequiresUserAssignment: BooleanNumber | number;
+    RequiresRoleAssignment: BooleanNumber | number;
     DisplayOrder: number;
 }
 
 export interface WorkflowRole {
     RoleID: number;
     RoleName: string;
-    IsUniversal: BooleanNumber;
-    isCluster: BooleanNumber;
+    IsUniversal: BooleanNumber | number;
+    isCluster: BooleanNumber | number;
 }
 
 export interface WorkflowProcess {
@@ -62,6 +62,7 @@ interface MainActions {
     setAllCanSeeStates: (el: any) => void;
     setRoleColors: (el: { [key: string]: string }) => void;
     setRoles: (el: { [key: string]: number }) => void;
+    toggleRoleForProcess: (role: string) => void;
 }
 
 const useMainStore = create<MainState & MainActions>()(
@@ -82,16 +83,42 @@ const useMainStore = create<MainState & MainActions>()(
         setRoleColors: (el) => set(() => ({ roleColors: el })),
         roles: { ...RoleList },
         setRoles: (el) => set(() => ({ roles: el })),
-        processes: [{ ProcessID: 2373, ProcessName: 'New Workflow' }, { ProcessID: 2374, ProcessName: 'New Workflow 2' }],
+        processes: [{ ProcessID: 2373, ProcessName: 'New Workflow', roles: [] }, { ProcessID: 2374, ProcessName: 'New Workflow 2', roles: [] }],
         addProcess: ({ name }: any) => set(({ processes }) => {
             const newProcess = {
                 ProcessID: processes.length + 1,
                 ProcessName: name,
+                roles: [],
             }
 
             return { processes: processes.concat(newProcess) }
         }),
         deleteProcess: (processId) => set(({ processes }) => ({ processes: processes.filter(p => p.ProcessID !== processId) })),
+        toggleRoleForProcess: (role) => set(({ processes, activeProcessName, roles: globalRoles }) => {
+            const foundProcessIndex = processes.findIndex(process => process.ProcessName === activeProcessName);
+            const updatedProcesses = [...processes]
+
+            if (foundProcessIndex !== -1) {
+                const updatedProcess = processes[foundProcessIndex];
+                const { roles = [] } = updatedProcess
+                const foundRole = roles.find(r => r?.RoleName === role);
+                
+                if (foundRole) {
+                    updatedProcess.roles = roles.filter(r => r.RoleName !== role)
+                } else {
+                    const newRole = {
+                        RoleID: globalRoles[role],
+                        RoleName: role,
+                        IsUniversal: 1,
+                        isCluster: 0,
+                    }
+
+                    updatedProcess.roles = roles.concat(newRole);
+                }
+            }
+
+            return { processes: updatedProcesses }
+        }),
     }))
 
 

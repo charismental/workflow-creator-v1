@@ -14,7 +14,7 @@ const { Option } = Select;
 
 interface SelectBoxProps {
   type: 'role' | 'state' | 'process';
-  items: string[];
+  items: string[] | { label: string; value: boolean }[];
   selectValue?: string;
   useStyle?: any;
   selectOnChange?: (value: string) => void;
@@ -42,7 +42,7 @@ const SelectBox: React.FC<SelectBoxProps> = ({
   const [resetKey, setResetKey] = useState(Math.random())
   const [dragPreventBlur, setDragPreventBlur] = useState<boolean | undefined>(undefined);
   const inputRef = useRef<InputRef>(null);
-  
+
 
   const onDragStart = (event: any, nodeType: any) => {
     event.dataTransfer.setData("application/reactflow", nodeType);
@@ -105,35 +105,39 @@ const SelectBox: React.FC<SelectBoxProps> = ({
         </>
       )}
     >
-      {items.map((item) => (
-        <Option key={item} label={item}>
-          {isDraggable ? (
-            <div
-              // hacky
-              onMouseDown={(e) => {
-                e.stopPropagation();
-                setDragPreventBlur(true);
-                setTimeout(() => {
-                  setDragPreventBlur(undefined)
-                  setResetKey(Math.random())
-                }, 200)
-              }}
-              draggable
-              onDragStart={(event) => onDragStart(event, item)}
-            >
-              {item}
-            </div>
-          ) : (
-            <div style={{ display: 'flex', justifyContent: 'space-between' }} onClick={() => selectOnChange && selectOnChange(item)}>
-              <div>{item}</div>
-              {multiselectHandler && <Checkbox onClick={(e: any) => {
-                e.stopPropagation()
-                multiselectHandler(item)
-              }} />}
-            </div>
-          )}
-        </Option>
-      ))}
+      {items.map((item) => {
+        const label = typeof item === 'string' ? item : item.label;
+
+        return (
+          <Option key={label} label={label}>
+            {isDraggable ? (
+              <div
+                // hacky
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  setDragPreventBlur(true);
+                  setTimeout(() => {
+                    setDragPreventBlur(undefined)
+                    setResetKey(Math.random())
+                  }, 200)
+                }}
+                draggable
+                onDragStart={(event) => onDragStart(event, label)}
+              >
+                {label}
+              </div>
+            ) : (
+              <div style={{ display: 'flex', justifyContent: 'space-between' }} onClick={() => selectOnChange && selectOnChange(label)}>
+                <div>{label}</div>
+                {multiselectHandler && typeof item !== 'string' && <Checkbox checked={item.value} onClick={(e: any) => {
+                  e.stopPropagation()
+                  multiselectHandler(item)
+                }} />}
+              </div>
+            )}
+          </Option>
+        )
+      })}
     </Select>
   );
 };
