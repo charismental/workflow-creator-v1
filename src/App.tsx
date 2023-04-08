@@ -17,7 +17,7 @@ const { Header, Content } = Layout;
 const { Title } = Typography;
 
 const spaceContainer: CSSProperties = {
-  width: "100%",
+  width: '100%'
 };
 const headerStyle: CSSProperties = {
   backgroundColor: "#fff",
