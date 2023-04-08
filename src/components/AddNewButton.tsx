@@ -1,4 +1,13 @@
-import { Button, ButtonProps, Input, InputProps, InputRef } from "antd";
+import {
+  Button,
+  ButtonProps,
+  Col,
+  Input,
+  InputProps,
+  InputRef,
+  Row,
+  Space,
+} from "antd";
 import { CSSProperties, FC, useRef } from "react";
 
 interface AddNewButtonProps {
@@ -11,8 +20,11 @@ interface AddNewButtonProps {
   addNew: any;
   icon?: ButtonProps["icon"];
   hasColorInput: boolean;
-  colorInputValue?: CSSProperties['color'];
+  colorInputValue?: CSSProperties["color"];
   onColorChange?: any;
+  containerStyle?: CSSProperties;
+  inputStyle?: CSSProperties;
+  buttonStyle?: CSSProperties;
 }
 
 const AddNewButton: FC<AddNewButtonProps> = (props) => {
@@ -27,36 +39,48 @@ const AddNewButton: FC<AddNewButtonProps> = (props) => {
     addNew,
     icon,
     hasColorInput,
-    colorInputValue
+    colorInputValue,
+    containerStyle,
+    inputStyle,
+    buttonStyle,
   } = props;
   const inputRef = useRef<InputRef>(null);
 
   return (
-    <div style={{ display: "flex" }}>
-      <Input
-        placeholder={placeholder}
-        ref={inputRef}
-        value={inputValue}
-        onChange={changeEvent}
-      />
-      {hasColorInput && (
-        <input
-          type="color"
-          name="color"
-          id="colorRef"
-          value={colorInputValue}
-          style={{ marginLeft: "8px" }}
-          onChange={onColorChange}
-        />
-      )}
-      <Button
-        shape={buttonShape}
-        disabled={disabledState}
-        icon={icon}
-        onClick={addNew}
-        type={buttonType}
-      />
-    </div>
+    <Space align="center" style={{ ...containerStyle }}>
+      <Row justify={'space-between'} align={'middle'} wrap={false} gutter={16}>
+        <Col flex={3}>
+          <Input
+            style={{ ...inputStyle }}
+            placeholder={placeholder}
+            ref={inputRef}
+            value={inputValue}
+            onChange={changeEvent}
+          />
+        </Col>
+        {hasColorInput && (
+          <Col flex={2}>
+            <input
+              type="color"
+              name="color"
+              id="colorRef"
+              value={colorInputValue}
+              onChange={onColorChange}
+            />
+          </Col>
+        )}
+        <Col flex={2}>
+          <Button
+            style={{ ...buttonStyle }}
+            shape={buttonShape}
+            disabled={disabledState}
+            icon={icon}
+            onClick={addNew}
+            type={buttonType}
+          />
+        </Col>
+      </Row>
+    </Space>
   );
 };
 

@@ -23,9 +23,11 @@ const WorkflowCreator = () => {
   const initialAllStates = useMainStore(
     useCallback((state) => state.initialAllStates, [])
   );
+  
   const processes = useMainStore((state) => state.processes);
   const deleteProcess = useMainStore((state) => state.deleteProcess);
   const addProcess = useMainStore((state) => state.addProcess);
+  const toggleRoleForProcess = useMainStore(state => state.toggleRoleForProcess);
   const [activeProcessName, setActiveProcessName] = useMainStore(
     (state) => [state.activeProcessName, state.setActiveProcessName],
     shallow
@@ -155,9 +157,6 @@ const WorkflowCreator = () => {
 
   const availableProcesses = processes.map((p) => p.ProcessName);
 
-    const toggleRoleForProcess = (role: string): void => {
-    console.log('addRoleToProcess', role)
-  };
 
   const activeProcess = processes.find((process: WorkflowProcess) => process.ProcessName === activeProcessName);
 
@@ -184,17 +183,18 @@ const WorkflowCreator = () => {
               }}
             >
               <SelectBox
-                useStyle={{ width: "300px", display: "inline-block" }}
+                useStyle={{ flexGrow: 1 }}
                 selectOnChange={setActiveProcessName}
                 addNew={addProcess}
                 type="process"
                 selectValue={activeProcessName}
                 items={availableProcesses}
                 placeholder="Select Process"
+                hasColorInput={false}
               />
               <Title
                 level={2}
-                style={{ display: "inline-block", paddingBottom: "18px" }}
+                style={{ flexGrow: 2, textAlign: 'center', paddingBottom: '18px'}}
               >
                 {activeRole}
               </Title>
@@ -202,7 +202,7 @@ const WorkflowCreator = () => {
                 roleIsToggled={true}
                 updateColor={updateColor}
                 color={roleColors[activeRole]}
-                useStyle={{ lineHeight: "normal", minWidth: "200px" }}
+                useStyle={{ flexGrow: 1 }}
               />
             </Header>
             <Content className="dndflow">
@@ -232,10 +232,11 @@ const WorkflowCreator = () => {
                   addNew={addNewStateOrRole}
                   placeholder="Select Role"
                   selectValue={activeRole}
-                  items={Object.keys(roles)}
+                  items={roleList}
                   type={"role"}
                   hasColorInput
-                  multiselectHandler={toggleRoleForProcess}
+                  useStyle={{width: '100%'}}
+                  multiselectHandler={el => toggleRoleForProcess(el.label)}
                   selectOnChange={setActiveRole}
                 />
               </>

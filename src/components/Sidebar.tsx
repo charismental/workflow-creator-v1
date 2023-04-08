@@ -19,7 +19,7 @@ const Sidebar: FC<SideBarProps> = (props): JSX.Element => {
 
   return (
     // supposed to show tab on breakpoint if collapseWidth is 0
-    <Sider width="min-content" style={sidebar} breakpoint="lg"
+    <Sider width="300px" style={sidebar} breakpoint="lg"
     collapsedWidth="0">
       <Space direction="vertical" size="small" style={sidebarSpacer}>
         {children}
