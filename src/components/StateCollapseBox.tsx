@@ -43,7 +43,7 @@ const StateCollapseBox: React.FC<StateCollapsebox> = ({
     e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
   ) => {
     e.preventDefault();
-    addNew && addNew({ type: "state", name });
+    addNew && addNew(name);
     setName("");
     setTimeout(() => {
       inputRef.current?.focus();
