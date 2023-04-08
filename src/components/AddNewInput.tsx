@@ -10,7 +10,7 @@ import {
 } from "antd";
 import { CSSProperties, FC, useRef } from "react";
 
-interface AddNewButtonProps {
+interface AddNewInputProps {
   placeholder?: InputProps["placeholder"];
   inputValue?: InputProps["value"];
   changeEvent: React.ChangeEventHandler<HTMLInputElement> | undefined;
@@ -27,7 +27,7 @@ interface AddNewButtonProps {
   buttonStyle?: CSSProperties;
 }
 
-const AddNewButton: FC<AddNewButtonProps> = (props) => {
+const AddNewInput: FC<AddNewInputProps> = (props) => {
   const {
     placeholder,
     buttonType,
@@ -84,4 +84,4 @@ const AddNewButton: FC<AddNewButtonProps> = (props) => {
   );
 };
 
-export default AddNewButton;
+export default AddNewInput;

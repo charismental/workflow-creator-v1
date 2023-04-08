@@ -75,7 +75,7 @@ const WorkflowCreator = () => {
   const filteredStates = useMainStore(useCallback((state) => state.filteredStates, [currentStates]));
   const addNewStateItem = useMainStore((state) => state.addNewStateItem);
 
-  const addNewStateOrRole = ({
+  const addNewRole = ({
     type,
     color,
     name,
@@ -84,27 +84,27 @@ const WorkflowCreator = () => {
     color?: string;
     name?: string;
   }) => {
-    if (name) {
-      let newId = Math.max(...Object.values(roles)) + 1;
+    if (!name) return
 
-      const newRolesObj = {
-        ...roles,
-        [name]: newId,
-      };
+    const newRolesObj = {
+      ...roles,
+      [name]: Math.max(...Object.values(roles)) + 1,
+    };
 
-      setRoles(newRolesObj);
-      color && setRoleColors({ ...roleColors, [name]: color });
-      setAllEdges({ ...allEdges, [name]: [] });
-      setAllCanSeeStates({ ...allCanSeeStates, [name]: [] });
-    }
+    setRoles(newRolesObj);
+    color && setRoleColors({ ...roleColors, [name]: color });
+    setAllEdges({ ...allEdges, [name]: [] });
+    setAllCanSeeStates({ ...allCanSeeStates, [name]: [] });
+    toggleRoleForProcess(name);
+    setActiveRole(name);
   };
 
   const findStateNameByNode = useCallback(
     (nodeId: string): string | undefined => {
       const foundNode = nodes.find((node) => node.id === nodeId);
 
-    return foundNode?.data?.label;
-  }, [nodes]);
+      return foundNode?.data?.label;
+    }, [nodes]);
 
   // only 'hides' the issue of non-activeRole edges still appearing for missing nodes
   // reduce function to avoid .filter().map()
@@ -118,10 +118,10 @@ const WorkflowCreator = () => {
             target: findStateNameByNode(target),
           };
         })
-        // Modified StateNode file to update Edges... seems to work???
-        // .filter((el: any) =>
-        //   ["source", "target"].every((key: string) => el[key])
-        // ),
+      // Modified StateNode file to update Edges... seems to work???
+      // .filter((el: any) =>
+      //   ["source", "target"].every((key: string) => el[key])
+      // ),
     },
   };
 
@@ -158,8 +158,14 @@ const WorkflowCreator = () => {
     };
   });
 
+  
+  const addNewProcessAndSelect = ({ name }: { name: string }) => {
+    addProcess({ name });
+    setActiveProcessName(name);
+  }
+  
   if (!hasHydrated) {
-    return <Spin size="large" style={{position: 'absolute', top: '50%', left: '50%'}} tip={<Title level={4} style={{color:'blue'}}>...Loading State</Title>}/>
+    return <Spin size="large" style={{ position: 'absolute', top: '50%', left: '50%' }} tip={<Title level={4} style={{ color: 'blue' }}>...Loading State</Title>} />
   }
 
   return (
@@ -169,9 +175,9 @@ const WorkflowCreator = () => {
           <Layout>
             <Header style={headerStyle}>
               <SelectBox
-                useStyle={{ flexGrow: 1 }}
+                useStyle={{ flexGrow: 1, maxWidth: "360px" }}
                 selectOnChange={setActiveProcessName}
-                addNew={addProcess}
+                addNew={addNewProcessAndSelect}
                 type="process"
                 selectValue={activeProcessName}
                 items={availableProcesses}
@@ -182,9 +188,10 @@ const WorkflowCreator = () => {
                 {activeRole}
               </Title>
               <ActiveRoleSettings
-                roleIsToggled={true}
+                roleIsToggled={!!activeProcess?.roles?.some((r) => r.RoleName === activeRole)}
                 updateColor={updateColor}
                 color={roleColors[activeRole]}
+                toggleRole={() => toggleRoleForProcess(activeRole)}
                 useStyle={{ flexGrow: 1 }}
               />
             </Header>
@@ -212,7 +219,7 @@ const WorkflowCreator = () => {
                   addNew={addNewStateItem}
                 />
                 <SelectBox
-                  addNew={addNewStateOrRole}
+                  addNew={addNewRole}
                   placeholder="Select Role"
                   selectValue={activeRole}
                   items={roleList}

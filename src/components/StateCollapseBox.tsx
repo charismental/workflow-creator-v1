@@ -3,7 +3,7 @@ import { Collapse, Divider, InputRef, Space } from "antd";
 import React, { useRef, useState } from "react";
 import useMainStore from "store";
 import { shallow } from "zustand/shallow";
-import AddNewButton from "./AddNewButton";
+import AddNewInput from "./AddNewInput";
 import styles from "./StateCollapseBox.module.css";
 
 const { Panel } = Collapse;
@@ -75,7 +75,7 @@ const StateCollapseBox: React.FC<StateCollapsebox> = ({
         <>
           {items.length > 0 && <Divider style={{ margin: "8px 0" }} />}
           <Space style={{ padding: "0 8px 4px" }}>
-            <AddNewButton
+            <AddNewInput
               hasColorInput={false}
               changeEvent={onNameChange}
               placeholder="Add New State"
