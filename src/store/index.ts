@@ -2,7 +2,7 @@
 import { RoleList, StateList, initialColors } from 'data';
 import { Node } from 'reactflow';
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+// import { persist } from 'zustand/middleware';
 import { WorkflowProcess } from './types';
 
 interface MainState {
@@ -36,7 +36,7 @@ interface MainActions {
 }
 
 const useMainStore = create<MainState & MainActions>()(
-    persist(
+    // persist(
     (set, get) => ({
         _hasHydrated: false,
         setHasHydrated: (state) => set(({_hasHydrated: state})),
@@ -109,12 +109,14 @@ const useMainStore = create<MainState & MainActions>()(
             return { states: newStatesObj }
         })
 
-    }), {
-        name: 'main-store',
-        onRehydrateStorage: () => (state) => {
-            state?.setHasHydrated(true)
-        }
-    }))
+    })
+    // , {
+    //     name: 'main-store',
+    //     onRehydrateStorage: () => (state) => {
+    //         state?.setHasHydrated(true)
+    //     }
+    // })
+    )
 
 
 export default useMainStore;
