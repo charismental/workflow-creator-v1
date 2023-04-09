@@ -110,7 +110,7 @@ const WorkflowCreator = () => {
   // reduce function to avoid .filter().map()
   const outputJSON = {
     [activeRole]: {
-      canSee: allCanSeeStates?.[activeRole].map(findStateNameByNode).filter((el: any) => el),
+      canSee: (allCanSeeStates?.[activeRole] || []).map(findStateNameByNode).filter((el: any) => el),
       canTransition: (allEdges?.[activeRole] || [])
         .map(({ source, target }: { source: string; target: string }) => {
           return {
