@@ -4,14 +4,13 @@ import ReactFlowBase from "components/ReactFlowBase";
 import SelectBox from "components/SelectBox";
 import StateCollapseBox from "components/StateCollapseBox";
 import { CSSProperties, useCallback, useState } from "react";
-import { ReactFlowProvider, useNodesState } from "reactflow";
+import { ReactFlowProvider } from "reactflow";
 import "reactflow/dist/style.css";
 import useMainStore from "store";
 import { WorkflowProcess } from "store/types";
 import { shallow } from "zustand/shallow";
 import Sidebar from "./components/Sidebar";
 import "./css/style.css";
-import initialNodes from "./data/initialNodes";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -35,10 +34,7 @@ const activeRoleTitleStyle: CSSProperties = {
 const layoutContainer: CSSProperties = { width: "100%", height: "100vh" };
 
 const WorkflowCreator = () => {
-  const hasHydrated = useMainStore((state) => state._hasHydrated);
-  const initialAllEdges = useMainStore(
-    useCallback((state) => state.initialAllEdges, [])
-  );
+  // const hasHydrated = useMainStore((state) => state._hasHydrated);
   const initialAllState = useMainStore(
     useCallback((state) => state.initialAllState, [])
   );
@@ -64,23 +60,24 @@ const WorkflowCreator = () => {
     (state) => [state.roles, state.setRoles],
     shallow
   );
+  const [nodes, setNodes] = useMainStore(
+    (state) => [state.nodes, state.setNodes],
+    shallow
+  );
   const [roleColors, setRoleColors] = useMainStore(
     (state) => [state.roleColors, state.setRoleColors],
     shallow
   );
   // const [allCanSeeStates, setAllCanSeeStates] = useMainStore((state) => [state.allCanSeeStates, state.setAllCanSeeStates], shallow);
   const [allCanSeeStates, setAllCanSeeStates] = useState(initialAllState);
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [currentStates, setCurrentStates] = useMainStore((state) => [state.states, state.setState], shallow)
+  const [currentStates, setCurrentStates] = useMainStore((state) => [state.states, state.setStates], shallow)
   const filteredStates = useMainStore(useCallback((state) => state.filteredStates, [currentStates]));
   const addNewStateItem = useMainStore((state) => state.addNewStateItem);
 
   const addNewRole = ({
-    type,
     color,
     name,
   }: {
-    type: string;
     color?: string;
     name?: string;
   }) => {
@@ -106,6 +103,7 @@ const WorkflowCreator = () => {
       return foundNode?.data?.label;
     }, [nodes]);
 
+  // may actually be resolved now
   // only 'hides' the issue of non-activeRole edges still appearing for missing nodes
   // reduce function to avoid .filter().map()
   const outputJSON = {
@@ -199,14 +197,9 @@ const WorkflowCreator = () => {
               <ReactFlowBase
                 allCanSeeStates={allCanSeeStates}
                 setAllCanSeeStates={setAllCanSeeStates}
-                allEdges={allEdges}
-                setAllEdges={setAllEdges}
                 roleColors={roleColors}
                 updateNodesColor={updateNodesColor}
                 activeRole={activeRole}
-                nodes={nodes}
-                setNodes={setNodes}
-                onNodesChange={onNodesChange}
               />
             </Content>
           </Layout>

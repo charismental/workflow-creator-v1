@@ -7,8 +7,6 @@ import {
   NodeProps,
   NodeResizer,
   Position,
-  getConnectedEdges,
-  useReactFlow,
   useStore as useReactFlowStore,
 } from "reactflow";
 import useMainStore from "store";
@@ -32,10 +30,9 @@ const StateNode: FunctionComponent<NodeProps> = ({
   data,
 }): JSX.Element => {
   const [isMouseOver, setIsMouseOver] = useState(false);
+  const [nodes, setNodes] = useMainStore((state) => [state.nodes, state.setNodes], shallow)
   const [allEdges, setAlledges] = useMainStore((state) => [state.allEdges, state.setAllEdges], shallow)
   const { toggleCanSeeState, isCanSee = false } = data;
-
-  const { getNode, getEdges, deleteElements } = useReactFlow();
 
   const connectionNodeId = useReactFlowStore(connectionNodeIdSelector);
   const isTarget = connectionNodeId && connectionNodeId !== id;
@@ -43,21 +40,17 @@ const StateNode: FunctionComponent<NodeProps> = ({
   const targetHandleStyle = { zIndex: isTarget ? 3 : 1 };
 
   const removeNode = useCallback(() => {
-    const node = getNode(id);
+    const updatedNodes = nodes.filter(node => node.id !== id);
 
-    if (!node) return;
+    const updatedEdges = { ...allEdges };
 
-    const edges = getEdges();
+    Object.keys(updatedEdges).forEach((key: string) => {
+      updatedEdges[key] = updatedEdges[key].filter(({ source, target }: { source: string; target: string }) => ![source, target].includes(id))
+    })
 
-    const connectedEdges = getConnectedEdges([node], edges);
-    const removedNode = { nodes: [node], edges: connectedEdges }
-    // TODO: should also delete edges/allEdges for this node with other roles
-
-    // trying this...
-    setAlledges(connectedEdges)
-    
-    deleteElements(removedNode);
-  }, [allEdges, setAlledges]);
+    setAlledges(updatedEdges);
+    setNodes(updatedNodes);
+  }, [allEdges, setAlledges, nodes, setNodes]);
 
   const minWidth = 200;
   const minHeight = 30;
@@ -74,7 +67,7 @@ const StateNode: FunctionComponent<NodeProps> = ({
         backgroundColor: isTarget ? "#ffcce3" : data?.color || "#ccd9f6",
       }}
     >
-      {isCanSee && <RollbackOutlined rotate={270} style={{color: 'black', fontSize: '32px', position: 'absolute', top: '-28px', right: '12px' }} />}
+      {isCanSee && <RollbackOutlined rotate={270} style={{ color: 'black', fontSize: '32px', position: 'absolute', top: '-28px', right: '12px' }} />}
       <NodeResizer
         isVisible
         minWidth={minWidth}

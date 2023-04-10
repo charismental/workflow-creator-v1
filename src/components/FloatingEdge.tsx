@@ -4,15 +4,21 @@ import { FunctionComponent, useCallback } from "react";
 import { EdgeProps, getStraightPath, useStore as useReactFlowStore } from "reactflow";
 import { getEdgeParams } from "../utils";
 
+import useMainStore from "store";
+
+
 const foreignObjectSize = 40;
 
 
 const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd, style, data }) => {
+  const edges = useMainStore((state) => state.edges);
+
   const onEdgeClick = (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>, id: string) => {
     event.stopPropagation();
+    const filtered = edges.filter((ed: any) => ed.id !== id)
+
     if (data?.setEdges)
-      // not sure if need/want to type edges
-      data.setEdges((edges: any) => edges.filter((ed: any) => ed.id !== id));
+      data.setEdges(filtered);
   };
 
   const sourceNode = useReactFlowStore(
