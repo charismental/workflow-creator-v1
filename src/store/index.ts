@@ -17,7 +17,11 @@ import {
     Connection,
 } from "reactflow";
 
-import initialNodes from 'data/initialNodes';
+import initialWorkflows from 'data/seed';
+
+const initialProcessName = 'LBHA v2';
+const initialRole = 'Intake-Specialist';
+const initialNodes = initialWorkflows.find(({ ProcessName }) => ProcessName === initialProcessName)?.nodes || [];
 
 export interface MainState {
     activeProcessName: string;
@@ -81,9 +85,9 @@ const useMainStore = create<MainState & MainActions>()(
                 edges: addEdge(connection, updatedEdges),
             });
         },
-        activeProcessName: 'LBHA v2',
+        activeProcessName: initialProcessName,
         setActiveProcessName: (processName) => set(() => ({ activeProcessName: processName })),
-        activeRole: 'Intake-Specialist',
+        activeRole: initialRole,
         setActiveRole: (role) => set(() => ({ activeRole: role })),
         initialAllEdges: { "Intake-Specialist": [], "Intake-Specialist Manager": [], "Caseworker": [], "Caseworker Manager": [], "Partner Final Reviewer": [], "Partner Reviewer": [], "Customer-Support": [] },
         initialAllState: { "Intake-Specialist": [], "Intake-Specialist Manager": [], "Caseworker": [], "Caseworker Manager": [], "Partner Final Reviewer": [], "Partner Reviewer": [], "Customer-Support": [] },
@@ -104,7 +108,7 @@ const useMainStore = create<MainState & MainActions>()(
         setRoles: (el) => set(() => ({ roles: el })),
         setNodes: (nodes) => set(() => ({ nodes })),
         setEdges: (edges) => set(() => ({ edges })),
-        processes: [{ ProcessID: 2373, ProcessName: 'New Workflow', roles: [] }, { ProcessID: 2374, ProcessName: 'LBHA v2', roles: [] }],
+        processes: initialWorkflows,
         addProcess: ({ name }: any) => set(({ processes }) => {
             const newProcess = {
                 ProcessID: processes.length + 1,

@@ -11,7 +11,7 @@ import { shallow } from 'zustand/shallow';
 const foreignObjectSize = 40;
 
 
-const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd, style, data }) => {
+const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd, style }) => {
   const [edges, setEdges] = useMainStore(
     (state) => [state.edges, state.setEdges],
     shallow

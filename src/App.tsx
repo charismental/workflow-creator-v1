@@ -78,7 +78,7 @@ const WorkflowCreator = () => {
     color,
     name,
   }: {
-    color?: string;
+    color: string;
     name?: string;
   }) => {
     if (!name) return
@@ -89,9 +89,7 @@ const WorkflowCreator = () => {
     };
 
     setRoles(newRolesObj);
-    color && setRoleColors({ ...roleColors, [name]: color });
-    setAllEdges({ ...allEdges, [name]: [] });
-    setAllCanSeeStates({ ...allCanSeeStates, [name]: [] });
+    setRoleColors({ ...roleColors, [name]: color });
     toggleRoleForProcess(name);
     setActiveRole(name);
   };
