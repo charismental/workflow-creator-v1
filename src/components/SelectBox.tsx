@@ -48,6 +48,12 @@ const SelectBox: React.FC<SelectBoxProps> = ({
     setName(event.target.value);
   };
 
+  const isDuplicateName = items.some(item => {
+    const label = typeof item === "string" ? item : item?.label;
+
+    return label === name;
+  })
+
   const addNewItem = (
     e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
   ) => {
@@ -76,12 +82,12 @@ const SelectBox: React.FC<SelectBoxProps> = ({
               <Divider style={{ margin: "8px 0" }} />
               <Space style={{ padding: "0 8px 4px" }} >
                 <AddNewInput
-                  disabledState={!name.length}
+                  disabledState={!name.length || isDuplicateName}
                   buttonShape="default"
                   buttonType="text"
                   addNew={addNewItem}
                   icon={
-                    !name.length ? (
+                    !name.length || isDuplicateName ? (
                       <PlusCircleOutlined style={{ fontSize: "20px" }} />
                     ) : (
                       <PlusCircleTwoTone style={{ fontSize: "20px" }} />
@@ -101,7 +107,7 @@ const SelectBox: React.FC<SelectBoxProps> = ({
       )}
     >
       {items.map((item) => {
-        const label = typeof item === "string" ? item : item.label;
+        const label = typeof item === "string" ? item : item?.label;
 
         return (
           <Option key={label} label={label}>

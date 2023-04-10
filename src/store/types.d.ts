@@ -1,3 +1,5 @@
+import { Node } from "reactflow";
+
 export interface WorkflowConnection {
     source: string;
     target: string;
@@ -25,6 +27,7 @@ export interface WorkflowProcess {
     states?: Array<WorkflowState>; //
     roles?: Array<WorkflowRole>;
     connections?: Array<WorkflowConnection>;
+    nodes?: Array<Node>
 }
 
 type BooleanNumber = 0 | 1;

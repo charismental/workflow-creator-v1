@@ -44,11 +44,6 @@ const selector = (state: MainState & MainActions) => ({
   onConnect: state.onConnect,
 });
 
-// TODO: nodes.length
-let id = 11;
-
-const getId = () => `state_node_${++id}`
-
 interface ReactFlowBaseProps {
   allCanSeeStates: any;
   setAllCanSeeStates: any;
@@ -168,7 +163,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
       });
 
       const newNode = {
-        id: getId(),
+        id: type,
         dragHandle: ".drag-handle",
         type: "custom",
         position,

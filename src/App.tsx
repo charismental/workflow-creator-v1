@@ -3,10 +3,10 @@ import ActiveRoleSettings from "components/ActiveRoleSettings";
 import ReactFlowBase from "components/ReactFlowBase";
 import SelectBox from "components/SelectBox";
 import StateCollapseBox from "components/StateCollapseBox";
-import { CSSProperties, useCallback, useState } from "react";
+import { CSSProperties, useCallback, useEffect, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
 import "reactflow/dist/style.css";
-import useMainStore from "store";
+import useMainStore, { initialAllCanSeeStates, initialNodes } from "store";
 import { WorkflowProcess } from "store/types";
 import { shallow } from "zustand/shallow";
 import Sidebar from "./components/Sidebar";
@@ -35,9 +35,10 @@ const layoutContainer: CSSProperties = { width: "100%", height: "100vh" };
 
 const WorkflowCreator = () => {
   // const hasHydrated = useMainStore((state) => state._hasHydrated);
-  const initialAllState = useMainStore(
-    useCallback((state) => state.initialAllState, [])
-  );
+  // const initialAllState = useMainStore(
+  //   useCallback((state) => state.initialAllState, [])
+  // );
+
   const processes = useMainStore((state) => state.processes);
   const deleteProcess = useMainStore((state) => state.deleteProcess);
   const addProcess = useMainStore((state) => state.addProcess);
@@ -69,10 +70,14 @@ const WorkflowCreator = () => {
     shallow
   );
   // const [allCanSeeStates, setAllCanSeeStates] = useMainStore((state) => [state.allCanSeeStates, state.setAllCanSeeStates], shallow);
-  const [allCanSeeStates, setAllCanSeeStates] = useState(initialAllState);
+  const [allCanSeeStates, setAllCanSeeStates] = useState<any>(initialAllCanSeeStates);
   const [currentStates, setCurrentStates] = useMainStore((state) => [state.states, state.setStates], shallow)
   const filteredStates = useMainStore(useCallback((state) => state.filteredStates, [currentStates]));
   const addNewStateItem = useMainStore((state) => state.addNewStateItem);
+
+  useEffect(() => {
+    setNodes(initialNodes);
+  }, [])
 
   const addNewRole = ({
     color,
@@ -147,6 +152,8 @@ const WorkflowCreator = () => {
     (process: WorkflowProcess) => process.ProcessName === activeProcessName
   );
 
+  // console.log(JSON.stringify(activeProcess, null, 2))
+
   const roleList = Object.keys(roles).map((role) => {
     return {
       label: role,
@@ -156,8 +163,8 @@ const WorkflowCreator = () => {
 
   
   const addNewProcessAndSelect = ({ name }: { name: string }) => {
-    addProcess({ name });
-    setActiveProcessName(name);
+    addProcess(name);
+    setActiveProcessName(name)
   }
   
   // if (!hasHydrated) {

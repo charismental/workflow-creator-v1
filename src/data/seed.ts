@@ -76,8 +76,8 @@ const nodeType = 'custom'
 
 const mappedRoles = Object.entries(RoleList).map(([role, id]) => ({ RoleID: id, RoleName: role, IsUniversal: 1, isCluster: 0 }))
 
-const mappedNodes = Object.entries(nodes).map(([nodeName, node]: any, i: number) => ({
-    id: `initial-${i + 1}`,
+const mappedNodes = Object.entries(nodes).map(([nodeName, node]: any) => ({
+    id: nodeName,
     dragHandle: dragHandleClass,
     type: nodeType,
     position: {
