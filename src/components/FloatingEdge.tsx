@@ -5,20 +5,22 @@ import { EdgeProps, getStraightPath, useStore as useReactFlowStore } from "react
 import { getEdgeParams } from "../utils";
 
 import useMainStore from "store";
+import { shallow } from 'zustand/shallow';
 
 
 const foreignObjectSize = 40;
 
 
 const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd, style, data }) => {
-  const edges = useMainStore((state) => state.edges);
+  const [edges, setEdges] = useMainStore(
+    (state) => [state.edges, state.setEdges],
+    shallow
+  );
 
   const onEdgeClick = (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>, id: string) => {
     event.stopPropagation();
     const filtered = edges.filter((ed: any) => ed.id !== id)
-
-    if (data?.setEdges)
-      data.setEdges(filtered);
+    setEdges(filtered);
   };
 
   const sourceNode = useReactFlowStore(

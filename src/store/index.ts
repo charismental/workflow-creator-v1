@@ -43,8 +43,8 @@ export interface MainActions {
     setAllEdges: (el: any) => void;
     setRoleColors: (el: { [key: string]: string }) => void;
     setRoles: (el: { [key: string]: number }) => void;
-    setNodes: (nodes: any | Node[]) => void;
-    setEdges: (edges: any | Edge[]) => void;
+    setNodes: (nodes: Node[]) => void;
+    setEdges: (edges: Edge[]) => void;
     toggleRoleForProcess: (role: string) => void;
     filteredStates: (nodes: Node[]) => string[];
     addNewStateItem: (name: string) => void;
@@ -73,15 +73,15 @@ const useMainStore = create<MainState & MainActions>()(
             });
         },
         onConnect: (connection: Connection) => {
-            const { allEdges, activeRole, setEdges } = get();
+            const { allEdges, activeRole } = get();
 
             const updatedEdges = [...(allEdges?.[activeRole] || [])];
 
             set({
-                edges: addEdge({ ...connection, data: { setEdges} }, updatedEdges),
+                edges: addEdge(connection, updatedEdges),
             });
         },
-        activeProcessName: 'New Workflow',
+        activeProcessName: 'LBHA v2',
         setActiveProcessName: (processName) => set(() => ({ activeProcessName: processName })),
         activeRole: 'Intake-Specialist',
         setActiveRole: (role) => set(() => ({ activeRole: role })),
@@ -104,7 +104,7 @@ const useMainStore = create<MainState & MainActions>()(
         setRoles: (el) => set(() => ({ roles: el })),
         setNodes: (nodes) => set(() => ({ nodes })),
         setEdges: (edges) => set(() => ({ edges })),
-        processes: [{ ProcessID: 2373, ProcessName: 'New Workflow', roles: [] }, { ProcessID: 2374, ProcessName: 'New Workflow 2', roles: [] }],
+        processes: [{ ProcessID: 2373, ProcessName: 'New Workflow', roles: [] }, { ProcessID: 2374, ProcessName: 'LBHA v2', roles: [] }],
         addProcess: ({ name }: any) => set(({ processes }) => {
             const newProcess = {
                 ProcessID: processes.length + 1,

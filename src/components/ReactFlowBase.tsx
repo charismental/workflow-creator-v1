@@ -8,29 +8,16 @@ import ReactFlow, {
   ReactFlowInstance,
   NodeTypes
 } from "reactflow";
-
-import useMainStore, { MainActions, MainState } from "store";
-
-const selector = (state: MainState & MainActions) => ({
-  nodes: state.nodes,
-  edges: state.edges,
-  onNodesChange: state.onNodesChange,
-  onEdgesChange: state.onEdgesChange,
-  setNodes: state.setNodes,
-  setEdges: state.setEdges,
-  allEdges: state.allEdges,
-  setAllEdges: state.setAllEdges,
-  onConnect: state.onConnect,
-});
-
 import defaultEdgeOptions from "data/defaultEdgeOptions";
 import isEqual from "lodash.isequal";
-import "reactflow/dist/style.css";
+import { shallow } from "zustand/shallow";
+import useMainStore, { MainActions, MainState } from "store";
 import CustomConnectionLine from "../components/CustomConnectionLine";
 import FloatingEdge from "../components/FloatingEdge";
 import StateNode from "../components/StateNode";
+
 import "../css/style.css";
-import { shallow } from "zustand/shallow";
+import "reactflow/dist/style.css";
 
 const connectionLineStyle = {
   strokeWidth: 1.5,
@@ -44,6 +31,18 @@ const nodeTypes: NodeTypes = {
 const edgeTypes: EdgeTypes = {
   floating: FloatingEdge,
 };
+
+const selector = (state: MainState & MainActions) => ({
+  nodes: state.nodes,
+  edges: state.edges,
+  onNodesChange: state.onNodesChange,
+  onEdgesChange: state.onEdgesChange,
+  setNodes: state.setNodes,
+  setEdges: state.setEdges,
+  allEdges: state.allEdges,
+  setAllEdges: state.setAllEdges,
+  onConnect: state.onConnect,
+});
 
 // TODO: nodes.length
 let id = 11;
@@ -105,6 +104,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     [activeRole, allCanSeeStates, setAllCanSeeStates]
   );
 
+  // TODO: handle these behaviors intentionally
   useEffect(() => {
     if (
       nodes.length &&
@@ -115,13 +115,12 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
       updateNodesColor();
     }
     // compare edges before doing this?
-    // todo: filter invalid edges from missing nodes
     setEdges(allEdges?.[activeRole] || []);
   }, [activeRole, nodes, allEdges[activeRole]]);
 
+  // TODO: handle this intentionally on all edge changes
   useEffect(() => {
     const uniqueEdges = (arr: any) => {
-      // console.log(arr)
       return arr.filter(
         (v: any, i: any, a: any) =>
           a.findIndex((v2: any) =>
@@ -180,9 +179,10 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
         },
       };
 
-      setNodes((nds: any) => nds.concat(newNode));
+      const updatedNodes = nodes.concat(newNode)
+      setNodes(updatedNodes);
     },
-    [reactFlowInstance, setNodes, activeRole]
+    [reactFlowInstance, setNodes, activeRole, nodes]
   );
 
   return (
