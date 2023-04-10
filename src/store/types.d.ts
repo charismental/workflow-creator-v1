@@ -27,6 +27,7 @@ export interface WorkflowProcess {
     states?: Array<WorkflowState>; //
     roles?: Array<WorkflowRole>;
     connections?: Array<WorkflowConnection>;
+    colors?: { [role: string]: string };
     nodes?: Array<Node>
 }
 

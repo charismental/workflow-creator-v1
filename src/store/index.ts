@@ -21,6 +21,7 @@ import initialWorkflows from 'data/seed';
 
 const initialProcessName = 'LBHA v2';
 const initialRole = 'Intake-Specialist';
+const defaultColor = "#d4d4d4";
 export const initialNodes = initialWorkflows.find(({ ProcessName }) => ProcessName === initialProcessName)?.nodes || [];
 const initialAllEdges = { "Intake-Specialist": [], "Intake-Specialist Manager": [], "Caseworker": [], "Caseworker Manager": [], "Partner Final Reviewer": [], "Partner Reviewer": [], "Customer-Support": [] };
 // need to make this go away
@@ -47,9 +48,9 @@ export interface MainActions {
     updateProcess: (payload: { processIndex: number; process: WorkflowProcess }) => void;
     deleteProcess: (processId: number) => void;
     setAllEdges: (el: any) => void;
-    setRoleColors: (el: { [key: string]: string }) => void;
+    setRoleColors: (el: { [key: string]: string }, processName?: string) => void;
     setRoles: (el: { [key: string]: number }) => void;
-    setNodes: (nodes: Node[], processName?: string) => Promise<void>;
+    setNodes: (nodes: Node[], processName?: string) => void;
     setEdges: (edges: Edge[]) => void;
     toggleRoleForProcess: (role: string) => void;
     filteredStates: (nodes: Node[]) => string[];
@@ -88,10 +89,16 @@ const useMainStore = create<MainState & MainActions>()(
             });
         },
         activeProcessName: initialProcessName,
-        setActiveProcessName: (processName) => set(({ processes, setNodes }) => {
+        setActiveProcessName: (processName) => set(({ processes, setNodes, setRoleColors, roles }) => {
             const process = processes.find(p => p.ProcessName === processName);
-
+            const updatedColors: any = { ...(process?.colors || initialColors)};
+            Object.keys(roles).forEach((role: string) => {
+                if (!updatedColors[role]) {
+                    updatedColors[role] = defaultColor;
+                }
+            })
             setNodes(process?.nodes || [], processName)
+            setRoleColors(updatedColors, processName)
 
             return { activeProcessName: processName }
         }),
@@ -109,10 +116,20 @@ const useMainStore = create<MainState & MainActions>()(
         allEdges: {},
         setAllEdges: (el) => set(() => ({ allEdges: el })),
         roleColors: { ...initialColors },
-        setRoleColors: (el) => set(() => ({ roleColors: el })),
+        // setRoleColors: (el) => set(() => ({ roleColors: el })),
+        setRoleColors: (colors, processName) => set(({ activeProcessName, processes, updateProcess }) => {
+            const processNameToUse = processName || activeProcessName;
+            const processIndex = processes.findIndex(p => p.ProcessName === processNameToUse);
+
+            const process = { ...processes[processIndex], colors };
+
+            updateProcess({ processIndex, process });
+
+            return { roleColors: colors }
+        }),
         roles: { ...RoleList },
         setRoles: (el) => set(() => ({ roles: el })),
-        setNodes: async (nodes, processName) => set(({ activeProcessName, processes, updateProcess }) => {
+        setNodes: (nodes, processName) => set(({ activeProcessName, processes, updateProcess }) => {
             const processNameToUse = processName || activeProcessName;
             const processIndex = processes.findIndex(p => p.ProcessName === processNameToUse);
 
