@@ -1,72 +1,165 @@
 // doing it this way for now to get around use of hook
 import { RoleList, StateList, initialColors } from 'data';
-import { Node } from 'reactflow';
 import { create } from 'zustand';
 // import { persist } from 'zustand/middleware';
 import { WorkflowProcess } from './types';
+import {
+    Node,
+    OnConnect,
+    OnEdgesChange,
+    OnNodesChange,
+    Edge,
+    addEdge,
+    applyNodeChanges,
+    applyEdgeChanges,
+    NodeChange,
+    EdgeChange,
+    Connection,
+} from "reactflow";
 
-interface MainState {
+import initialWorkflows from 'data/seed';
+
+const initialProcessName = 'LBHA v2';
+const initialRole = 'Intake-Specialist';
+const defaultColor = "#d4d4d4";
+export const initialNodes = initialWorkflows.find(({ ProcessName }) => ProcessName === initialProcessName)?.nodes || [];
+// need to make this go away
+export const initialAllCanSeeStates = { "Intake-Specialist": [], "Intake-Specialist Manager": [], "Caseworker": [], "Caseworker Manager": [], "Partner Final Reviewer": [], "Partner Reviewer": [], "Customer-Support": [] };
+
+export interface MainState {
     activeProcessName: string;
     activeRole: string;
-    initialAllEdges: any;
-    initialAllState: { [key: string]: Array<any> };
     states: { [key: string]: number };
     processes: Array<WorkflowProcess>;
     allEdges: any;
     roleColors: { [key: string]: string };
     roles: { [key: string]: number };
     _hasHydrated: boolean;
+    nodes: Node[];
+    edges: Edge[];
 }
 
-interface MainActions {
+export interface MainActions {
     setActiveProcessName: (processName: string) => void;
     setActiveRole: (role: string) => void;
-    setState: (el: any) => void;
-    addProcess: any;
+    setStates: (el: any) => void;
+    addProcess: (processName: string) => void;
+    updateProcess: (payload: { processIndex: number; process: WorkflowProcess }) => void;
     deleteProcess: (processId: number) => void;
-    // setAllEdges: (el: { [key: string]: number }) => void;
-    setAllEdges: (el: any) => void;
-    setRoleColors: (el: { [key: string]: string }) => void;
+    setAllEdges: (allEdges: { [roleName: string]: Edge[] }, processName?: string) => void;
+    setRoleColors: (el: { [key: string]: string }, processName?: string) => void;
     setRoles: (el: { [key: string]: number }) => void;
+    setNodes: (nodes: Node[], processName?: string) => void;
+    setEdges: (edges: Edge[]) => void;
     toggleRoleForProcess: (role: string) => void;
     filteredStates: (nodes: Node[]) => string[];
     addNewStateItem: (name: string) => void;
     // setAllCanSeeStates: (name: string) => void;
     setHasHydrated: (state: boolean) => void;
+    onNodesChange: OnNodesChange;
+    onEdgesChange: OnEdgesChange;
+    onConnect: OnConnect;
 }
 
 const useMainStore = create<MainState & MainActions>()(
     // persist(
     (set, get) => ({
         _hasHydrated: false,
-        setHasHydrated: (state) => set(({_hasHydrated: state})),
-        activeProcessName: 'New Workflow',
-        setActiveProcessName: (processName) => set(() => ({ activeProcessName: processName })),
-        activeRole: 'Intake-Specialist',
+        setHasHydrated: (state) => set(({ _hasHydrated: state })),
+        nodes: [],
+        edges: [],
+        onNodesChange: (changes: NodeChange[]) => {
+            set({
+                nodes: applyNodeChanges(changes, get().nodes),
+            });
+        },
+        onEdgesChange: (changes: EdgeChange[]) => {
+            set({
+                edges: applyEdgeChanges(changes, get().edges),
+            });
+        },
+        onConnect: (connection: Connection) => {
+            const { allEdges, activeRole } = get();
+
+            const updatedEdges = [...(allEdges?.[activeRole] || [])];
+
+            set({
+                edges: addEdge(connection, updatedEdges),
+            });
+        },
+        activeProcessName: initialProcessName,
+        setActiveProcessName: (processName) => set(({ processes, setNodes, setRoleColors, roles, setEdges }) => {
+            const process = processes.find(p => p.ProcessName === processName);
+            const updatedColors: any = { ...(process?.colors || initialColors)};
+            Object.keys(roles).forEach((role: string) => {
+                if (!updatedColors[role]) {
+                    updatedColors[role] = defaultColor;
+                }
+            })
+            setNodes(process?.nodes || [], processName)
+            setRoleColors(updatedColors, processName)
+
+            return { activeProcessName: processName }
+        }),
+        activeRole: initialRole,
         setActiveRole: (role) => set(() => ({ activeRole: role })),
-        initialAllEdges: { "Intake-Specialist": [], "Intake-Specialist Manager": [], "Caseworker": [], "Caseworker Manager": [], "Partner Final Reviewer": [], "Partner Reviewer": [], "Customer-Support": [] },
-        initialAllState: { "Intake-Specialist": [], "Intake-Specialist Manager": [], "Caseworker": [], "Caseworker Manager": [], "Partner Final Reviewer": [], "Partner Reviewer": [], "Customer-Support": [] },
         // setAllCanSeeStates: (name) => set(({allCanSeeStates}) => ({allCanSeeStates: {...allCanSeeStates, [name]: []}})),
         states: { ...StateList },
-        setState: (el) => set(({states}) => {
+        setStates: (el) => set(({ states }) => {
             const newStateObj = {
                 ...states,
                 el
             }
-            return {states: newStateObj}
+            return { states: newStateObj }
         }),
-        allEdges: [],
-        setAllEdges: (el) => set(() => ({ allEdges: el })),
+        allEdges: {},
+        setAllEdges: (allEdges) => set(({ activeProcessName, processes, updateProcess, activeRole }) => {
+            const processIndex = processes.findIndex(p => p.ProcessName === activeProcessName);
+
+            // TODO: check against nodes for process, filter invalid connections
+            const process = { ...processes[processIndex], connections: [...(allEdges?.[activeRole] || [])] };
+
+            updateProcess({ processIndex, process });
+
+            return { allEdges }
+        }),
         roleColors: { ...initialColors },
-        setRoleColors: (el) => set(() => ({ roleColors: el })),
+        // setRoleColors: (el) => set(() => ({ roleColors: el })),
+        setRoleColors: (colors, processName) => set(({ activeProcessName, processes, updateProcess }) => {
+            const processNameToUse = processName || activeProcessName;
+            const processIndex = processes.findIndex(p => p.ProcessName === processNameToUse);
+
+            const process = { ...processes[processIndex], colors };
+
+            updateProcess({ processIndex, process });
+
+            return { roleColors: colors }
+        }),
         roles: { ...RoleList },
         setRoles: (el) => set(() => ({ roles: el })),
-        processes: [{ ProcessID: 2373, ProcessName: 'New Workflow', roles: [] }, { ProcessID: 2374, ProcessName: 'New Workflow 2', roles: [] }],
-        addProcess: ({ name }: any) => set(({ processes }) => {
+        setNodes: (nodes, processName) => set(({ activeProcessName, processes, updateProcess }) => {
+            const processNameToUse = processName || activeProcessName;
+            const processIndex = processes.findIndex(p => p.ProcessName === processNameToUse);
+
+            const process = { ...processes[processIndex], nodes };
+
+            updateProcess({ processIndex, process });
+
+            return { nodes }
+        }),
+        setEdges: (edges) => set(() => ({ edges })),
+        processes: initialWorkflows,
+        updateProcess: ({ processIndex, process }: { processIndex: number; process: WorkflowProcess }) => set(({ processes }) => {
+            const updatedProcesses = processes.map((p, i) => i === processIndex ? process : p);
+
+            return { processes: updatedProcesses };
+        }),
+        addProcess: (name: string) => set(({ processes }) => {
             const newProcess = {
                 ProcessID: processes.length + 1,
                 ProcessName: name,
                 roles: [],
+                nodes: [],
             }
 
             return { processes: processes.concat(newProcess) }
@@ -116,7 +209,7 @@ const useMainStore = create<MainState & MainActions>()(
     //         state?.setHasHydrated(true)
     //     }
     // })
-    )
+)
 
 
 export default useMainStore;

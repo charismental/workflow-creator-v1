@@ -1,3 +1,5 @@
+import { Edge, Node } from "reactflow";
+
 export interface WorkflowConnection {
     source: string;
     target: string;
@@ -22,9 +24,11 @@ export interface WorkflowProcess {
     ProcessID: number;
     ProcessName: string;
     CatID?: number;
-    states?: Array<WorkflowState>; //
+    states?: Array<WorkflowState>; // ?
     roles?: Array<WorkflowRole>;
-    connections?: Array<WorkflowConnection>;
+    connections?: Array<Edge>;
+    colors?: { [role: string]: string };
+    nodes?: Array<Node>
 }
 
 type BooleanNumber = 0 | 1;

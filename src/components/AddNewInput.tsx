@@ -14,6 +14,7 @@ interface AddNewInputProps {
   placeholder?: InputProps["placeholder"];
   inputValue?: InputProps["value"];
   changeEvent: React.ChangeEventHandler<HTMLInputElement> | undefined;
+  pressEnterHandler: any;
   buttonShape: ButtonProps["shape"];
   buttonType: ButtonProps["type"];
   disabledState: ButtonProps["disabled"];
@@ -43,6 +44,7 @@ const AddNewInput: FC<AddNewInputProps> = (props) => {
     containerStyle,
     inputStyle,
     buttonStyle,
+    pressEnterHandler = () => {},
   } = props;
   const inputRef = useRef<InputRef>(null);
 
@@ -56,6 +58,7 @@ const AddNewInput: FC<AddNewInputProps> = (props) => {
             ref={inputRef}
             value={inputValue}
             onChange={changeEvent}
+            onPressEnter={pressEnterHandler}
           />
         </Col>
         {hasColorInput && (

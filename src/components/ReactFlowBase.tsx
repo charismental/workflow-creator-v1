@@ -5,21 +5,19 @@ import ReactFlow, {
   Controls,
   Edge,
   EdgeTypes,
-  NodeTypes,
   ReactFlowInstance,
-  addEdge,
-  useEdgesState
+  NodeTypes
 } from "reactflow";
-
 import defaultEdgeOptions from "data/defaultEdgeOptions";
 import isEqual from "lodash.isequal";
-import "reactflow/dist/style.css";
+import { shallow } from "zustand/shallow";
+import useMainStore, { MainActions, MainState } from "store";
 import CustomConnectionLine from "../components/CustomConnectionLine";
 import FloatingEdge from "../components/FloatingEdge";
 import StateNode from "../components/StateNode";
-import "../css/style.css";
 
-const initialEdges: Edge[] = [];
+import "../css/style.css";
+import "reactflow/dist/style.css";
 
 const connectionLineStyle = {
   strokeWidth: 1.5,
@@ -34,21 +32,23 @@ const edgeTypes: EdgeTypes = {
   floating: FloatingEdge,
 };
 
-// TODO: nodes.length
-let id = 11;
-
-const getId = () => `state_node_${++id}`
+const selector = (state: MainState & MainActions) => ({
+  nodes: state.nodes,
+  edges: state.edges,
+  onNodesChange: state.onNodesChange,
+  onEdgesChange: state.onEdgesChange,
+  setNodes: state.setNodes,
+  setEdges: state.setEdges,
+  allEdges: state.allEdges,
+  setAllEdges: state.setAllEdges,
+  onConnect: state.onConnect,
+});
 
 interface ReactFlowBaseProps {
   allCanSeeStates: any;
   setAllCanSeeStates: any;
-  allEdges: any;
-  setAllEdges: any;
   roleColors: any;
   activeRole: any;
-  nodes: any;
-  setNodes: any;
-  onNodesChange: any;
   updateNodesColor: any;
 }
 
@@ -56,20 +56,26 @@ interface ReactFlowBaseProps {
 
 const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>(initialEdges);
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance>();
 
   const {
-    allCanSeeStates,
-    setAllCanSeeStates,
-    allEdges,
-    setAllEdges,
-    roleColors,
-    activeRole,
     nodes,
     setNodes,
     onNodesChange,
+    edges,
+    setEdges,
+    onEdgesChange,
+    allEdges,
+    setAllEdges,
+    onConnect,
+  } = useMainStore(selector, shallow);
+
+  const {
+    allCanSeeStates,
+    setAllCanSeeStates,
+    roleColors,
+    activeRole,
     updateNodesColor,
   } = props;
 
@@ -93,20 +99,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     [activeRole, allCanSeeStates, setAllCanSeeStates]
   );
 
-  const onConnect = useCallback(
-    (params: any) => {
-      setEdges((eds) => {
-        const updatedEdges = [
-          ...(allEdges?.[activeRole] || []),
-          ...eds.slice(-1),
-        ]
-
-        return addEdge({ ...params, data: { setEdges } }, updatedEdges);
-      });
-    },
-    [setEdges, allEdges, activeRole]
-  );
-
+  // TODO: handle these behaviors intentionally
   useEffect(() => {
     if (
       nodes.length &&
@@ -117,10 +110,10 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
       updateNodesColor();
     }
     // compare edges before doing this?
-    // todo: filter invalid edges from missing nodes
-    setEdges(() => allEdges?.[activeRole] || []);
+    setEdges(allEdges?.[activeRole] || []);
   }, [activeRole, nodes, allEdges[activeRole]]);
 
+  // TODO: handle this intentionally on all edge changes
   useEffect(() => {
     const uniqueEdges = (arr: any) => {
       return arr.filter(
@@ -170,7 +163,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
       });
 
       const newNode = {
-        id: getId(),
+        id: type,
         dragHandle: ".drag-handle",
         type: "custom",
         position,
@@ -181,9 +174,10 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
         },
       };
 
-      setNodes((nds: any) => nds.concat(newNode));
+      const updatedNodes = nodes.concat(newNode)
+      setNodes(updatedNodes);
     },
-    [reactFlowInstance, setNodes, activeRole]
+    [reactFlowInstance, setNodes, activeRole, nodes]
   );
 
   return (
