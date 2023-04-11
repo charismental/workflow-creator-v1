@@ -1,15 +1,15 @@
 import { Layout, Space, Typography } from "antd";
+import { CSSProperties, useCallback, useEffect, useState } from "react";
+import { ReactFlowProvider } from "reactflow";
+import useMainStore, { initialAllCanSeeStates, initialNodes } from "store";
+import { WorkflowProcess } from "store/types";
+import { shallow } from "zustand/shallow";
 import ActiveRoleSettings from "components/ActiveRoleSettings";
 import ReactFlowBase from "components/ReactFlowBase";
 import SelectBox from "components/SelectBox";
 import StateCollapseBox from "components/StateCollapseBox";
-import { CSSProperties, useCallback, useEffect, useState } from "react";
-import { ReactFlowProvider } from "reactflow";
-import "reactflow/dist/style.css";
-import useMainStore, { initialAllCanSeeStates, initialNodes } from "store";
-import { WorkflowProcess } from "store/types";
-import { shallow } from "zustand/shallow";
 import Sidebar from "./components/Sidebar";
+import "reactflow/dist/style.css";
 import "./css/style.css";
 
 const { Header, Content } = Layout;

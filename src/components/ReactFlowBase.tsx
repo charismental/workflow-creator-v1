@@ -59,6 +59,11 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance>();
 
+  // reactFlowInstance should only change on init. I think...
+  useEffect(() => {
+    if (reactFlowInstance) reactFlowInstance.fitView();
+  }, [reactFlowInstance])
+
   const {
     nodes,
     setNodes,
