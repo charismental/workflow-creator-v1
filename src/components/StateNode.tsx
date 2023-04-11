@@ -54,7 +54,7 @@ const StateNode: FunctionComponent<NodeProps> = ({
     setAllSelfConnectingEdges(updatedAllSelfConnectingEdges)
     setAlledges(updatedEdges);
     setNodes(updatedNodes);
-  }, [allEdges, setAlledges, nodes, setNodes]);
+  }, [allEdges, setAlledges, nodes, setNodes, allSelfConnectingEdges, setAllSelfConnectingEdges]);
 
   const minWidth = 200;
   const minHeight = 30;
