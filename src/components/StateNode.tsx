@@ -32,6 +32,7 @@ const StateNode: FunctionComponent<NodeProps> = ({
   const [isMouseOver, setIsMouseOver] = useState(false);
   const [nodes, setNodes] = useMainStore((state) => [state.nodes, state.setNodes], shallow)
   const [allEdges, setAlledges] = useMainStore((state) => [state.allEdges, state.setAllEdges], shallow)
+  const [allSelfConnectingEdges, setAllSelfConnectingEdges] = useMainStore((state) => [state.allSelfConnectingEdges, state.setAllSelfConnectingEdges], shallow)
   const { toggleSelfConnected, selfConnected = false } = data;
 
   const connectionNodeId = useReactFlowStore(connectionNodeIdSelector);
@@ -43,11 +44,14 @@ const StateNode: FunctionComponent<NodeProps> = ({
     const updatedNodes = nodes.filter(node => node.id !== id);
 
     const updatedEdges = { ...allEdges };
+    const updatedAllSelfConnectingEdges = { ...allSelfConnectingEdges };
 
     Object.keys(updatedEdges).forEach((key: string) => {
       updatedEdges[key] = updatedEdges[key].filter(({ source, target }: { source: string; target: string }) => ![source, target].includes(id))
+      updatedAllSelfConnectingEdges[key] = (updatedAllSelfConnectingEdges?.[key] || []).filter(({ source, target }: { source: string; target: string }) => ![source, target].includes(id))
     })
 
+    setAllSelfConnectingEdges(updatedAllSelfConnectingEdges)
     setAlledges(updatedEdges);
     setNodes(updatedNodes);
   }, [allEdges, setAlledges, nodes, setNodes]);
