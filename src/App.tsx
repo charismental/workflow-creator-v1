@@ -1,7 +1,7 @@
 import { Layout, Space, Typography } from "antd";
 import { CSSProperties, useCallback, useEffect, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
-import useMainStore, { initialAllCanSeeStates, initialNodes } from "store";
+import useMainStore, { initialNodes } from "store";
 import { WorkflowProcess } from "store/types";
 import { shallow } from "zustand/shallow";
 import ActiveRoleSettings from "components/ActiveRoleSettings";
@@ -36,12 +36,8 @@ const layoutContainer: CSSProperties = { width: "100%", height: "100vh" };
 
 const WorkflowCreator = () => {
   // const hasHydrated = useMainStore((state) => state._hasHydrated);
-  // const initialAllState = useMainStore(
-  //   useCallback((state) => state.initialAllState, [])
-  // );
 
   const processes = useMainStore((state) => state.processes);
-  const deleteProcess = useMainStore((state) => state.deleteProcess);
   const addProcess = useMainStore((state) => state.addProcess);
   const toggleRoleForProcess = useMainStore(
     (state) => state.toggleRoleForProcess
@@ -70,8 +66,11 @@ const WorkflowCreator = () => {
     (state) => [state.roleColors, state.setRoleColors],
     shallow
   );
-  // const [allCanSeeStates, setAllCanSeeStates] = useMainStore((state) => [state.allCanSeeStates, state.setAllCanSeeStates], shallow);
-  const [allCanSeeStates, setAllCanSeeStates] = useState<any>(initialAllCanSeeStates);
+  const [allSelfConnectingEdges, setAllSelfConnectingEdges] = useMainStore(
+    (state) => [state.allSelfConnectingEdges, state.setAllSelfConnectingEdges],
+    shallow
+  );
+
   const [currentStates, setCurrentStates] = useMainStore((state) => [state.states, state.setStates], shallow)
   const filteredStates = useMainStore(useCallback((state) => state.filteredStates, [currentStates]));
   const addNewStateItem = useMainStore((state) => state.addNewStateItem);
@@ -107,23 +106,18 @@ const WorkflowCreator = () => {
       return foundNode?.data?.label;
     }, [nodes]);
 
-  // may actually be resolved now
+
   // only 'hides' the issue of non-activeRole edges still appearing for missing nodes
   // reduce function to avoid .filter().map()
   const outputJSON = {
     [activeRole]: {
-      canSee: (allCanSeeStates?.[activeRole] || []).map(findStateNameByNode).filter((el: any) => el),
-      canTransition: (allEdges?.[activeRole] || [])
+      connections: [...(allEdges?.[activeRole] || []), ...(allSelfConnectingEdges?.[activeRole] || [])]
         .map(({ source, target }: { source: string; target: string }) => {
           return {
             source: findStateNameByNode(source),
             target: findStateNameByNode(target),
           };
         }).filter(({ source, target }: any) => !!source && !!target)
-      // Modified StateNode file to update Edges... seems to work???
-      // .filter((el: any) =>
-      //   ["source", "target"].every((key: string) => el[key])
-      // ),
     },
   };
 
@@ -201,8 +195,8 @@ const WorkflowCreator = () => {
             </Header>
             <Content className="dndflow">
               <ReactFlowBase
-                allCanSeeStates={allCanSeeStates}
-                setAllCanSeeStates={setAllCanSeeStates}
+                allSelfConnectingEdges={allSelfConnectingEdges}
+                setAllSelfConnectingEdges={setAllSelfConnectingEdges}
                 roleColors={roleColors}
                 updateNodesColor={updateNodesColor}
                 activeRole={activeRole}

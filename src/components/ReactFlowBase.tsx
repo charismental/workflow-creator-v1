@@ -45,8 +45,8 @@ const selector = (state: MainState & MainActions) => ({
 });
 
 interface ReactFlowBaseProps {
-  allCanSeeStates: any;
-  setAllCanSeeStates: any;
+  allSelfConnectingEdges: any;
+  setAllSelfConnectingEdges: any;
   roleColors: any;
   activeRole: any;
   updateNodesColor: any;
@@ -77,31 +77,31 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   } = useMainStore(selector, shallow);
 
   const {
-    allCanSeeStates,
-    setAllCanSeeStates,
+    allSelfConnectingEdges,
+    setAllSelfConnectingEdges,
     roleColors,
     activeRole,
     updateNodesColor,
   } = props;
 
-  const toggleCanSeeState = useCallback(
+  const toggleSelfConnected = useCallback(
     (stateId: string) => {
-      let activeRoleCanSee = allCanSeeStates[activeRole];
+      let activeRoleSelfConnected = allSelfConnectingEdges?.[activeRole] || [];
 
-      if (activeRoleCanSee.includes(stateId)) {
-        activeRoleCanSee = activeRoleCanSee.filter(
-          (state: string) => state !== stateId
+      if (activeRoleSelfConnected.some(({ target }: any) => target === stateId)) {
+        activeRoleSelfConnected = activeRoleSelfConnected.filter(
+          ({ target }: any) => target !== stateId
         );
       } else {
-        activeRoleCanSee.push(stateId);
+        activeRoleSelfConnected.push({ source: stateId, target: stateId });
       }
 
-      setAllCanSeeStates({
-        ...allCanSeeStates,
-        [activeRole]: activeRoleCanSee,
+      setAllSelfConnectingEdges({
+        ...allSelfConnectingEdges,
+        [activeRole]: activeRoleSelfConnected,
       });
     },
-    [activeRole, allCanSeeStates, setAllCanSeeStates]
+    [activeRole, allSelfConnectingEdges, setAllSelfConnectingEdges]
   );
 
   // TODO: handle these behaviors intentionally
@@ -175,7 +175,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
         data: {
           label: type,
           color: roleColors[activeRole],
-          toggleCanSeeState,
+          toggleSelfConnected,
         },
       };
 
@@ -193,8 +193,8 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
             ...node,
             data: {
               ...node.data,
-              toggleCanSeeState,
-              isCanSee: allCanSeeStates?.[activeRole]?.includes(node.id),
+              toggleSelfConnected,
+              selfConnected: allSelfConnectingEdges?.[activeRole]?.some(({ target }: any) => target === node.id),
             },
           }))}
           edges={allEdges?.[activeRole] || []}

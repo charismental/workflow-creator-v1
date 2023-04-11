@@ -2,7 +2,7 @@
 import { RoleList, StateList, initialColors } from 'data';
 import { create } from 'zustand';
 // import { persist } from 'zustand/middleware';
-import { WorkflowProcess } from './types';
+import { WorkflowConnection, WorkflowProcess } from './types';
 import {
     Node,
     OnConnect,
@@ -23,8 +23,6 @@ const initialProcessName = 'LBHA v2';
 const initialRole = 'Intake-Specialist';
 const defaultColor = "#d4d4d4";
 export const initialNodes = initialWorkflows.find(({ ProcessName }) => ProcessName === initialProcessName)?.nodes || [];
-// need to make this go away
-export const initialAllCanSeeStates = { "Intake-Specialist": [], "Intake-Specialist Manager": [], "Caseworker": [], "Caseworker Manager": [], "Partner Final Reviewer": [], "Partner Reviewer": [], "Customer-Support": [] };
 
 export interface MainState {
     activeProcessName: string;
@@ -32,6 +30,7 @@ export interface MainState {
     states: { [key: string]: number };
     processes: Array<WorkflowProcess>;
     allEdges: any;
+    allSelfConnectingEdges: { [roleName: string]: WorkflowConnection[] };
     roleColors: { [key: string]: string };
     roles: { [key: string]: number };
     _hasHydrated: boolean;
@@ -47,6 +46,7 @@ export interface MainActions {
     updateProcess: (payload: { processIndex: number; process: WorkflowProcess }) => void;
     deleteProcess: (processId: number) => void;
     setAllEdges: (allEdges: { [roleName: string]: Edge[] }, processName?: string) => void;
+    setAllSelfConnectingEdges: (allSelfConnectingEdges: { [roleName: string]: WorkflowConnection[] }) => void;
     setRoleColors: (el: { [key: string]: string }, processName?: string) => void;
     setRoles: (el: { [key: string]: number }) => void;
     setNodes: (nodes: Node[], processName?: string) => void;
@@ -54,7 +54,6 @@ export interface MainActions {
     toggleRoleForProcess: (role: string) => void;
     filteredStates: (nodes: Node[]) => string[];
     addNewStateItem: (name: string) => void;
-    // setAllCanSeeStates: (name: string) => void;
     setHasHydrated: (state: boolean) => void;
     onNodesChange: OnNodesChange;
     onEdgesChange: OnEdgesChange;
@@ -103,7 +102,6 @@ const useMainStore = create<MainState & MainActions>()(
         }),
         activeRole: initialRole,
         setActiveRole: (role) => set(() => ({ activeRole: role })),
-        // setAllCanSeeStates: (name) => set(({allCanSeeStates}) => ({allCanSeeStates: {...allCanSeeStates, [name]: []}})),
         states: { ...StateList },
         setStates: (el) => set(({ states }) => {
             const newStateObj = {
@@ -123,6 +121,8 @@ const useMainStore = create<MainState & MainActions>()(
 
             return { allEdges }
         }),
+        allSelfConnectingEdges: {},
+        setAllSelfConnectingEdges: (allSelfConnectingEdges) => set(() => ({ allSelfConnectingEdges })),
         roleColors: { ...initialColors },
         // setRoleColors: (el) => set(() => ({ roleColors: el })),
         setRoleColors: (colors, processName) => set(({ activeProcessName, processes, updateProcess }) => {

@@ -32,7 +32,7 @@ const StateNode: FunctionComponent<NodeProps> = ({
   const [isMouseOver, setIsMouseOver] = useState(false);
   const [nodes, setNodes] = useMainStore((state) => [state.nodes, state.setNodes], shallow)
   const [allEdges, setAlledges] = useMainStore((state) => [state.allEdges, state.setAllEdges], shallow)
-  const { toggleCanSeeState, isCanSee = false } = data;
+  const { toggleSelfConnected, selfConnected = false } = data;
 
   const connectionNodeId = useReactFlowStore(connectionNodeIdSelector);
   const isTarget = connectionNodeId && connectionNodeId !== id;
@@ -67,7 +67,7 @@ const StateNode: FunctionComponent<NodeProps> = ({
         backgroundColor: isTarget ? "#ffcce3" : data?.color || "#ccd9f6",
       }}
     >
-      {isCanSee && <RollbackOutlined rotate={270} style={{ color: 'black', fontSize: '32px', position: 'absolute', top: '-28px', right: '12px' }} />}
+      {selfConnected && <RollbackOutlined rotate={270} style={{ color: 'black', fontSize: '32px', position: 'absolute', top: '-28px', right: '12px' }} />}
       <NodeResizer
         isVisible
         minWidth={minWidth}
@@ -78,8 +78,8 @@ const StateNode: FunctionComponent<NodeProps> = ({
         <>
           <Checkbox
             style={checkboxStyle}
-            checked={isCanSee}
-            onChange={() => toggleCanSeeState(id)}
+            checked={selfConnected}
+            onChange={() => toggleSelfConnected(id)}
           />
           <div className="state-delete-button" onClick={removeNode} />
         </>
