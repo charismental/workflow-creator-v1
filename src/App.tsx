@@ -31,6 +31,7 @@ const activeRoleTitleStyle: CSSProperties = {
   textAlign: "center",
   paddingBottom: "18px",
 };
+
 const layoutContainer: CSSProperties = { width: "100%", height: "100vh" };
 
 const WorkflowCreator = () => {
@@ -118,7 +119,7 @@ const WorkflowCreator = () => {
             source: findStateNameByNode(source),
             target: findStateNameByNode(target),
           };
-        })
+        }).filter(({ source, target }: any) => !!source && !!target)
       // Modified StateNode file to update Edges... seems to work???
       // .filter((el: any) =>
       //   ["source", "target"].every((key: string) => el[key])
@@ -161,12 +162,12 @@ const WorkflowCreator = () => {
     };
   });
 
-  
+
   const addNewProcessAndSelect = ({ name }: { name: string }) => {
     addProcess(name);
     setActiveProcessName(name)
   }
-  
+
   // if (!hasHydrated) {
   //   return <Spin size="large" style={{ position: 'absolute', top: '50%', left: '50%' }} tip={<Title level={4} style={{ color: 'blue' }}>...Loading State</Title>} />
   // }

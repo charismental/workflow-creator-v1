@@ -23,7 +23,6 @@ const initialProcessName = 'LBHA v2';
 const initialRole = 'Intake-Specialist';
 const defaultColor = "#d4d4d4";
 export const initialNodes = initialWorkflows.find(({ ProcessName }) => ProcessName === initialProcessName)?.nodes || [];
-const initialAllEdges = { "Intake-Specialist": [], "Intake-Specialist Manager": [], "Caseworker": [], "Caseworker Manager": [], "Partner Final Reviewer": [], "Partner Reviewer": [], "Customer-Support": [] };
 // need to make this go away
 export const initialAllCanSeeStates = { "Intake-Specialist": [], "Intake-Specialist Manager": [], "Caseworker": [], "Caseworker Manager": [], "Partner Final Reviewer": [], "Partner Reviewer": [], "Customer-Support": [] };
 
@@ -47,7 +46,7 @@ export interface MainActions {
     addProcess: (processName: string) => void;
     updateProcess: (payload: { processIndex: number; process: WorkflowProcess }) => void;
     deleteProcess: (processId: number) => void;
-    setAllEdges: (el: any) => void;
+    setAllEdges: (allEdges: { [roleName: string]: Edge[] }, processName?: string) => void;
     setRoleColors: (el: { [key: string]: string }, processName?: string) => void;
     setRoles: (el: { [key: string]: number }) => void;
     setNodes: (nodes: Node[], processName?: string) => void;
@@ -89,7 +88,7 @@ const useMainStore = create<MainState & MainActions>()(
             });
         },
         activeProcessName: initialProcessName,
-        setActiveProcessName: (processName) => set(({ processes, setNodes, setRoleColors, roles }) => {
+        setActiveProcessName: (processName) => set(({ processes, setNodes, setRoleColors, roles, setEdges }) => {
             const process = processes.find(p => p.ProcessName === processName);
             const updatedColors: any = { ...(process?.colors || initialColors)};
             Object.keys(roles).forEach((role: string) => {
@@ -114,7 +113,16 @@ const useMainStore = create<MainState & MainActions>()(
             return { states: newStateObj }
         }),
         allEdges: {},
-        setAllEdges: (el) => set(() => ({ allEdges: el })),
+        setAllEdges: (allEdges) => set(({ activeProcessName, processes, updateProcess, activeRole }) => {
+            const processIndex = processes.findIndex(p => p.ProcessName === activeProcessName);
+
+            // TODO: check against nodes for process, filter invalid connections
+            const process = { ...processes[processIndex], connections: [...(allEdges?.[activeRole] || [])] };
+
+            updateProcess({ processIndex, process });
+
+            return { allEdges }
+        }),
         roleColors: { ...initialColors },
         // setRoleColors: (el) => set(() => ({ roleColors: el })),
         setRoleColors: (colors, processName) => set(({ activeProcessName, processes, updateProcess }) => {
