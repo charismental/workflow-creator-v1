@@ -25,6 +25,14 @@ const Sidebar: FC<SideBarProps> = (props): JSX.Element => {
   const { Sider } = Layout;
   const { output, children, theme, setColorTheme } = props;
 
+  const switchStyle: CSSProperties = {
+    color: theme ? '': 'white',
+    position: 'absolute',
+    fontSize: '10px',
+    bottom: '10px',
+    right: '10px'
+  }
+
   return (
     // supposed to show tab on breakpoint if collapseWidth is 0
     <Sider
@@ -37,12 +45,15 @@ const Sidebar: FC<SideBarProps> = (props): JSX.Element => {
       theme={theme ? 'light' : 'dark'}
     >
       <Space direction="vertical" size="small" style={sidebarSpacer}>
-        <div style={!theme ? {color: 'white'}: {}}>
-          Color Theme
-          <Switch onChange={() => setColorTheme(!theme)} style={{marginLeft: '20px'}}/>
-        </div>
+
         {children}
+        <div style={!theme ? {color: 'white'}: {}}>
         {output && <pre>{JSON.stringify(output, null, 2)}</pre>}
+        </div>
+        <div style={switchStyle}>
+          Toggle Theme
+          <Switch size="small" onChange={() => setColorTheme(!theme)} style={{marginLeft: '20px'}}/>
+        </div>
       </Space>
     </Sider>
   );

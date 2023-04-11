@@ -64,7 +64,7 @@ const StateCollapseBox: React.FC<StateCollapsebox> = ({
           <div
             key={item}
             className={styles.stateItem}
-            style={{ backgroundColor: itemColor() }}
+            style={{ backgroundColor: itemColor(), color: 'white' }}
             onMouseDown={(e) => {
               e.stopPropagation();
             }}

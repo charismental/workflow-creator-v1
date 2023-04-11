@@ -18,14 +18,14 @@ const { Title } = Typography;
 const spaceContainer: CSSProperties = {
   width: '100%'
 };
-const headerStyle: CSSProperties = {
-  // backgroundColor: ,
-  padding: "25px",
-  height: "80px",
-  display: "inline-flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-};
+// const headerStyle: CSSProperties = {
+//   // backgroundColor: ,
+//   padding: "25px",
+//   height: "80px",
+//   display: "inline-flex",
+//   justifyContent: "space-between",
+//   alignItems: "center",
+// };
 const activeRoleTitleStyle: CSSProperties = {
   color: 'white',
   flexGrow: 2,
@@ -76,6 +76,15 @@ const WorkflowCreator = () => {
   const [currentStates, setCurrentStates] = useMainStore((state) => [state.states, state.setStates], shallow)
   const filteredStates = useMainStore(useCallback((state) => state.filteredStates, [currentStates]));
   const addNewStateItem = useMainStore((state) => state.addNewStateItem);
+
+  const headerStyle: CSSProperties = {
+    backgroundColor: colorTheme ? '#6E7888':  '#001529',
+    padding: "25px",
+    height: "80px",
+    display: "inline-flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  };
 
   useEffect(() => {
     setNodes(initialNodes);
