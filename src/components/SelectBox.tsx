@@ -93,6 +93,7 @@ const SelectBox: React.FC<SelectBoxProps> = ({
                       <PlusCircleTwoTone style={{ fontSize: "20px" }} />
                     )
                   }
+                  pressEnterHandler={name?.length && !isDuplicateName && addNewItem}
                   hasColorInput={hasColorInput}
                   colorInputValue={color}
                   onColorChange={(e: any) => setColor(e.target.value)}

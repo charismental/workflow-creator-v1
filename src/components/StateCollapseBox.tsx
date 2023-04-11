@@ -84,6 +84,7 @@ const StateCollapseBox: React.FC<StateCollapsebox> = ({
               buttonType="text"
               disabledState={!name.length}
               addNew={addNewItem}
+              pressEnterHandler={name?.length && addNewItem}
               icon={
                 !name.length ? (
                   <PlusCircleOutlined style={{ fontSize: "20px" }} />
