@@ -1,4 +1,4 @@
-import { Layout, Space, Typography } from "antd";
+import { ConfigProvider, Layout, Space, Typography, theme } from "antd";
 import ActiveRoleSettings from "components/ActiveRoleSettings";
 import ReactFlowBase from "components/ReactFlowBase";
 import SelectBox from "components/SelectBox";
@@ -20,7 +20,7 @@ const spaceContainer: CSSProperties = {
   width: '100%'
 };
 const headerStyle: CSSProperties = {
-  backgroundColor: "#fff",
+  // backgroundColor: ,
   padding: "25px",
   height: "80px",
   display: "inline-flex",
@@ -28,6 +28,7 @@ const headerStyle: CSSProperties = {
   alignItems: "center",
 };
 const activeRoleTitleStyle: CSSProperties = {
+  color: 'white',
   flexGrow: 2,
   textAlign: "center",
   paddingBottom: "18px",
@@ -42,6 +43,11 @@ const WorkflowCreator = () => {
   const initialAllState = useMainStore(
     useCallback((state) => state.initialAllState, [])
   );
+  // const hasHydrated = useMainStore((state) => state._hasHydrated);
+  // const initialAllState = useMainStore(
+  //   useCallback((state) => state.initialAllState, [])
+  // );
+  const [colorTheme, setColorTheme] = useState(true);
   const processes = useMainStore((state) => state.processes);
   const deleteProcess = useMainStore((state) => state.deleteProcess);
   const addProcess = useMainStore((state) => state.addProcess);
@@ -167,8 +173,8 @@ const WorkflowCreator = () => {
   // if (!hasHydrated) {
   //   return <Spin size="large" style={{ position: 'absolute', top: '50%', left: '50%' }} tip={<Title level={4} style={{ color: 'blue' }}>...Loading State</Title>} />
   // }
-
   return (
+    <ConfigProvider theme={colorTheme ? {algorithm: theme.defaultAlgorithm} : {algorithm: theme.darkAlgorithm}}>
     <Space direction="vertical" style={spaceContainer}>
       <ReactFlowProvider>
         <Layout style={layoutContainer}>
@@ -192,7 +198,7 @@ const WorkflowCreator = () => {
                 updateColor={updateColor}
                 color={roleColors[activeRole]}
                 toggleRole={() => toggleRoleForProcess(activeRole)}
-                useStyle={{ flexGrow: 1 }}
+                useStyle={{ flexGrow: 1, color: 'white' }}
               />
             </Header>
             <Content className="dndflow">
@@ -212,11 +218,14 @@ const WorkflowCreator = () => {
           </Layout>
           <Sidebar
             output={outputJSON}
+            theme={colorTheme}
+            setColorTheme={setColorTheme}
             children={
               <>
                 <StateCollapseBox
                   items={filteredStates(nodes)}
                   addNew={addNewStateItem}
+                  colorTheme={colorTheme}
                 />
                 <SelectBox
                   addNew={addNewRole}
@@ -235,6 +244,7 @@ const WorkflowCreator = () => {
         </Layout>
       </ReactFlowProvider>
     </Space>
+    </ConfigProvider>
   );
 };
 
