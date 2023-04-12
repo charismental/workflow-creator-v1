@@ -11,6 +11,7 @@ import StateCollapseBox from "components/StateCollapseBox";
 import Sidebar from "./components/Sidebar";
 import "reactflow/dist/style.css";
 import "./css/style.css";
+import OutputJSON from "components/OutputJSON";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -108,21 +109,21 @@ const WorkflowCreator = () => {
 
   // only 'hides' the issue of non-activeRole edges still appearing for missing nodes
   // reduce function to avoid .filter().map()
-  const outputJSON = {
-    [activeRole]: {
-      connections: [
-        ...(allEdges?.[activeRole] || []),
-        ...(allSelfConnectingEdges?.[activeRole] || []),
-      ]
-        .map(({ source, target }: { source: string; target: string }) => {
-          return {
-            source: findStateNameByNode(source),
-            target: findStateNameByNode(target),
-          };
-        })
-        .filter(({ source, target }: any) => !!source && !!target),
-    },
-  };
+  // const outputJSON = {
+  //   [activeRole]: {
+  //     connections: [
+  //       ...(allEdges?.[activeRole] || []),
+  //       ...(allSelfConnectingEdges?.[activeRole] || []),
+  //     ]
+  //       .map(({ source, target }: { source: string; target: string }) => {
+  //         return {
+  //           source: findStateNameByNode(source),
+  //           target: findStateNameByNode(target),
+  //         };
+  //       })
+  //       .filter(({ source, target }: any) => !!source && !!target),
+  //   },
+  // };
 
   const updateNodesColor = useCallback(() => {
     setNodes(
@@ -208,7 +209,12 @@ const WorkflowCreator = () => {
             </Content>
           </Layout>
           <Sidebar
-            output={outputJSON}
+            output={OutputJSON({
+              activeRole,
+              allEdges,
+              allSelfConnectingEdges,
+              findStateNameByNode,
+            })}
             children={
               <>
                 <StateCollapseBox
