@@ -1,5 +1,10 @@
-import { Layout, Space, Switch } from "antd";
-import { CSSProperties, FC } from "react";
+import { Layout, Space, Radio, Typography } from "antd";
+import type { RadioChangeEvent } from "antd";
+import { CSSProperties, FC, useEffect, useState } from "react";
+import useMainStore from "store";
+import { shallow } from "zustand/shallow";
+
+const { Text } = Typography;
 
 const sidebar: CSSProperties = {
   backgroundColor: "white",
@@ -17,12 +22,19 @@ const triggerStyle: CSSProperties = {
 interface SideBarProps {
   output: any;
   children: React.ReactNode;
-  setEdgeType: () => void;
 }
 
 const Sidebar: FC<SideBarProps> = (props): JSX.Element => {
   const { Sider } = Layout;
-  const { output, children, setEdgeType } = props;
+  const { output, children } = props;
+  const [edgeType, setEdgeType] = useMainStore(
+    (state) => [state.edgeType, state.setEdgeType],
+    shallow
+  );
+
+  const onChange = (e: RadioChangeEvent) => {
+    setEdgeType(e.target.value);
+  };
 
   return (
     // supposed to show tab on breakpoint if collapseWidth is 0
@@ -37,9 +49,28 @@ const Sidebar: FC<SideBarProps> = (props): JSX.Element => {
     >
       <Space direction="vertical" size="small" style={sidebarSpacer}>
         {children}
-        {output && <pre>{JSON.stringify(output, null, 2)}</pre>}
-        <div>
-          <Switch onChange={setEdgeType}></Switch>
+        {output && (
+          <pre style={{ maxHeight: "20em", overflow: "scroll" }}>
+            {JSON.stringify(output, null, 2)}
+          </pre>
+        )}
+        <div style={{ marginTop: "50px" }}>
+          <div>
+            <Text underline>Choose Edge Type</Text>
+          </div>
+          <div>
+            <Radio.Group
+              onChange={onChange}
+              value={edgeType}
+              defaultValue={"Straight"}
+            >
+              <Space direction={"vertical"}>
+                <Radio value={"Straight"}>Straight</Radio>
+                <Radio value={"Bezier"}>Bezier</Radio>
+                <Radio value={"Step"}>Step</Radio>
+              </Space>
+            </Radio.Group>
+          </div>
         </div>
       </Space>
     </Sider>

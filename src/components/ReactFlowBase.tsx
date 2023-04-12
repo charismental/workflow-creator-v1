@@ -15,7 +15,7 @@ import useMainStore, { MainActions, MainState } from "store";
 import CustomConnectionLine from "../components/CustomConnectionLine";
 import FloatingEdge from "../components/FloatingEdge";
 import StateNode from "../components/StateNode";
-import { SmartBezierEdge } from "@tisoap/react-flow-smart-edge";
+import { SmartBezierEdge, SmartStepEdge } from "@tisoap/react-flow-smart-edge";
 
 import "../css/style.css";
 import "reactflow/dist/style.css";
@@ -39,6 +39,7 @@ const selector = (state: MainState & MainActions) => ({
   allEdges: state.allEdges,
   setAllEdges: state.setAllEdges,
   onConnect: state.onConnect,
+  edgeType: state.edgeType,
 });
 
 interface ReactFlowBaseProps {
@@ -47,7 +48,6 @@ interface ReactFlowBaseProps {
   roleColors: any;
   activeRole: any;
   updateNodesColor: any;
-  edgeType: boolean;
 }
 
 const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
@@ -78,11 +78,10 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     roleColors,
     activeRole,
     updateNodesColor,
-    edgeType,
   } = props;
 
   const edgeTypes: any = {
-    floating: edgeType ? FloatingEdge : SmartBezierEdge,
+    floating: FloatingEdge,
   };
 
   const toggleSelfConnected = useCallback(

@@ -36,7 +36,6 @@ const layoutContainer: CSSProperties = { width: "100%", height: "100vh" };
 
 const WorkflowCreator = () => {
   // const hasHydrated = useMainStore((state) => state._hasHydrated);
-  const [edgeType, setEdgeType] = useState(false);
   const processes = useMainStore((state) => state.processes);
   const addProcess = useMainStore((state) => state.addProcess);
   const toggleRoleForProcess = useMainStore(
@@ -205,12 +204,10 @@ const WorkflowCreator = () => {
                 roleColors={roleColors}
                 updateNodesColor={updateNodesColor}
                 activeRole={activeRole}
-                edgeType={edgeType}
               />
             </Content>
           </Layout>
           <Sidebar
-            setEdgeType={() => setEdgeType(!edgeType)}
             output={outputJSON}
             children={
               <>
