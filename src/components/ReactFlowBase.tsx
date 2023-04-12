@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -49,8 +49,12 @@ interface ReactFlowBaseProps {
   activeRole: any;
   updateNodesColor: any;
 }
+const edgeTypes: any = {
+  floating: FloatingEdge,
+};
 
 const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
+  // const edgeTypes = useMemo(() => ({ floadting: FloatingEdge }), []);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance>();
@@ -79,10 +83,6 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     activeRole,
     updateNodesColor,
   } = props;
-
-  const edgeTypes: any = {
-    floating: FloatingEdge,
-  };
 
   const toggleSelfConnected = useCallback(
     (stateId: string) => {

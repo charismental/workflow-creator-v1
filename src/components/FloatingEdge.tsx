@@ -33,6 +33,8 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
     shallow
   );
 
+  console.log(edgeType);
+
   const onEdgeClick = (
     event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>,
     id: string
@@ -105,10 +107,12 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
         width={foreignObjectSize}
         height={foreignObjectSize}
         x={
-          edgeType === "Straight" ? labelX : edgeCenterX - foreignObjectSize / 2
+          (edgeType === "Straight" ? labelX : edgeCenterX) -
+          foreignObjectSize / 2
         }
         y={
-          edgeType === "Straight" ? labelY : edgeCenterY - foreignObjectSize / 2
+          (edgeType === "Straight" ? labelY : edgeCenterY) -
+          foreignObjectSize / 2
         }
         className="edgebutton-foreignobject"
         requiredExtensions="http://www.w3.org/1999/xhtml"
