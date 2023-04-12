@@ -16,7 +16,7 @@ const { Header, Content } = Layout;
 const { Title } = Typography;
 
 const spaceContainer: CSSProperties = {
-  width: '100%'
+  width: "100%",
 };
 const headerStyle: CSSProperties = {
   backgroundColor: "#fff",
@@ -36,7 +36,7 @@ const layoutContainer: CSSProperties = { width: "100%", height: "100vh" };
 
 const WorkflowCreator = () => {
   // const hasHydrated = useMainStore((state) => state._hasHydrated);
-
+  const [edgeType, setEdgeType] = useState(false);
   const processes = useMainStore((state) => state.processes);
   const addProcess = useMainStore((state) => state.addProcess);
   const toggleRoleForProcess = useMainStore(
@@ -71,22 +71,21 @@ const WorkflowCreator = () => {
     shallow
   );
 
-  const [currentStates, setCurrentStates] = useMainStore((state) => [state.states, state.setStates], shallow)
-  const filteredStates = useMainStore(useCallback((state) => state.filteredStates, [currentStates]));
+  const [currentStates, setCurrentStates] = useMainStore(
+    (state) => [state.states, state.setStates],
+    shallow
+  );
+  const filteredStates = useMainStore(
+    useCallback((state) => state.filteredStates, [currentStates])
+  );
   const addNewStateItem = useMainStore((state) => state.addNewStateItem);
 
   useEffect(() => {
     setNodes(initialNodes);
-  }, [])
+  }, []);
 
-  const addNewRole = ({
-    color,
-    name,
-  }: {
-    color: string;
-    name?: string;
-  }) => {
-    if (!name) return
+  const addNewRole = ({ color, name }: { color: string; name?: string }) => {
+    if (!name) return;
 
     const newRolesObj = {
       ...roles,
@@ -104,20 +103,25 @@ const WorkflowCreator = () => {
       const foundNode = nodes.find((node) => node.id === nodeId);
 
       return foundNode?.data?.label;
-    }, [nodes]);
-
+    },
+    [nodes]
+  );
 
   // only 'hides' the issue of non-activeRole edges still appearing for missing nodes
   // reduce function to avoid .filter().map()
   const outputJSON = {
     [activeRole]: {
-      connections: [...(allEdges?.[activeRole] || []), ...(allSelfConnectingEdges?.[activeRole] || [])]
+      connections: [
+        ...(allEdges?.[activeRole] || []),
+        ...(allSelfConnectingEdges?.[activeRole] || []),
+      ]
         .map(({ source, target }: { source: string; target: string }) => {
           return {
             source: findStateNameByNode(source),
             target: findStateNameByNode(target),
           };
-        }).filter(({ source, target }: any) => !!source && !!target)
+        })
+        .filter(({ source, target }: any) => !!source && !!target),
     },
   };
 
@@ -156,11 +160,10 @@ const WorkflowCreator = () => {
     };
   });
 
-
   const addNewProcessAndSelect = ({ name }: { name: string }) => {
     addProcess(name);
-    setActiveProcessName(name)
-  }
+    setActiveProcessName(name);
+  };
 
   // if (!hasHydrated) {
   //   return <Spin size="large" style={{ position: 'absolute', top: '50%', left: '50%' }} tip={<Title level={4} style={{ color: 'blue' }}>...Loading State</Title>} />
@@ -186,7 +189,9 @@ const WorkflowCreator = () => {
                 {activeRole}
               </Title>
               <ActiveRoleSettings
-                roleIsToggled={!!activeProcess?.roles?.some((r) => r.RoleName === activeRole)}
+                roleIsToggled={
+                  !!activeProcess?.roles?.some((r) => r.RoleName === activeRole)
+                }
                 updateColor={updateColor}
                 color={roleColors[activeRole]}
                 toggleRole={() => toggleRoleForProcess(activeRole)}
@@ -200,10 +205,12 @@ const WorkflowCreator = () => {
                 roleColors={roleColors}
                 updateNodesColor={updateNodesColor}
                 activeRole={activeRole}
+                edgeType={edgeType}
               />
             </Content>
           </Layout>
           <Sidebar
+            setEdgeType={() => setEdgeType(!edgeType)}
             output={outputJSON}
             children={
               <>

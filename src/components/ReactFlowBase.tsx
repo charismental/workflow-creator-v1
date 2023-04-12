@@ -6,7 +6,7 @@ import ReactFlow, {
   Edge,
   EdgeTypes,
   ReactFlowInstance,
-  NodeTypes
+  NodeTypes,
 } from "reactflow";
 import defaultEdgeOptions from "data/defaultEdgeOptions";
 import isEqual from "lodash.isequal";
@@ -15,6 +15,7 @@ import useMainStore, { MainActions, MainState } from "store";
 import CustomConnectionLine from "../components/CustomConnectionLine";
 import FloatingEdge from "../components/FloatingEdge";
 import StateNode from "../components/StateNode";
+import { SmartBezierEdge } from "@tisoap/react-flow-smart-edge";
 
 import "../css/style.css";
 import "reactflow/dist/style.css";
@@ -26,10 +27,6 @@ const connectionLineStyle = {
 
 const nodeTypes: NodeTypes = {
   custom: StateNode,
-};
-
-const edgeTypes: EdgeTypes = {
-  floating: FloatingEdge,
 };
 
 const selector = (state: MainState & MainActions) => ({
@@ -50,9 +47,8 @@ interface ReactFlowBaseProps {
   roleColors: any;
   activeRole: any;
   updateNodesColor: any;
+  edgeType: boolean;
 }
-
-
 
 const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -62,7 +58,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   // reactFlowInstance should only change on init. I think...
   useEffect(() => {
     if (reactFlowInstance) reactFlowInstance.fitView();
-  }, [reactFlowInstance])
+  }, [reactFlowInstance]);
 
   const {
     nodes,
@@ -82,13 +78,20 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     roleColors,
     activeRole,
     updateNodesColor,
+    edgeType,
   } = props;
+
+  const edgeTypes: any = {
+    floating: edgeType ? FloatingEdge : SmartBezierEdge,
+  };
 
   const toggleSelfConnected = useCallback(
     (stateId: string) => {
       let activeRoleSelfConnected = allSelfConnectingEdges?.[activeRole] || [];
 
-      if (activeRoleSelfConnected.some(({ target }: any) => target === stateId)) {
+      if (
+        activeRoleSelfConnected.some(({ target }: any) => target === stateId)
+      ) {
         activeRoleSelfConnected = activeRoleSelfConnected.filter(
           ({ target }: any) => target !== stateId
         );
@@ -108,9 +111,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   useEffect(() => {
     if (
       nodes.length &&
-      nodes.some(
-        (n: any) => n?.data.color !== roleColors[activeRole]
-      )
+      nodes.some((n: any) => n?.data.color !== roleColors[activeRole])
     ) {
       updateNodesColor();
     }
@@ -148,8 +149,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     (event: React.DragEvent<HTMLDivElement>) => {
       event.preventDefault();
 
-      const reactFlowBounds =
-        reactFlowWrapper.current?.getBoundingClientRect();
+      const reactFlowBounds = reactFlowWrapper.current?.getBoundingClientRect();
 
       const type = event.dataTransfer.getData("application/reactflow");
 
@@ -179,7 +179,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
         },
       };
 
-      const updatedNodes = nodes.concat(newNode)
+      const updatedNodes = nodes.concat(newNode);
       setNodes(updatedNodes);
     },
     [reactFlowInstance, setNodes, activeRole, nodes]
@@ -194,7 +194,9 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
             data: {
               ...node.data,
               toggleSelfConnected,
-              selfConnected: allSelfConnectingEdges?.[activeRole]?.some(({ target }: any) => target === node.id),
+              selfConnected: allSelfConnectingEdges?.[activeRole]?.some(
+                ({ target }: any) => target === node.id
+              ),
             },
           }))}
           edges={allEdges?.[activeRole] || []}
