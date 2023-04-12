@@ -26,6 +26,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "npm18": "react-scripts --openssl-legacy-provider start",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
