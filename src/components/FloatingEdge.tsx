@@ -100,28 +100,30 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
         markerEnd={markerEnd}
         style={style}
       />
-      <foreignObject
-        width={foreignObjectSize}
-        height={foreignObjectSize}
-        x={
-          (edgeType === "Straight" ? labelX : edgeCenterX) -
-          foreignObjectSize / 2
-        }
-        y={
-          (edgeType === "Straight" ? labelY : edgeCenterY) -
-          foreignObjectSize / 2
-        }
-        className="edgebutton-foreignobject"
-        requiredExtensions="http://www.w3.org/1999/xhtml"
-      >
-        <div>
-          <Button
-            className="edgebutton"
-            onClick={(event) => onEdgeClick(event, id)}
-            icon={<CloseCircleOutlined />}
-          />
-        </div>
-      </foreignObject>
+      <div className="edgebutton-foreignobject">
+        <foreignObject
+          width={foreignObjectSize}
+          height={foreignObjectSize}
+          x={
+            (edgeType === "Straight" ? labelX : edgeCenterX) -
+            foreignObjectSize / 2
+          }
+          y={
+            (edgeType === "Straight" ? labelY : edgeCenterY) -
+            foreignObjectSize / 2
+          }
+          className="edgebutton-foreignobject"
+          requiredExtensions="http://www.w3.org/1999/xhtml"
+        >
+          <div>
+            <Button
+              className="edgebutton"
+              onClick={(event) => onEdgeClick(event, id)}
+              icon={<CloseCircleOutlined />}
+            />
+          </div>
+        </foreignObject>
+      </div>
     </>
   );
 };
