@@ -12,6 +12,8 @@ import Sidebar from "./components/Sidebar";
 import "reactflow/dist/style.css";
 import "./css/style.css";
 import OutputJSON from "components/OutputJSON";
+import ToggleEdgeTypes from "components/ToggleEdgeTypes";
+import type { MainActions, MainState } from "store";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -35,50 +37,62 @@ const activeRoleTitleStyle: CSSProperties = {
 
 const layoutContainer: CSSProperties = { width: "100%", height: "100vh" };
 
+const storeSelector = (state: MainActions & MainState) => ({
+  processes: state.processes,
+  addProcess: state.addProcess,
+  toggleRoleForProcess: state.toggleRoleForProcess,
+  activeProcessName: state.activeProcessName,
+  setActiveProcessName: state.setActiveProcessName,
+  activeRole: state.activeRole,
+  setActiveRole: state.setActiveRole,
+  allEdges: state.allEdges,
+  setAllEdges: state.setAllEdges,
+  roles: state.roles,
+  setRoles: state.setRoles,
+  nodes: state.nodes,
+  setNodes: state.setNodes,
+  roleColors: state.roleColors,
+  setRoleColors: state.setRoleColors,
+  allSelfConnectingEdges: state.allSelfConnectingEdges,
+  setAllSelfConnectingEdges: state.setAllSelfConnectingEdges,
+  currentStates: state.states,
+  setCurrentStates: state.setStates,
+  addNewStateItem: state.addNewStateItem,
+  edgeType: state.edgeType,
+  setEdgeType: state.setEdgeType,
+});
+
 const WorkflowCreator = () => {
   // const hasHydrated = useMainStore((state) => state._hasHydrated);
-  const processes = useMainStore((state) => state.processes);
-  const addProcess = useMainStore((state) => state.addProcess);
-  const toggleRoleForProcess = useMainStore(
-    (state) => state.toggleRoleForProcess
-  );
-  const [activeProcessName, setActiveProcessName] = useMainStore(
-    (state) => [state.activeProcessName, state.setActiveProcessName],
-    shallow
-  );
-  const [activeRole, setActiveRole] = useMainStore(
-    (state) => [state.activeRole, state.setActiveRole],
-    shallow
-  );
-  const [allEdges, setAllEdges] = useMainStore(
-    (state) => [state.allEdges, state.setAllEdges],
-    shallow
-  );
-  const [roles, setRoles] = useMainStore(
-    (state) => [state.roles, state.setRoles],
-    shallow
-  );
-  const [nodes, setNodes] = useMainStore(
-    (state) => [state.nodes, state.setNodes],
-    shallow
-  );
-  const [roleColors, setRoleColors] = useMainStore(
-    (state) => [state.roleColors, state.setRoleColors],
-    shallow
-  );
-  const [allSelfConnectingEdges, setAllSelfConnectingEdges] = useMainStore(
-    (state) => [state.allSelfConnectingEdges, state.setAllSelfConnectingEdges],
-    shallow
-  );
 
-  const [currentStates, setCurrentStates] = useMainStore(
-    (state) => [state.states, state.setStates],
-    shallow
-  );
+  const {
+    processes,
+    addProcess,
+    toggleRoleForProcess,
+    activeProcessName,
+    setActiveProcessName,
+    activeRole,
+    setActiveRole,
+    allEdges,
+    setAllEdges,
+    roles,
+    setRoles,
+    nodes,
+    setNodes,
+    roleColors,
+    setRoleColors,
+    allSelfConnectingEdges,
+    setAllSelfConnectingEdges,
+    currentStates,
+    setCurrentStates,
+    addNewStateItem,
+    edgeType,
+    setEdgeType,
+  } = useMainStore(storeSelector, shallow);
+
   const filteredStates = useMainStore(
     useCallback((state) => state.filteredStates, [currentStates])
   );
-  const addNewStateItem = useMainStore((state) => state.addNewStateItem);
 
   useEffect(() => {
     setNodes(initialNodes);
@@ -107,24 +121,6 @@ const WorkflowCreator = () => {
     [nodes]
   );
 
-  // only 'hides' the issue of non-activeRole edges still appearing for missing nodes
-  // reduce function to avoid .filter().map()
-  // const outputJSON = {
-  //   [activeRole]: {
-  //     connections: [
-  //       ...(allEdges?.[activeRole] || []),
-  //       ...(allSelfConnectingEdges?.[activeRole] || []),
-  //     ]
-  //       .map(({ source, target }: { source: string; target: string }) => {
-  //         return {
-  //           source: findStateNameByNode(source),
-  //           target: findStateNameByNode(target),
-  //         };
-  //       })
-  //       .filter(({ source, target }: any) => !!source && !!target),
-  //   },
-  // };
-
   const updateNodesColor = useCallback(() => {
     setNodes(
       nodes.map((n: any) => ({
@@ -150,8 +146,6 @@ const WorkflowCreator = () => {
   const activeProcess = processes.find(
     (process: WorkflowProcess) => process.ProcessName === activeProcessName
   );
-
-  // console.log(JSON.stringify(activeProcess, null, 2))
 
   const roleList = Object.keys(roles).map((role) => {
     return {
@@ -209,12 +203,6 @@ const WorkflowCreator = () => {
             </Content>
           </Layout>
           <Sidebar
-            output={OutputJSON({
-              activeRole,
-              allEdges,
-              allSelfConnectingEdges,
-              findStateNameByNode,
-            })}
             children={
               <>
                 <StateCollapseBox
@@ -231,6 +219,22 @@ const WorkflowCreator = () => {
                   useStyle={{ width: "100%" }}
                   multiselectHandler={(el) => toggleRoleForProcess(el.label)}
                   selectOnChange={setActiveRole}
+                />
+                <pre style={{ maxHeight: "20em", overflow: "scroll" }}>
+                  {JSON.stringify(
+                    OutputJSON({
+                      activeRole,
+                      allEdges,
+                      allSelfConnectingEdges,
+                      findStateNameByNode,
+                    }),
+                    null,
+                    2
+                  )}
+                </pre>
+                <ToggleEdgeTypes
+                  edgeType={edgeType}
+                  setEdgeType={setEdgeType}
                 />
               </>
             }

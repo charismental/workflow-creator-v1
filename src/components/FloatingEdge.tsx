@@ -33,8 +33,6 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
     shallow
   );
 
-  console.log(edgeType);
-
   const onEdgeClick = (
     event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>,
     id: string
@@ -56,7 +54,6 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
     return null;
   }
 
-  console.log(edgeType);
   const { sx, sy, tx, ty } = getEdgeParams(sourceNode, targetNode);
 
   const getSmartEdgeResponse = getSmartEdge({
