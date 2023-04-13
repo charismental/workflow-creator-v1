@@ -1,6 +1,6 @@
 import { CloseCircleOutlined } from "@ant-design/icons";
 import { Button } from "antd";
-import { CSSProperties, FunctionComponent, useCallback, useState } from "react";
+import { CSSProperties, FunctionComponent, useCallback, useEffect, useState } from "react";
 import {
   EdgeProps,
   getStraightPath,
@@ -35,28 +35,40 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
   );
   const [isHover, setIsHover] = useState(false);
 
-  const handleMouseOver = () => {
-    setIsHover(true);
+  useEffect(() => {
     const filteredSourceNode = nodes.find((node) => node.id === sourceNode?.id);
     const filteredTargetNode = nodes.find((node) => node.id === targetNode?.id);
+    const shadow = isHover ? '0 0 4px 4px #0ff' : ''
     const updatedNode = nodes.map((node: Node) =>
       node.id === filteredSourceNode?.id || node.id === filteredTargetNode?.id
-        ? { ...node, style: { boxShadow: "0 0 4px 4px #0ff" } }
+        ? { ...node, style: { boxShadow: shadow } }
         : node
     );
     setNodes(updatedNode);
+  }, [isHover])
+
+  const handleMouseOver = () => {
+    setIsHover(true);
+    // const filteredSourceNode = nodes.find((node) => node.id === sourceNode?.id);
+    // const filteredTargetNode = nodes.find((node) => node.id === targetNode?.id);
+    // const updatedNode = nodes.map((node: Node) =>
+    //   node.id === filteredSourceNode?.id || node.id === filteredTargetNode?.id
+    //     ? { ...node, style: { boxShadow: "0 0 4px 4px #0ff" } }
+    //     : node
+    // );
+    // setNodes(updatedNode);
   };
 
   const handleMouseLeave = () => {
     setIsHover(false);
-    const filteredSourceNode = nodes.find((node) => node.id === sourceNode?.id);
-    const filteredTargetNode = nodes.find((node) => node.id === targetNode?.id);
-    const updatedNode = nodes.map((node: Node) =>
-      node.id === filteredSourceNode?.id || node.id === filteredTargetNode?.id
-        ? { ...node, style: { boxShadow: "" } }
-        : node
-    );
-    setNodes(updatedNode);
+    // const filteredSourceNode = nodes.find((node) => node.id === sourceNode?.id);
+    // const filteredTargetNode = nodes.find((node) => node.id === targetNode?.id);
+    // const updatedNode = nodes.map((node: Node) =>
+    //   node.id === filteredSourceNode?.id || node.id === filteredTargetNode?.id
+    //     ? { ...node, style: { boxShadow: "" } }
+    //     : node
+    // );
+    // setNodes(updatedNode)
   };
 
   const onEdgeClick = (
@@ -66,6 +78,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
     event.stopPropagation();
     const filtered = edges.filter((ed: any) => ed.id !== id);
     setEdges(filtered);
+    setIsHover(false)
   };
 
   const sourceNode = useReactFlowStore(
