@@ -38,40 +38,40 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
 
  //  updates node style, but resizes nodes, will revert manually resized nodes
 
-  // const updateNodeStyle = useCallback(() => {
-  //   const filteredSourceNode = nodes.find((node) => node.id === sourceNode?.id);
-  //   const filteredTargetNode = nodes.find((node) => node.id === targetNode?.id);
-  //   const shadow = isHover ? "" : '0 0 4px 4px #0ff'
+  const updateNodeStyle = useCallback(() => {
+    const filteredSourceNode = nodes.find((node) => node.id === sourceNode?.id);
+    const filteredTargetNode = nodes.find((node) => node.id === targetNode?.id);
+    const shadow = isHover ? "" : '0 0 4px 4px #0ff'
     
-  //   setNodes(nodes.map((node: Node) =>
-  //     node.id === filteredSourceNode?.id || node.id === filteredTargetNode?.id
-  //       ? { ...node, style: { boxShadow: shadow } }
-  //       : node
-  //   ), activeProcess)
+    setNodes(nodes.map((node: Node) =>
+      node.id === filteredSourceNode?.id || node.id === filteredTargetNode?.id
+        ? { ...node, style: { ...(node?.style || {}),boxShadow: shadow } }
+        : node
+    ), activeProcess)
 
-  // },[])
+  },[nodes])
 
   
 
   // does not resize nodes, but does not update node style, will revert manually resized nodes
 
-  const updateNodeStyle = useCallback(() => {
-    const filteredSourceNode = nodes.find((node) => node.id === sourceNode?.id);
-    const filteredTargetNode = nodes.find((node) => node.id === targetNode?.id);
-    const shadow = isHover ? '' : '0 0 4px 4px #0ff';
-    const processIndex = processes.findIndex(
-      (p) => p.ProcessName === activeProcess
-    );
-    setNodes(
-      processes[processIndex].nodes ||
-        nodes?.map((node: Node) => {
-          return node.id === filteredSourceNode?.id ||
-            node.id === filteredTargetNode?.id
-            ? { ...node, style: { boxShadow: shadow } }
-            : node;
-        })
-    );
-  }, []);
+  // const updateNodeStyle = useCallback(() => {
+  //   const filteredSourceNode = nodes.find((node) => node.id === sourceNode?.id);
+  //   const filteredTargetNode = nodes.find((node) => node.id === targetNode?.id);
+  //   const shadow = isHover ? '' : '0 0 4px 4px #0ff';
+  //   const processIndex = processes.findIndex(
+  //     (p) => p.ProcessName === activeProcess
+  //   );
+  //   setNodes(
+  //     processes[processIndex].nodes ||
+  //       nodes?.map((node: Node) => {
+  //         return node.id === filteredSourceNode?.id ||
+  //           node.id === filteredTargetNode?.id
+  //           ? { ...node, style: { boxShadow: shadow } }
+  //           : node;
+  //       })
+  //   );
+  // }, []);
 
   useEffect(() => {
     updateNodeStyle()
