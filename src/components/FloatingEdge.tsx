@@ -33,7 +33,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
     (state) => [state.edgeType, state.nodes, state.setNodes, state.activeProcessName, state.processes],
     shallow
   );
-  const [isHover, setIsHover] = useState(false);
+  const [isHover, setIsHover] = useState<boolean | null>(null);
 
 
  //  updates node style, but resizes nodes, will revert manually resized nodes
@@ -45,11 +45,11 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
     
     setNodes(nodes.map((node: Node) =>
       node.id === filteredSourceNode?.id || node.id === filteredTargetNode?.id
-        ? { ...node, style: { ...(node?.style || {}),boxShadow: shadow } }
+        ? { ...node, style: { ...(node?.style || {}), boxShadow: shadow } }
         : node
     ), activeProcess)
 
-  },[nodes])
+  }, [nodes, activeProcess])
 
   
 
@@ -74,7 +74,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
   // }, []);
 
   useEffect(() => {
-    updateNodeStyle()
+    if (isHover !== null) updateNodeStyle()
   },[isHover])
 
   // const handleMouseOver = () => {
@@ -152,8 +152,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
         id={id}
         className="edge_path"
         d={edgeType === 'Straight' ? edgePath : svgPathString}
-        markerEnd={markerEnd}
-        
+        markerEnd={markerEnd}  
         // style={style}
         stroke={isHover ? '#0ff': 'black'}
       />    
@@ -181,8 +180,6 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
           />
         </div>
       </foreignObject>
-
-
     </>
   );
 };
