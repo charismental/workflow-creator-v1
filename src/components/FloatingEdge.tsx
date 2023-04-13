@@ -29,47 +29,63 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
     shallow
   );
 
-  const [edgeType, nodes, setNodes] = useMainStore(
-    (state) => [state.edgeType, state.nodes, state.setNodes],
+  const [edgeType, nodes, setNodes, activeProcess, processes] = useMainStore(
+    (state) => [state.edgeType, state.nodes, state.setNodes, state.activeProcessName, state.processes],
     shallow
   );
   const [isHover, setIsHover] = useState(false);
 
-  useEffect(() => {
+
+ //  updates node style, but resizes nodes, will revert manually resized nodes
+
+  // const updateNodeStyle = useCallback(() => {
+  //   const filteredSourceNode = nodes.find((node) => node.id === sourceNode?.id);
+  //   const filteredTargetNode = nodes.find((node) => node.id === targetNode?.id);
+  //   const shadow = isHover ? "" : '0 0 4px 4px #0ff'
+    
+  //   setNodes(nodes.map((node: Node) =>
+  //     node.id === filteredSourceNode?.id || node.id === filteredTargetNode?.id
+  //       ? { ...node, style: { boxShadow: shadow } }
+  //       : node
+  //   ), activeProcess)
+
+  // },[])
+
+  
+
+  // does not resize nodes, but does not update node style, will revert manually resized nodes
+
+  const updateNodeStyle = useCallback(() => {
     const filteredSourceNode = nodes.find((node) => node.id === sourceNode?.id);
     const filteredTargetNode = nodes.find((node) => node.id === targetNode?.id);
-    const shadow = isHover ? '0 0 4px 4px #0ff' : '';
-    const updatedNode = nodes.map((node: Node) =>
-      node.id === filteredSourceNode?.id || node.id === filteredTargetNode?.id
-        ? { ...node, style: { boxShadow: shadow } }
-        : node
+    const shadow = isHover ? '' : '0 0 4px 4px #0ff';
+    const processIndex = processes.findIndex(
+      (p) => p.ProcessName === activeProcess
     );
-    setNodes(updatedNode);
-  }, [isHover]);
+    setNodes(
+      processes[processIndex].nodes ||
+        nodes?.map((node: Node) => {
+          return node.id === filteredSourceNode?.id ||
+            node.id === filteredTargetNode?.id
+            ? { ...node, style: { boxShadow: shadow } }
+            : node;
+        })
+    );
+  }, []);
 
-  const handleMouseOver = () => {
-    setIsHover(true);
-    // const filteredSourceNode = nodes.find((node) => node.id === sourceNode?.id);
-    // const filteredTargetNode = nodes.find((node) => node.id === targetNode?.id);
-    // const updatedNode = nodes.map((node: Node) =>
-    //   node.id === filteredSourceNode?.id || node.id === filteredTargetNode?.id
-    //     ? { ...node, style: { boxShadow: "0 0 4px 4px #0ff" } }
-    //     : node
-    // );
-    // setNodes(updatedNode);
-  };
+  useEffect(() => {
+    updateNodeStyle()
+  },[isHover])
 
-  const handleMouseLeave = () => {
-    setIsHover(false);
-    // const filteredSourceNode = nodes.find((node) => node.id === sourceNode?.id);
-    // const filteredTargetNode = nodes.find((node) => node.id === targetNode?.id);
-    // const updatedNode = nodes.map((node: Node) =>
-    //   node.id === filteredSourceNode?.id || node.id === filteredTargetNode?.id
-    //     ? { ...node, style: { boxShadow: "" } }
-    //     : node
-    // );
-    // setNodes(updatedNode)
-  };
+  // const handleMouseOver = () => {
+   
+  //   updateNodeStyle();
+  // };
+
+  // const handleMouseLeave = () => {
+
+  //   updateNodeStyle()
+  // };
 
   const onEdgeClick = (
     event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>,
@@ -142,8 +158,8 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
         stroke={isHover ? '#0ff': 'black'}
       />    
       <foreignObject
-        onMouseOver={handleMouseOver}
-        onMouseLeave={handleMouseLeave}
+        onMouseOver={() => setIsHover(true)}
+        onMouseLeave={() => setIsHover(false)}
         width={foreignObjectSize}
         height={foreignObjectSize}
         x={
