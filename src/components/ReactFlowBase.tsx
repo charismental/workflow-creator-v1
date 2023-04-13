@@ -1,10 +1,8 @@
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
   Background,
   BackgroundVariant,
   Controls,
-  Edge,
-  EdgeTypes,
   ReactFlowInstance,
   NodeTypes,
 } from "reactflow";
@@ -15,7 +13,6 @@ import useMainStore, { MainActions, MainState } from "store";
 import CustomConnectionLine from "../components/CustomConnectionLine";
 import FloatingEdge from "../components/FloatingEdge";
 import StateNode from "../components/StateNode";
-import { SmartBezierEdge, SmartStepEdge } from "@tisoap/react-flow-smart-edge";
 
 import "../css/style.css";
 import "reactflow/dist/style.css";

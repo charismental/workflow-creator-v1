@@ -1,19 +1,19 @@
-import { CloseCircleOutlined } from "@ant-design/icons";
-import { Button } from "antd";
-import { CSSProperties, FunctionComponent, useCallback, useEffect, useState } from "react";
+import { CloseCircleOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
+import { FunctionComponent, useCallback, useEffect, useState } from 'react';
 import {
   EdgeProps,
   getStraightPath,
   useStore as useReactFlowStore,
   Position,
   Node,
-} from "reactflow";
-import { getEdgeParams } from "../utils";
-import { getSmartEdge } from "@tisoap/react-flow-smart-edge";
+} from 'reactflow';
+import { getEdgeParams } from '../utils';
+import { getSmartEdge } from '@tisoap/react-flow-smart-edge';
 
-import useMainStore from "store";
-import { shallow } from "zustand/shallow";
-import { bezierResult, stepResult, straightResult } from "data/edgeOptions";
+import useMainStore from 'store';
+import { shallow } from 'zustand/shallow';
+import { bezierResult, stepResult, straightResult } from 'data/edgeOptions';
 
 const foreignObjectSize = 40;
 
@@ -38,14 +38,14 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
   useEffect(() => {
     const filteredSourceNode = nodes.find((node) => node.id === sourceNode?.id);
     const filteredTargetNode = nodes.find((node) => node.id === targetNode?.id);
-    const shadow = isHover ? '0 0 4px 4px #0ff' : ''
+    const shadow = isHover ? '0 0 4px 4px #0ff' : '';
     const updatedNode = nodes.map((node: Node) =>
       node.id === filteredSourceNode?.id || node.id === filteredTargetNode?.id
         ? { ...node, style: { boxShadow: shadow } }
         : node
     );
     setNodes(updatedNode);
-  }, [isHover])
+  }, [isHover]);
 
   const handleMouseOver = () => {
     setIsHover(true);
@@ -78,7 +78,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
     event.stopPropagation();
     const filtered = edges.filter((ed: any) => ed.id !== id);
     setEdges(filtered);
-    setIsHover(false)
+    setIsHover(false);
   };
 
   const sourceNode = useReactFlowStore(
@@ -105,9 +105,9 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
     nodes: nodes,
     // Pass down options in the getSmartEdge object
     options:
-      edgeType === "Straight"
+      edgeType === 'Straight'
         ? straightResult
-        : edgeType === "Bezier"
+        : edgeType === 'Bezier'
         ? bezierResult
         : stepResult,
   });
@@ -134,24 +134,24 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
     <>
       <path
         id={id}
-        className="react-flow__edge-path"
-        d={edgeType === "Straight" ? edgePath : svgPathString}
+        className="edge_path"
+        d={edgeType === 'Straight' ? edgePath : svgPathString}
         markerEnd={markerEnd}
-        style={style}
-        fill="red"
-      />
-
+        
+        // style={style}
+        stroke={isHover ? '#0ff': 'black'}
+      />    
       <foreignObject
         onMouseOver={handleMouseOver}
         onMouseLeave={handleMouseLeave}
         width={foreignObjectSize}
         height={foreignObjectSize}
         x={
-          (edgeType === "Straight" ? labelX : edgeCenterX) -
+          (edgeType === 'Straight' ? labelX : edgeCenterX) -
           foreignObjectSize / 2
         }
         y={
-          (edgeType === "Straight" ? labelY : edgeCenterY) -
+          (edgeType === 'Straight' ? labelY : edgeCenterY) -
           foreignObjectSize / 2
         }
         className="edgebutton-foreignobject"
@@ -165,6 +165,8 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
           />
         </div>
       </foreignObject>
+
+
     </>
   );
 };
