@@ -54,7 +54,6 @@ const edgeTypes: any = {
 };
 
 const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
-  // const edgeTypes = useMemo(() => ({ floadting: FloatingEdge }), []);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance>();

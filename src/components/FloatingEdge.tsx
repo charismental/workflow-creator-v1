@@ -1,11 +1,12 @@
 import { CloseCircleOutlined } from "@ant-design/icons";
 import { Button } from "antd";
-import { FunctionComponent, useCallback } from "react";
+import { CSSProperties, FunctionComponent, useCallback, useState } from "react";
 import {
   EdgeProps,
   getStraightPath,
   useStore as useReactFlowStore,
   Position,
+  Node,
 } from "reactflow";
 import { getEdgeParams } from "../utils";
 import { getSmartEdge } from "@tisoap/react-flow-smart-edge";
@@ -28,10 +29,35 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
     shallow
   );
 
-  const [edgeType, nodes] = useMainStore(
-    (state) => [state.edgeType, state.nodes],
+  const [edgeType, nodes, setNodes] = useMainStore(
+    (state) => [state.edgeType, state.nodes, state.setNodes],
     shallow
   );
+  const [isHover, setIsHover] = useState(false);
+
+  const handleMouseOver = () => {
+    setIsHover(true);
+    const filteredSourceNode = nodes.find((node) => node.id === sourceNode?.id);
+    const filteredTargetNode = nodes.find((node) => node.id === targetNode?.id);
+    const updatedNode = nodes.map((node: Node) =>
+      node.id === filteredSourceNode?.id || node.id === filteredTargetNode?.id
+        ? { ...node, style: { boxShadow: "0 0 4px 4px #0ff" } }
+        : node
+    );
+    setNodes(updatedNode);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHover(false);
+    const filteredSourceNode = nodes.find((node) => node.id === sourceNode?.id);
+    const filteredTargetNode = nodes.find((node) => node.id === targetNode?.id);
+    const updatedNode = nodes.map((node: Node) =>
+      node.id === filteredSourceNode?.id || node.id === filteredTargetNode?.id
+        ? { ...node, style: { boxShadow: "" } }
+        : node
+    );
+    setNodes(updatedNode);
+  };
 
   const onEdgeClick = (
     event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>,
@@ -99,31 +125,33 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
         d={edgeType === "Straight" ? edgePath : svgPathString}
         markerEnd={markerEnd}
         style={style}
+        fill="red"
       />
-      <div className="edgebutton-foreignobject">
-        <foreignObject
-          width={foreignObjectSize}
-          height={foreignObjectSize}
-          x={
-            (edgeType === "Straight" ? labelX : edgeCenterX) -
-            foreignObjectSize / 2
-          }
-          y={
-            (edgeType === "Straight" ? labelY : edgeCenterY) -
-            foreignObjectSize / 2
-          }
-          className="edgebutton-foreignobject"
-          requiredExtensions="http://www.w3.org/1999/xhtml"
-        >
-          <div>
-            <Button
-              className="edgebutton"
-              onClick={(event) => onEdgeClick(event, id)}
-              icon={<CloseCircleOutlined />}
-            />
-          </div>
-        </foreignObject>
-      </div>
+
+      <foreignObject
+        onMouseOver={handleMouseOver}
+        onMouseLeave={handleMouseLeave}
+        width={foreignObjectSize}
+        height={foreignObjectSize}
+        x={
+          (edgeType === "Straight" ? labelX : edgeCenterX) -
+          foreignObjectSize / 2
+        }
+        y={
+          (edgeType === "Straight" ? labelY : edgeCenterY) -
+          foreignObjectSize / 2
+        }
+        className="edgebutton-foreignobject"
+        requiredExtensions="http://www.w3.org/1999/xhtml"
+      >
+        <div>
+          <Button
+            className="edgebutton"
+            onClick={(event) => onEdgeClick(event, id)}
+            icon={<CloseCircleOutlined />}
+          />
+        </div>
+      </foreignObject>
     </>
   );
 };

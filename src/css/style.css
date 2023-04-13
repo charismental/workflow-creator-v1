@@ -125,7 +125,7 @@ div.targetHandle {
 }
 
 .edgebutton-foreignobject div {
-  background: transparent;
+  background: "transparent";
   width: 40px;
   height: 40px;
   display: flex;
