@@ -160,3 +160,20 @@ div.targetHandle {
   line-height: 12px;
   text-align: center;
 }
+
+.connection_animated {
+  stroke-dasharray: 5;
+  -webkit-animation: dashdraw 0.5s linear infinite;
+  animation: dashdraw 0.5s linear infinite;
+}
+
+@-webkit-keyframes dashdraw {
+  to {
+    stroke-dashoffset: 20;
+  }
+}
+@keyframes dashdraw {
+  to {
+    stroke-dashoffset: 20;
+  }
+}

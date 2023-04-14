@@ -17,7 +17,12 @@ const CustomConnectionLine: FunctionComponent<ConnectionLineComponentProps> = ({
 
   return (
     <g>
-      <path style={connectionLineStyle} fill="none" d={edgePath} />
+      <path
+        style={connectionLineStyle}
+        fill="none"
+        d={edgePath}
+        className="connection_animated" // from local style.css
+      />
       <circle
         cx={toX}
         cy={toY}
