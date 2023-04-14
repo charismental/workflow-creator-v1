@@ -5,6 +5,7 @@ import ReactFlow, {
   Controls,
   ReactFlowInstance,
   NodeTypes,
+  Edge,
 } from "reactflow";
 import defaultEdgeOptions from "data/defaultEdgeOptions";
 import isEqual from "lodash.isequal";
@@ -12,6 +13,8 @@ import { shallow } from "zustand/shallow";
 import useMainStore, { MainActions, MainState } from "store";
 import CustomConnectionLine from "../components/CustomConnectionLine";
 import FloatingEdge from "../components/FloatingEdge";
+import { Dropdown } from "antd";
+import type { MenuProps } from "antd";
 import StateNode from "../components/StateNode";
 
 import "../css/style.css";
@@ -79,6 +82,34 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     activeRole,
     updateNodesColor,
   } = props;
+
+  const [items, setItems] = useState<MenuProps["items"]>();
+
+  // const edgeContextMenuItems = (el: Edge): MenuProps['items'] => {
+  //   return [{label: `Source: ${el.source}`, key: 1}, {label: `Target: ${el.target}`, key:2}]
+  // }
+
+  const openEdgeContextMenu = useCallback((e: React.MouseEvent, el: Edge) => {
+    e.preventDefault();
+    setItems([
+      { label: `Source: ${el.source}`, key: 1 },
+      { label: `Target: ${el.target}`, key: 2 },
+    ]);
+  }, []);
+
+  const openNodeContextMenu = useCallback((e: React.MouseEvent, node: any) => {
+    e.preventDefault();
+    setItems([
+      {
+        label: `Position: {x: ${node.position.x}, y: ${node.position.y}}`,
+        key: 1,
+      },
+      {
+        label: `Dimensions: {width: ${node.style.width}, height: ${node.style.height}}`,
+        key: 2,
+      },
+    ]);
+  }, []);
 
   const toggleSelfConnected = useCallback(
     (stateId: string) => {
@@ -183,34 +214,38 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   return (
     <>
       <div className="reactflow-wrapper" ref={reactFlowWrapper}>
-        <ReactFlow
-          nodes={nodes.map((node: any) => ({
-            ...node,
-            data: {
-              ...node.data,
-              toggleSelfConnected,
-              selfConnected: allSelfConnectingEdges?.[activeRole]?.some(
-                ({ target }: any) => target === node.id
-              ),
-            },
-          }))}
-          edges={allEdges?.[activeRole] || []}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onInit={setReactFlowInstance}
-          onDrop={onDrop}
-          onDragOver={onDragOver}
-          fitView
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
-          defaultEdgeOptions={defaultEdgeOptions}
-          connectionLineComponent={CustomConnectionLine}
-          connectionLineStyle={connectionLineStyle}
-        >
-          <Background variant={BackgroundVariant.Dots} />
-          <Controls />
-        </ReactFlow>
+        <Dropdown menu={{ items }} trigger={["contextMenu"]}>
+          <ReactFlow
+            nodes={nodes.map((node: any) => ({
+              ...node,
+              data: {
+                ...node.data,
+                toggleSelfConnected,
+                selfConnected: allSelfConnectingEdges?.[activeRole]?.some(
+                  ({ target }: any) => target === node.id
+                ),
+              },
+            }))}
+            edges={allEdges?.[activeRole] || []}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            onInit={setReactFlowInstance}
+            onDrop={onDrop}
+            onDragOver={onDragOver}
+            fitView
+            nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
+            defaultEdgeOptions={defaultEdgeOptions}
+            connectionLineComponent={CustomConnectionLine}
+            connectionLineStyle={connectionLineStyle}
+            onEdgeContextMenu={openEdgeContextMenu}
+            onNodeContextMenu={openNodeContextMenu}
+          >
+            <Background variant={BackgroundVariant.Dots} />
+            <Controls />
+          </ReactFlow>
+        </Dropdown>
       </div>
     </>
   );
