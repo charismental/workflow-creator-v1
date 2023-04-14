@@ -203,6 +203,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
           color: roleColors[activeRole],
           toggleSelfConnected,
         },
+        positionAbsolute: { ...position },
       };
 
       const updatedNodes = nodes.concat(newNode);
