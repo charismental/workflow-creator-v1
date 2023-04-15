@@ -21,11 +21,6 @@ const CustomControls: FC = () => {
     Modal.confirm({
       title: "Are you sure you want to reset the state?",
       icon: <ExclamationCircleFilled />,
-      content: (
-        <div>
-          <p>This action cannot be undone!</p>
-        </div>
-      ),
       onCancel() {},
       onOk() {
         return new Promise((res, rej) => {
