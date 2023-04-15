@@ -7,6 +7,7 @@ import ReactFlow, {
   NodeTypes,
   Edge,
 } from "reactflow";
+import CustomControls from "./CustomControls";
 import defaultEdgeOptions from "data/defaultEdgeOptions";
 import isEqual from "lodash.isequal";
 import { shallow } from "zustand/shallow";
@@ -244,7 +245,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
             onNodeContextMenu={openNodeContextMenu}
           >
             <Background variant={BackgroundVariant.Dots} />
-            <Controls />
+            <CustomControls />
           </ReactFlow>
         </Dropdown>
       </div>

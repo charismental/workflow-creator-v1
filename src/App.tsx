@@ -1,5 +1,5 @@
-import { Layout, Space, Typography } from "antd";
-import { CSSProperties, useCallback, useEffect, useState } from "react";
+import { Layout, Space, Typography, Divider, Spin, Button } from "antd";
+import { CSSProperties, useCallback, useEffect } from "react";
 import { ReactFlowProvider } from "reactflow";
 import useMainStore, { initialNodes } from "store";
 import { WorkflowProcess } from "store/types";
@@ -63,7 +63,8 @@ const storeSelector = (state: MainActions & MainState) => ({
 });
 
 const WorkflowCreator = () => {
-  // const hasHydrated = useMainStore((state) => state._hasHydrated);
+  const hasHydrated = useMainStore((state) => state._hasHydrated);
+  const deleteState = useMainStore.persist.clearStorage;
 
   const {
     processes,
@@ -159,9 +160,19 @@ const WorkflowCreator = () => {
     setActiveProcessName(name);
   };
 
-  // if (!hasHydrated) {
-  //   return <Spin size="large" style={{ position: 'absolute', top: '50%', left: '50%' }} tip={<Title level={4} style={{ color: 'blue' }}>...Loading State</Title>} />
-  // }
+  if (!hasHydrated) {
+    return (
+      <Spin
+        size="large"
+        style={{ position: "absolute", top: "50%", left: "50%" }}
+        tip={
+          <Title level={4} style={{ color: "blue" }}>
+            ...Loading State
+          </Title>
+        }
+      />
+    );
+  }
 
   return (
     <Space direction="vertical" style={spaceContainer}>
@@ -192,6 +203,7 @@ const WorkflowCreator = () => {
                 useStyle={{ flexGrow: 1 }}
               />
             </Header>
+
             <Content className="dndflow">
               <ReactFlowBase
                 allSelfConnectingEdges={allSelfConnectingEdges}
