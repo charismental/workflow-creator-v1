@@ -2,6 +2,7 @@
 import { RoleList, StateList, initialColors } from "data";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { MenuProps } from "antd";
 import { WorkflowConnection, WorkflowProcess } from "./types";
 import {
   Node,
@@ -35,10 +36,10 @@ export interface MainState {
   allSelfConnectingEdges: { [roleName: string]: WorkflowConnection[] };
   roleColors: { [key: string]: string };
   roles: { [key: string]: number };
-  _hasHydrated: boolean;
   nodes: Node[];
   edges: Edge[];
   edgeType: string;
+  contextMenuItems: MenuProps["items"];
 }
 
 export interface MainActions {
@@ -65,18 +66,16 @@ export interface MainActions {
   toggleRoleForProcess: (role: string) => void;
   filteredStates: (nodes: Node[]) => string[];
   addNewStateItem: (name: string) => void;
-  setHasHydrated: (state: boolean) => void;
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
   onConnect: OnConnect;
   setEdgeType: (el: string) => void;
+  setMenuItems: (items: MenuProps["items"]) => void;
 }
 
 const useMainStore = create<MainState & MainActions>()(
   persist(
     (set, get) => ({
-      _hasHydrated: false,
-      setHasHydrated: (state) => set({ _hasHydrated: state }),
       nodes: [],
       edges: [],
       onNodesChange: (changes: NodeChange[]) => {
@@ -98,6 +97,8 @@ const useMainStore = create<MainState & MainActions>()(
           edges: addEdge(connection, updatedEdges),
         });
       },
+      contextMenuItems: [],
+      setMenuItems: (items) => set({ contextMenuItems: items }),
       activeProcessName: initialProcessName,
       setActiveProcessName: (processName) =>
         set(({ processes, setNodes, setRoleColors, roles, setEdges }) => {
@@ -259,7 +260,6 @@ const useMainStore = create<MainState & MainActions>()(
             );
           } else {
             console.log("State Hydrated");
-            state?.setHasHydrated(true);
           }
         };
       },

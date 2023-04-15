@@ -14,6 +14,7 @@ import "./css/style.css";
 import OutputJSON from "components/OutputJSON";
 import ToggleEdgeTypes from "components/ToggleEdgeTypes";
 import type { MainActions, MainState } from "store";
+import useHydration from "hooks/useHydration";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -63,8 +64,7 @@ const storeSelector = (state: MainActions & MainState) => ({
 });
 
 const WorkflowCreator = () => {
-  const hasHydrated = useMainStore((state) => state._hasHydrated);
-  const deleteState = useMainStore.persist.clearStorage;
+  const hasHydrated = useHydration();
 
   const {
     processes,
@@ -173,7 +173,6 @@ const WorkflowCreator = () => {
       />
     );
   }
-
   return (
     <Space direction="vertical" style={spaceContainer}>
       <ReactFlowProvider>

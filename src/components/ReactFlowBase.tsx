@@ -7,6 +7,7 @@ import ReactFlow, {
   NodeTypes,
   Edge,
 } from "reactflow";
+import { DragOutlined } from "@ant-design/icons";
 import CustomControls from "./CustomControls";
 import defaultEdgeOptions from "data/defaultEdgeOptions";
 import isEqual from "lodash.isequal";
@@ -17,9 +18,10 @@ import FloatingEdge from "../components/FloatingEdge";
 import { Dropdown } from "antd";
 import type { MenuProps } from "antd";
 import StateNode from "../components/StateNode";
-
+import getItem from "utils/getItem";
 import "../css/style.css";
 import "reactflow/dist/style.css";
+import ContextMenu from "./ContextMenu";
 
 const connectionLineStyle = {
   strokeWidth: 1.5,
@@ -54,6 +56,34 @@ const edgeTypes: any = {
   floating: FloatingEdge,
 };
 
+// const getItem = (
+//       label: React.ReactNode,
+//       key: React.Key | null,
+//       icon?: React.ReactNode,
+//       children?: MenuItem[],
+//       type?: "group"
+//     ): MenuItem=> {
+//         return { key, icon, children, label, type } as MenuItem;
+//       };
+
+// type MenuItem = Required<MenuProps>["items"][number];
+
+// function sgetItem(
+//   label: React.ReactNode,
+//   key?: React.Key | null,
+//   icon?: React.ReactNode,
+//   children?: MenuItem,
+//   type?: "group"
+// ): MenuItem {
+//   return {
+//     key,
+//     icon,
+//     children,
+//     label,
+//     type,
+//   } as MenuItem;
+// }
+
 const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] =
@@ -84,31 +114,29 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     updateNodesColor,
   } = props;
 
-  const [items, setItems] = useState<MenuProps["items"]>();
-
-  // const edgeContextMenuItems = (el: Edge): MenuProps['items'] => {
-  //   return [{label: `Source: ${el.source}`, key: 1}, {label: `Target: ${el.target}`, key:2}]
-  // }
+  const setMenuItems = useMainStore(
+    useCallback((state) => state.setMenuItems, [])
+  );
 
   const openEdgeContextMenu = useCallback((e: React.MouseEvent, el: Edge) => {
     e.preventDefault();
-    setItems([
-      { label: `Source: ${el.source}`, key: 1 },
-      { label: `Target: ${el.target}`, key: 2 },
+    setMenuItems([
+      getItem(`Source: ${el.source}`, 1, null),
+      getItem(`Target: ${el.target}`, 2, null),
     ]);
   }, []);
 
   const openNodeContextMenu = useCallback((e: React.MouseEvent, node: any) => {
     e.preventDefault();
-    setItems([
-      {
-        label: `Position: {x: ${node.position.x}, y: ${node.position.y}}`,
-        key: 1,
-      },
-      {
-        label: `Dimensions: {width: ${node.style.width}, height: ${node.style.height}}`,
-        key: 2,
-      },
+    setMenuItems([
+      getItem("Position", 1, <DragOutlined />, [
+        getItem(`x: ${node.position.x}`, "x", null),
+        getItem(`y: ${node.position.y}`, "y", null),
+      ]),
+      getItem("Dimensions", 2, <DragOutlined rotate={45} />, [
+        getItem(`width: ${node.style.width} `, "w", null),
+        getItem(`height: ${node.style.height}`, "h", null),
+      ]),
     ]);
   }, []);
 
@@ -216,7 +244,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   return (
     <>
       <div className="reactflow-wrapper" ref={reactFlowWrapper}>
-        <Dropdown menu={{ items }} trigger={["contextMenu"]}>
+        <ContextMenu>
           <ReactFlow
             nodes={nodes.map((node: any) => ({
               ...node,
@@ -247,7 +275,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
             <Background variant={BackgroundVariant.Dots} />
             <CustomControls />
           </ReactFlow>
-        </Dropdown>
+        </ContextMenu>
       </div>
     </>
   );
