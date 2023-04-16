@@ -1,5 +1,5 @@
 import { Controls, ControlButton } from "reactflow";
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import {
   ClearOutlined,
   ReloadOutlined,
@@ -10,12 +10,21 @@ import { Modal } from "antd";
 import { shallow } from "zustand/shallow";
 
 const CustomControls: FC = () => {
+  const state = useMainStore();
   const clearStorage = useMainStore.persist.clearStorage;
   const rehydrateState = useMainStore.persist.rehydrate;
-  const [setNodes, activeProcessName] = useMainStore(
-    (state) => [state.setNodes, state.activeProcessName],
+  const [setAllEdges, setNodes, activeProcessName] = useMainStore(
+    (state) => [state.setNodes, state.setAllEdges, state.activeProcessName],
     shallow
   );
+
+  useEffect(() => {
+    console.log("state changed");
+    // localStorage.setItem(
+    //   useMainStore.persist.getOptions().name || "main-store",
+    //   JSON.stringify(state)
+    // );
+  }, [state]);
 
   const deleteStateWarning = () =>
     Modal.confirm({
@@ -25,7 +34,11 @@ const CustomControls: FC = () => {
       onOk() {
         return new Promise((res, rej) => {
           setTimeout(() => {
-            res((setNodes([], activeProcessName), clearStorage()));
+            res(
+              (setNodes({}, activeProcessName),
+              setAllEdges([], activeProcessName),
+              clearStorage())
+            );
           }, 2000);
         }).catch(() => console.log("error...."));
       },
