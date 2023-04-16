@@ -1,19 +1,19 @@
-import { CloseCircleOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
-import { FunctionComponent, useCallback, useEffect, useState } from 'react';
+import { CloseCircleOutlined } from "@ant-design/icons";
+import { Button } from "antd";
+import { FunctionComponent, useCallback, useEffect, useState } from "react";
 import {
   EdgeProps,
   getStraightPath,
   useStore as useReactFlowStore,
   Position,
   Node,
-} from 'reactflow';
-import { getEdgeParams } from '../utils';
-import { getSmartEdge } from '@tisoap/react-flow-smart-edge';
+} from "reactflow";
+import { getEdgeParams } from "../utils";
+import { getSmartEdge } from "@tisoap/react-flow-smart-edge";
 
-import useMainStore from 'store';
-import { shallow } from 'zustand/shallow';
-import { bezierResult, stepResult, straightResult } from 'data/edgeOptions';
+import useMainStore from "store";
+import { shallow } from "zustand/shallow";
+import { bezierResult, stepResult, straightResult } from "data/edgeOptions";
 
 const foreignObjectSize = 40;
 
@@ -29,63 +29,36 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
     shallow
   );
 
-  const [edgeType, nodes, setNodes, activeProcess, processes] = useMainStore(
-    (state) => [state.edgeType, state.nodes, state.setNodes, state.activeProcessName, state.processes],
+  const [edgeType, nodes, setNodes, activeProcess, colorTheme] = useMainStore(
+    (state) => [
+      state.edgeType,
+      state.nodes,
+      state.setNodes,
+      state.activeProcessName,
+      state.colorTheme,
+    ],
     shallow
   );
   const [isHover, setIsHover] = useState<boolean | null>(null);
 
-
- //  updates node style, but resizes nodes, will revert manually resized nodes
-
   const updateNodeStyle = useCallback(() => {
     const filteredSourceNode = nodes.find((node) => node.id === sourceNode?.id);
     const filteredTargetNode = nodes.find((node) => node.id === targetNode?.id);
-    const shadow = isHover ? "" : '0 0 4px 4px #0ff'
-    
-    setNodes(nodes.map((node: Node) =>
-      node.id === filteredSourceNode?.id || node.id === filteredTargetNode?.id
-        ? { ...node, style: { ...(node?.style || {}), boxShadow: shadow } }
-        : node
-    ), activeProcess)
+    const shadow = isHover ? "" : "0 0 4px 4px #0ff";
 
-  }, [nodes, activeProcess])
-
-  
-
-  // does not resize nodes, but does not update node style, will revert manually resized nodes
-
-  // const updateNodeStyle = useCallback(() => {
-  //   const filteredSourceNode = nodes.find((node) => node.id === sourceNode?.id);
-  //   const filteredTargetNode = nodes.find((node) => node.id === targetNode?.id);
-  //   const shadow = isHover ? '' : '0 0 4px 4px #0ff';
-  //   const processIndex = processes.findIndex(
-  //     (p) => p.ProcessName === activeProcess
-  //   );
-  //   setNodes(
-  //     processes[processIndex].nodes ||
-  //       nodes?.map((node: Node) => {
-  //         return node.id === filteredSourceNode?.id ||
-  //           node.id === filteredTargetNode?.id
-  //           ? { ...node, style: { boxShadow: shadow } }
-  //           : node;
-  //       })
-  //   );
-  // }, []);
+    setNodes(
+      nodes.map((node: Node) =>
+        node.id === filteredSourceNode?.id || node.id === filteredTargetNode?.id
+          ? { ...node, style: { ...(node?.style || {}), boxShadow: shadow } }
+          : node
+      ),
+      activeProcess
+    );
+  }, [nodes, activeProcess]);
 
   useEffect(() => {
-    if (isHover !== null) updateNodeStyle()
-  },[isHover])
-
-  // const handleMouseOver = () => {
-   
-  //   updateNodeStyle();
-  // };
-
-  // const handleMouseLeave = () => {
-
-  //   updateNodeStyle()
-  // };
+    if (isHover !== null) updateNodeStyle();
+  }, [isHover]);
 
   const onEdgeClick = (
     event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>,
@@ -121,9 +94,9 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
     nodes: nodes,
     // Pass down options in the getSmartEdge object
     options:
-      edgeType === 'Straight'
+      edgeType === "Straight"
         ? straightResult
-        : edgeType === 'Bezier'
+        : edgeType === "Bezier"
         ? bezierResult
         : stepResult,
   });
@@ -146,27 +119,38 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
 
   const { edgeCenterX, edgeCenterY, svgPathString } = getSmartEdgeResponse;
 
+  const strokeColor = useCallback(() => {
+    let color = "black";
+    if (isHover !== null && isHover) {
+      color = "#0ff";
+    }
+    if (!colorTheme) {
+      color = "white";
+    }
+    return color;
+  }, [colorTheme, isHover]);
+
   return (
     <>
       <path
         id={id}
         className="edge_path"
-        d={edgeType === 'Straight' ? edgePath : svgPathString}
-        markerEnd={markerEnd}  
+        d={edgeType === "Straight" ? edgePath : svgPathString}
+        markerEnd={markerEnd}
         // style={style}
-        stroke={isHover ? '#0ff': 'black'}
-      />    
+        stroke={strokeColor()}
+      />
       <foreignObject
         onMouseOver={() => setIsHover(true)}
         onMouseLeave={() => setIsHover(false)}
         width={foreignObjectSize}
         height={foreignObjectSize}
         x={
-          (edgeType === 'Straight' ? labelX : edgeCenterX) -
+          (edgeType === "Straight" ? labelX : edgeCenterX) -
           foreignObjectSize / 2
         }
         y={
-          (edgeType === 'Straight' ? labelY : edgeCenterY) -
+          (edgeType === "Straight" ? labelY : edgeCenterY) -
           foreignObjectSize / 2
         }
         className="edgebutton-foreignobject"

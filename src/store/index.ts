@@ -40,6 +40,7 @@ export interface MainState {
   edges: Edge[];
   edgeType: string;
   contextMenuItems: MenuProps["items"];
+  colorTheme: boolean;
 }
 
 export interface MainActions {
@@ -71,11 +72,14 @@ export interface MainActions {
   onConnect: OnConnect;
   setEdgeType: (el: string) => void;
   setMenuItems: (items: MenuProps["items"]) => void;
+  setColorScheme: () => void;
 }
 
 const useMainStore = create<MainState & MainActions>()(
   persist(
     (set, get) => ({
+      colorTheme: true,
+      setColorScheme: () => set({ colorTheme: !get().colorTheme }),
       nodes: [],
       edges: [],
       onNodesChange: (changes: NodeChange[]) => {
