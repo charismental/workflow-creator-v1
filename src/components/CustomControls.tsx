@@ -10,21 +10,12 @@ import { Modal } from "antd";
 import { shallow } from "zustand/shallow";
 
 const CustomControls: FC = () => {
-  const state = useMainStore();
   const clearStorage = useMainStore.persist.clearStorage;
   const rehydrateState = useMainStore.persist.rehydrate;
   const [setAllEdges, setNodes, activeProcessName] = useMainStore(
     (state) => [state.setNodes, state.setAllEdges, state.activeProcessName],
     shallow
   );
-
-  useEffect(() => {
-    console.log("state changed");
-    // localStorage.setItem(
-    //   useMainStore.persist.getOptions().name || "main-store",
-    //   JSON.stringify(state)
-    // );
-  }, [state]);
 
   const deleteStateWarning = () =>
     Modal.confirm({

@@ -7,6 +7,7 @@ import {
   Button,
   ConfigProvider,
   theme,
+  Switch,
 } from "antd";
 import { CSSProperties, useCallback, useEffect, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
@@ -31,14 +32,13 @@ const { Title } = Typography;
 const spaceContainer: CSSProperties = {
   width: "100%",
 };
-// const headerStyle: CSSProperties = {
-//   // backgroundColor: ,
-//   padding: "25px",
-//   height: "80px",
-//   display: "inline-flex",
-//   justifyContent: "space-between",
-//   alignItems: "center",
-// };
+const switchStyle: CSSProperties = {
+  color: theme ? "" : "white",
+  position: "absolute",
+  fontSize: "10px",
+  bottom: "10px",
+  right: "10px",
+};
 const activeRoleTitleStyle: CSSProperties = {
   color: "white",
   flexGrow: 2,
@@ -243,6 +243,7 @@ const WorkflowCreator = () => {
               </Content>
             </Layout>
             <Sidebar
+              theme={colorTheme}
               children={
                 <>
                   <StateCollapseBox
@@ -261,7 +262,13 @@ const WorkflowCreator = () => {
                     multiselectHandler={(el) => toggleRoleForProcess(el.label)}
                     selectOnChange={setActiveRole}
                   />
-                  <pre style={{ maxHeight: "20em", overflow: "scroll" }}>
+                  <pre
+                    style={{
+                      maxHeight: "20em",
+                      overflow: "scroll",
+                      color: theme ? "black" : "white",
+                    }}
+                  >
                     {JSON.stringify(
                       OutputJSON({
                         activeRole,
@@ -277,6 +284,16 @@ const WorkflowCreator = () => {
                     edgeType={edgeType}
                     setEdgeType={setEdgeType}
                   />
+                  <div style={switchStyle}>
+                    Toggle Theme
+                    <Switch
+                      size="small"
+                      onChange={() => (
+                        setColorTheme(!theme), console.log(colorTheme)
+                      )}
+                      style={{ marginLeft: "20px" }}
+                    />
+                  </div>
                 </>
               }
             />
