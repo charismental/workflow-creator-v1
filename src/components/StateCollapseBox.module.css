@@ -1,9 +1,9 @@
 .stateItem {
+  color: 'white';
   border: 1px solid #d4d4d4;
   padding: 2px 4px;
   border-radius: 4px;
   line-height: 1.8;
-  color: white;
   text-align: center;
   margin: 0.5rem 0;
 }

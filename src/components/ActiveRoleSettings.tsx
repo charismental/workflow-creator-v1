@@ -23,6 +23,7 @@ const ActiveRoleSettings: React.FC<ActiveRoleSettingsProps> = ({
           <Checkbox
             checked={roleIsToggled}
             onChange={toggleRole}
+            style={{color: 'white'}}
           >{roleIsToggled ? 'Active' : 'Inactive'}</Checkbox>
         </div>
       )}

@@ -1,9 +1,10 @@
 import { PlusCircleOutlined, PlusCircleTwoTone } from "@ant-design/icons";
-import { Checkbox, Divider, InputRef, Select, Space } from "antd";
+import { Checkbox, Divider, InputRef, Select, Space, theme } from "antd";
 import React, { useRef, useState } from "react";
 import AddNewInput from "./AddNewInput";
 
 const { Option } = Select;
+const {useToken} = theme;
 
 interface SelectBoxProps {
   type: "role" | "state" | "process";
@@ -30,6 +31,7 @@ const SelectBox: React.FC<SelectBoxProps> = ({
   isDraggable = false,
   hasColorInput = false,
 }) => {
+  const {token} = useToken();
   const initialColor = "#d4d4d4";
   const [color, setColor] = useState(initialColor);
   const [name, setName] = useState("");
@@ -66,12 +68,13 @@ const SelectBox: React.FC<SelectBoxProps> = ({
     }, 10);
   };
 
+
   return (
     <Select
       key={resetKey}
       value={selectValue}
       open={dragPreventBlur}
-      style={{  ...useStyle }}
+      style={{ ...useStyle }}
       placeholder={placeholder}
       optionLabelProp="label"
       dropdownRender={(menu) => (
@@ -80,7 +83,7 @@ const SelectBox: React.FC<SelectBoxProps> = ({
           {addNew && (
             <>
               <Divider style={{ margin: "8px 0" }} />
-              <Space style={{ padding: "0 8px 4px" }} >
+              <Space style={{ padding: "0 8px 4px" }}>
                 <AddNewInput
                   disabledState={!name.length || isDuplicateName}
                   buttonShape="default"
@@ -88,9 +91,9 @@ const SelectBox: React.FC<SelectBoxProps> = ({
                   addNew={addNewItem}
                   icon={
                     !name.length || isDuplicateName ? (
-                      <PlusCircleOutlined style={{ fontSize: "20px" }} />
+                      <PlusCircleOutlined style={{ fontSize: token.fontSizeHeading4 }} />
                     ) : (
-                      <PlusCircleTwoTone style={{ fontSize: "20px" }} />
+                      <PlusCircleTwoTone style={{ fontSize: token.fontSizeHeading4 }} />
                     )
                   }
                   pressEnterHandler={name?.length && !isDuplicateName && addNewItem}
@@ -112,7 +115,7 @@ const SelectBox: React.FC<SelectBoxProps> = ({
 
         return (
           <Option key={label} label={label}>
-            {isDraggable ? (
+            {/* {isDraggable ? (
               <div
                 // hacky
                 onMouseDown={(e) => {
@@ -128,23 +131,23 @@ const SelectBox: React.FC<SelectBoxProps> = ({
               >
                 {label}
               </div>
-            ) : (
-              <div
-                style={{ display: "flex", justifyContent: "space-between" }}
-                onClick={() => selectOnChange && selectOnChange(label)}
-              >
-                <div>{label}</div>
-                {multiselectHandler && typeof item !== "string" && (
-                  <Checkbox
-                    checked={item.value}
-                    onClick={(e: any) => {
-                      e.stopPropagation();
-                      multiselectHandler(item);
-                    }}
-                  />
-                )}
-              </div>
-            )}
+            ) : ( */}
+            <div
+              style={{ display: "flex", justifyContent: 'space-between' }}
+              onClick={() => selectOnChange && selectOnChange(label)}
+            >
+              <div style={{ padding: "4px 8px" }}>{label}</div>
+              {multiselectHandler && typeof item !== "string" && (
+                <Checkbox
+                  checked={item.value}
+                  onClick={(e: any) => {
+                    e.stopPropagation();
+                    multiselectHandler(item);
+                  }}
+                />
+              )}
+            </div>
+            {/* )} */}
           </Option>
         );
       })}

@@ -12,12 +12,14 @@ interface StateCollapsebox {
   items: string[];
   useStyle?: any;
   addNew?: any;
+  colorTheme: boolean;
 }
 
 const StateCollapseBox: React.FC<StateCollapsebox> = ({
   items,
   addNew,
   useStyle = {},
+  colorTheme
 }) => {
   const [name, setName] = useState("");
   const inputRef = useRef<InputRef>(null);
@@ -57,12 +59,12 @@ const StateCollapseBox: React.FC<StateCollapsebox> = ({
       size="small"
       expandIconPosition="end"
     >
-      <Panel header={"Add/Select State"} key="1">
+      <Panel header={"Add/Select State"} key="1" style={colorTheme ?{ backgroundColor: 'lightgray'}: {}}>
         {items.map((item) => (
           <div
             key={item}
             className={styles.stateItem}
-            style={{ backgroundColor: itemColor() }}
+            style={{ backgroundColor: itemColor(), color: 'white' }}
             onMouseDown={(e) => {
               e.stopPropagation();
             }}

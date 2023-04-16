@@ -1,13 +1,9 @@
-import { Layout, Space, Radio, Typography } from "antd";
-import type { RadioChangeEvent } from "antd";
+import { Layout, Space } from "antd";
 import { CSSProperties, FC } from "react";
 import useMainStore from "store";
-import { shallow } from "zustand/shallow";
-
-const { Text } = Typography;
 
 const sidebar: CSSProperties = {
-  backgroundColor: "white",
+  // backgroundColor: "white",
 };
 const sidebarSpacer: CSSProperties = {
   display: "flex",
@@ -21,11 +17,12 @@ const triggerStyle: CSSProperties = {
 };
 interface SideBarProps {
   children: React.ReactNode;
+  theme: boolean;
 }
 
 const Sidebar: FC<SideBarProps> = (props): JSX.Element => {
   const { Sider } = Layout;
-  const { children } = props;
+  const { children, theme } = props;
 
   return (
     // supposed to show tab on breakpoint if collapseWidth is 0
@@ -33,10 +30,10 @@ const Sidebar: FC<SideBarProps> = (props): JSX.Element => {
       width={"300px"}
       style={sidebar}
       breakpoint="lg"
-      theme="dark"
       collapsedWidth="0"
       reverseArrow={true}
       zeroWidthTriggerStyle={triggerStyle}
+      theme={theme ? "light" : "dark"}
     >
       <Space direction="vertical" size="small" style={sidebarSpacer}>
         {children}
