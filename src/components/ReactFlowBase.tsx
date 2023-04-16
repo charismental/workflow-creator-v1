@@ -2,11 +2,11 @@ import { FC, useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
   Background,
   BackgroundVariant,
-  Controls,
   ReactFlowInstance,
   NodeTypes,
   Edge,
 } from "reactflow";
+import { Typography } from "antd";
 import { DragOutlined } from "@ant-design/icons";
 import CustomControls from "./CustomControls";
 import defaultEdgeOptions from "data/defaultEdgeOptions";
@@ -15,13 +15,13 @@ import { shallow } from "zustand/shallow";
 import useMainStore, { MainActions, MainState } from "store";
 import CustomConnectionLine from "../components/CustomConnectionLine";
 import FloatingEdge from "../components/FloatingEdge";
-import { Dropdown } from "antd";
-import type { MenuProps } from "antd";
 import StateNode from "../components/StateNode";
 import getItem from "utils/getItem";
 import "../css/style.css";
 import "reactflow/dist/style.css";
 import ContextMenu from "./ContextMenu";
+
+const { Text, Title } = Typography;
 
 const connectionLineStyle = {
   strokeWidth: 1.5,
@@ -55,34 +55,6 @@ interface ReactFlowBaseProps {
 const edgeTypes: any = {
   floating: FloatingEdge,
 };
-
-// const getItem = (
-//       label: React.ReactNode,
-//       key: React.Key | null,
-//       icon?: React.ReactNode,
-//       children?: MenuItem[],
-//       type?: "group"
-//     ): MenuItem=> {
-//         return { key, icon, children, label, type } as MenuItem;
-//       };
-
-// type MenuItem = Required<MenuProps>["items"][number];
-
-// function sgetItem(
-//   label: React.ReactNode,
-//   key?: React.Key | null,
-//   icon?: React.ReactNode,
-//   children?: MenuItem,
-//   type?: "group"
-// ): MenuItem {
-//   return {
-//     key,
-//     icon,
-//     children,
-//     label,
-//     type,
-//   } as MenuItem;
-// }
 
 const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -121,8 +93,16 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   const openEdgeContextMenu = useCallback((e: React.MouseEvent, el: Edge) => {
     e.preventDefault();
     setMenuItems([
-      getItem(`Source: ${el.source}`, 1, null),
-      getItem(`Target: ${el.target}`, 2, null),
+      getItem(
+        <Text style={{ fontSize: "18px" }}>Source: {el.source}</Text>,
+        1,
+        null
+      ),
+      getItem(
+        <Text style={{ fontSize: "18px" }}>Target: {el.target}</Text>,
+        2,
+        null
+      ),
     ]);
   }, []);
 
@@ -130,8 +110,8 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     e.preventDefault();
     setMenuItems([
       getItem("Position", 1, <DragOutlined />, [
-        getItem(`x: ${node.position.x}`, "x", null),
-        getItem(`y: ${node.position.y}`, "y", null),
+        getItem(<Text>X: {node.position.x}</Text>, "x", null),
+        getItem(<Text>Y: {node.position.y}</Text>, "y", null),
       ]),
       getItem("Dimensions", 2, <DragOutlined rotate={45} />, [
         getItem(`width: ${node.style.width} `, "w", null),

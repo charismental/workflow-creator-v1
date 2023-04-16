@@ -21,7 +21,7 @@ import StateCollapseBox from "components/StateCollapseBox";
 import Sidebar from "./components/Sidebar";
 import "reactflow/dist/style.css";
 import "./css/style.css";
-import OutputJSON from "components/OutputJSON";
+import OutputJSON from "utils/OutputJSON";
 import ToggleEdgeTypes from "components/ToggleEdgeTypes";
 import type { MainActions, MainState } from "store";
 import useHydration from "hooks/useHydration";
