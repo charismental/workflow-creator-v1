@@ -1,7 +1,9 @@
 import Icon from "@ant-design/icons";
 import {
+  Button,
   ConfigProvider,
   Layout,
+  ModalFuncProps,
   Space,
   Spin,
   Switch,
@@ -11,6 +13,7 @@ import {
 
 import { MoonSvg, SunSvg } from "assets/icons/icons";
 import ActiveRoleSettings from "components/ActiveRoleSettings";
+import ModalInstance from "components/ModalInstance";
 import ReactFlowBase from "components/ReactFlowBase";
 import SelectBox from "components/SelectBox";
 import StateCollapseBox from "components/StateCollapseBox";
@@ -120,7 +123,12 @@ const WorkflowCreator = () => {
   };
 
   useEffect(() => {
-    setNodes(initialNodes);
+    const storage = localStorage.getItem("main-store");
+    if (storage && JSON.parse(storage).state?.nodes) {
+      setNodes(JSON.parse(storage).state?.nodes || []);
+    } else {
+      setNodes(initialNodes);
+    }
   }, []);
 
   const addNewRole = ({ color, name }: { color: string; name?: string }) => {
@@ -180,8 +188,34 @@ const WorkflowCreator = () => {
   });
 
   const addNewProcessAndSelect = ({ name }: { name: string }) => {
-    addProcess(name);
-    setActiveProcessName(name);
+    const modalOptions: ModalFuncProps = {
+      title: "Unsaved Changes Detected!",
+      content: "Save Changes Before Creating New Process?",
+      width: 700,
+      centered: true,
+
+      footer: [
+        <Space style={{marginTop: '20px'}}>
+          <Button
+            onClick={() => {
+              console.log("return");
+            }}
+          >
+            Return to Current Process
+          </Button>
+          <Button type="primary" danger>
+            Continue Without Saving
+          </Button>
+          <Button
+            onClick={() => (addProcess(name), setActiveProcessName(name))}
+            type="primary"
+          >
+            Save Progress And Continue
+          </Button>
+        </Space>,
+      ],
+    };
+    return ModalInstance({ modalType: "confirm", modalOptions });
   };
 
   if (!hasHydrated) {
