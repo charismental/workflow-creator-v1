@@ -6,7 +6,9 @@ import {
   ConfigProvider,
   theme,
   Switch,
+  Button,
 } from "antd";
+import type { ModalFuncProps } from "antd";
 import Icon from "@ant-design/icons";
 
 import { CSSProperties, useCallback, useEffect } from "react";
@@ -26,6 +28,7 @@ import ToggleEdgeTypes from "components/ToggleEdgeTypes";
 import type { MainActions, MainState } from "store";
 import useHydration from "hooks/useHydration";
 import { SunSvg, MoonSvg } from "assets/icons/icons";
+import DialogInstance from "components/DialogInstance";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -180,8 +183,47 @@ const WorkflowCreator = () => {
   });
 
   const addNewProcessAndSelect = ({ name }: { name: string }) => {
-    addProcess(name);
-    setActiveProcessName(name);
+    const dialogInfo: ModalFuncProps = {
+      title: "Unsaved Changed Detected",
+      content: "Would you like to save changes first?",
+      // onCancel() {},
+      // onOk() {
+      //   addProcess(name), setActiveProcessName(name);
+      // },
+      width: 600,
+      centered: true,
+      footer: [
+        <Space style={{ marginTop: "20px" }}>
+          <Button
+            key="back"
+            onClick={() => {
+              console.log("clicked cancel");
+            }}
+          >
+            Return To Current Process
+          </Button>
+          ,
+          <Button
+            key="submit"
+            type="primary"
+            onClick={() => (addProcess(name), setActiveProcessName(name))}
+          >
+            Save And Continue
+          </Button>
+          ,
+          <Button
+            type="primary"
+            danger
+            onClick={() => {
+              console.log("clicked continue without save");
+            }}
+          >
+            Continue Without Saving
+          </Button>
+        </Space>,
+      ],
+    };
+    DialogInstance({ dialogMethod: "warning", dialogProps: dialogInfo });
   };
 
   if (!hasHydrated) {
