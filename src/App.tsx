@@ -1,31 +1,31 @@
+import Icon from "@ant-design/icons";
 import {
+  ConfigProvider,
   Layout,
   Space,
-  Typography,
   Spin,
-  ConfigProvider,
-  theme,
   Switch,
+  Typography,
+  theme,
 } from "antd";
-import Icon from "@ant-design/icons";
 
-import { CSSProperties, useCallback, useEffect } from "react";
-import { ReactFlowProvider } from "reactflow";
-import useMainStore, { initialNodes } from "store";
-import { WorkflowProcess } from "store/types";
-import { shallow } from "zustand/shallow";
+import { MoonSvg, SunSvg } from "assets/icons/icons";
 import ActiveRoleSettings from "components/ActiveRoleSettings";
 import ReactFlowBase from "components/ReactFlowBase";
 import SelectBox from "components/SelectBox";
 import StateCollapseBox from "components/StateCollapseBox";
-import Sidebar from "./components/Sidebar";
-import "reactflow/dist/style.css";
-import "./css/style.css";
-import OutputJSON from "utils/OutputJSON";
 import ToggleEdgeTypes from "components/ToggleEdgeTypes";
-import type { MainActions, MainState } from "store";
 import useHydration from "hooks/useHydration";
-import { SunSvg, MoonSvg } from "assets/icons/icons";
+import { CSSProperties, useCallback, useEffect } from "react";
+import { ReactFlowProvider } from "reactflow";
+import "reactflow/dist/style.css";
+import type { MainActions, MainState } from "store";
+import useMainStore, { initialNodes } from "store";
+import { WorkflowProcess } from "store/types";
+import OutputJSON from "utils/OutputJSON";
+import { shallow } from "zustand/shallow";
+import Sidebar from "./components/Sidebar";
+import "./css/style.css";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;

@@ -1,12 +1,12 @@
-import { Controls, ControlButton } from "reactflow";
-import { FC, useEffect } from "react";
 import {
   ClearOutlined,
-  ReloadOutlined,
   ExclamationCircleFilled,
+  ReloadOutlined,
 } from "@ant-design/icons";
-import useMainStore from "store";
 import { Modal } from "antd";
+import { FC } from "react";
+import { ControlButton, Controls } from "reactflow";
+import useMainStore from "store";
 import { shallow } from "zustand/shallow";
 
 const CustomControls: FC = () => {
