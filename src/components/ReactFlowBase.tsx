@@ -21,12 +21,7 @@ import "../css/style.css";
 import "reactflow/dist/style.css";
 import ContextMenu from "./ContextMenu";
 
-const { Text, Title } = Typography;
-
-const connectionLineStyle = {
-  strokeWidth: 1.5,
-  stroke: "black",
-};
+const { Text } = Typography;
 
 const nodeTypes: NodeTypes = {
   custom: StateNode,
@@ -43,6 +38,7 @@ const selector = (state: MainState & MainActions) => ({
   setAllEdges: state.setAllEdges,
   onConnect: state.onConnect,
   edgeType: state.edgeType,
+  colorTheme: state.colorTheme,
 });
 
 interface ReactFlowBaseProps {
@@ -76,7 +72,13 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     allEdges,
     setAllEdges,
     onConnect,
+    colorTheme,
   } = useMainStore(selector, shallow);
+  
+  const connectionLineStyle = {
+    strokeWidth: 1.5,
+    stroke: colorTheme ? "black" : "white",
+  };
 
   const {
     allSelfConnectingEdges,
@@ -92,6 +94,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
   const openEdgeContextMenu = useCallback((e: React.MouseEvent, el: Edge) => {
     e.preventDefault();
+
     setMenuItems([
       getItem(
         <Text style={{ fontSize: "18px" }}>Source: {el.source}</Text>,
@@ -249,6 +252,9 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
             defaultEdgeOptions={defaultEdgeOptions}
             connectionLineComponent={CustomConnectionLine}
             connectionLineStyle={connectionLineStyle}
+            // onEdgeContextMenu={e => console.log('onEdgeContext')}
+            // onNodeContextMenu={e => console.log('onNodeContext')}
+            // onPaneContextMenu={e => openNodeContextMenu(e, null)}
             onEdgeContextMenu={openEdgeContextMenu}
             onNodeContextMenu={openNodeContextMenu}
           >

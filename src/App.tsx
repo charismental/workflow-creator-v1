@@ -124,7 +124,8 @@ const WorkflowCreator = () => {
 
   useEffect(() => {
     const storage = localStorage.getItem("main-store");
-    if (storage && JSON.parse(storage).state?.nodes) {
+
+    if (storage && JSON.parse(storage).state?.nodes.length) {
       setNodes(JSON.parse(storage).state?.nodes || []);
     } else {
       setNodes(initialNodes);

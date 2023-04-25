@@ -121,8 +121,7 @@ div.targetHandle {
   outline: 1px solid #fff;
   cursor: pointer;
   border-radius: 50%;
-  font-size: 12px;
-  line-height: 1;
+  position: relative;
 }
 
 .edgebutton:hover {
@@ -137,6 +136,13 @@ div.targetHandle {
   justify-content: center;
   align-items: center;
   min-height: 40px;
+}
+
+.dumb-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(-14%, 15%) !important;
 }
 
 .state-delete-button {

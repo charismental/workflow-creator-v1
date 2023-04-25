@@ -160,7 +160,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
           <Button
             className="edgebutton"
             onClick={(event) => onEdgeClick(event, id)}
-            icon={<CloseCircleOutlined />}
+            icon={<CloseCircleOutlined className="dumb-icon" />}
           />
         </div>
       </foreignObject>
