@@ -1,4 +1,4 @@
 export default (error: Error, info: { componentStack: string }) => {
-  console.error("Error: ", error);
-  console.error("Error Stack: ", info);
+  console.error("LogError console statement - Error: ", error);
+  console.error("LogError console statement - Error Stack: ", info);
 };
