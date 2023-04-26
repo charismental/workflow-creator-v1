@@ -1,30 +1,29 @@
+import { DragOutlined } from "@ant-design/icons";
+import { Typography } from "antd";
+import defaultEdgeOptions from "data/defaultEdgeOptions";
+import isEqual from "lodash.isequal";
 import { FC, useCallback, useEffect, useRef, useState } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 import ReactFlow, {
   Background,
   BackgroundVariant,
-  ReactFlowInstance,
-  NodeTypes,
-  Edge,
   ConnectionMode,
+  Edge,
+  NodeTypes,
+  ReactFlowInstance,
   SelectionMode,
 } from "reactflow";
-import { Typography } from "antd";
-import { DragOutlined } from "@ant-design/icons";
-import CustomControls from "./CustomControls";
-import defaultEdgeOptions from "data/defaultEdgeOptions";
-import isEqual from "lodash.isequal";
-import { shallow } from "zustand/shallow";
+import "reactflow/dist/style.css";
 import useMainStore, { MainActions, MainState } from "store";
+import getItem from "utils/getItem";
+import logError from "utils/logError";
+import { shallow } from "zustand/shallow";
 import CustomConnectionLine from "../components/CustomConnectionLine";
 import FloatingEdge from "../components/FloatingEdge";
 import StateNode from "../components/StateNode";
-import getItem from "utils/getItem";
 import "../css/style.css";
-import "reactflow/dist/style.css";
 import ContextMenu from "./ContextMenu";
-import { ErrorBoundary } from "react-error-boundary";
-import ErrorFallbackUI from "./ErrorFallbackUI";
-import logError from "utils/logError";
+import CustomControls from "./CustomControls";
 
 const { Text } = Typography;
 
@@ -185,10 +184,11 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
       updateNodesColor();
     }
 
-    if (!isEqual(edges, allEdges[activeRole])) {
-      return setEdges(allEdges?.[activeRole] || []);
+    if (isEqual(edges, allEdges[activeRole])) {
+      return
     }
-  }, [activeRole, allEdges[activeRole]]);
+    setEdges(allEdges?.[activeRole] || []);
+  }, [activeRole, nodes, allEdges[activeRole]]);
 
   const uniqueEdges = (arr: any) => {
     return arr.filter(
@@ -207,9 +207,10 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
       [activeRole]: uniqueEdges(edges),
     };
 
-    if (!isEqual(allEdges, updatedEdges)) {
-      return setAllEdges(updatedEdges);
+    if (isEqual(allEdges, updatedEdges)) {
+      return 
     }
+    setAllEdges(updatedEdges);
   }, [edges]);
 
   const onDragOver = useCallback((event: any) => {
@@ -261,8 +262,14 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   return (
     <>
       <div className="reactflow-wrapper" ref={reactFlowWrapper}>
-        <ErrorBoundary FallbackComponent={ErrorFallbackUI} onError={logError}>
           <ContextMenu items={contextMenuItems}>
+        <ErrorBoundary fallbackRender={({error, resetErrorBoundary}) => (
+          <div>
+            <h1>Error occured in ReactFlowBase.tsx</h1>
+            <details>{error.message}</details>
+            <button onClick={resetErrorBoundary}>Reset Error</button>
+          </div>
+        )} onError={logError}>
             <ReactFlow
               nodes={nodes.map((node: any) => ({
                 ...node,
@@ -272,7 +279,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
                   selfConnected: allSelfConnectingEdges?.[activeRole]?.some(
                     ({ target }: any) => target === node.id
                   ),
-                },
+                }, 
               }))}
               edges={allEdges?.[activeRole] || []}
               onNodesChange={onNodesChange}
@@ -297,8 +304,8 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
               <Background variant={BackgroundVariant.Dots} />
               <CustomControls />
             </ReactFlow>
-          </ContextMenu>
         </ErrorBoundary>
+          </ContextMenu>
       </div>
     </>
   );

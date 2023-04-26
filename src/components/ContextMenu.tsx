@@ -1,8 +1,6 @@
-import React, { FC, memo } from "react";
 import { Dropdown } from "antd";
-import useMainStore from "store";
+import { FC, memo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import ErrorFallbackUI from "./ErrorFallbackUI";
 import logError from "utils/logError";
 
 interface ContextMenuProps {
@@ -12,7 +10,13 @@ interface ContextMenuProps {
 
 const ContextMenu: FC<ContextMenuProps> = ({ items, children }) => {
   return (
-    <ErrorBoundary FallbackComponent={ErrorFallbackUI} onError={logError}>
+    <ErrorBoundary fallbackRender={({error, resetErrorBoundary}) => (
+      <div>
+        <h1>Error occured in ContextMenu.tsx</h1>
+        <details>{error.message}</details>
+        <button onClick={resetErrorBoundary}>Reset Error</button>
+      </div>
+    )} onError={logError}>
       <Dropdown trigger={["contextMenu"]} menu={{ items }} destroyPopupOnHide>
         {children}
       </Dropdown>

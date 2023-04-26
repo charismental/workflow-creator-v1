@@ -1,36 +1,32 @@
 import Icon from "@ant-design/icons";
 import {
-  Button,
   ConfigProvider,
   Layout,
-  ModalFuncProps,
   Space,
   Spin,
   Switch,
   Typography,
-  theme,
+  theme
 } from "antd";
-import { ErrorBoundary } from "react-error-boundary";
-import ErrorFallback from "components/ErrorFallbackUI";
 import { MoonSvg, SunSvg } from "assets/icons/icons";
 import ActiveRoleSettings from "components/ActiveRoleSettings";
-import ModalInstance from "components/ModalInstance";
 import ReactFlowBase from "components/ReactFlowBase";
 import SelectBox from "components/SelectBox";
 import StateCollapseBox from "components/StateCollapseBox";
 import ToggleEdgeTypes from "components/ToggleEdgeTypes";
 import useHydration from "hooks/useHydration";
 import { CSSProperties, useCallback, useEffect } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 import { ReactFlowProvider } from "reactflow";
 import "reactflow/dist/style.css";
 import type { MainActions, MainState } from "store";
 import useMainStore, { initialNodes } from "store";
 import { WorkflowProcess } from "store/types";
 import OutputJSON from "utils/OutputJSON";
+import logError from "utils/logError";
 import { shallow } from "zustand/shallow";
 import Sidebar from "./components/Sidebar";
 import "./css/style.css";
-import logError from "utils/logError";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -244,7 +240,13 @@ const WorkflowCreator = () => {
       <Space direction="vertical" style={spaceContainer}>
         <Layout style={layoutContainer}>
           <Layout>
-            <ErrorBoundary FallbackComponent={ErrorFallback} onError={logError}>
+            <ErrorBoundary fallbackRender={({error, resetErrorBoundary}) => (
+          <div>
+            <h1>Error occured in App.tsx</h1>
+            <details>{error.message}</details>
+            <button onClick={resetErrorBoundary}>Reset Error</button>
+          </div>
+        )} onError={logError}>
               <Header style={headerStyle}>
                 <SelectBox
                   useStyle={{ flexGrow: 1, maxWidth: "360px" }}
@@ -273,7 +275,13 @@ const WorkflowCreator = () => {
                 />
               </Header>
             </ErrorBoundary>
-            <ErrorBoundary FallbackComponent={ErrorFallback} onError={logError}>
+            <ErrorBoundary fallbackRender={({error, resetErrorBoundary}) => (
+          <div>
+            <h1>Error occured in ReactFlowProviderx</h1>
+            <details>{error.message}</details>
+            <button onClick={resetErrorBoundary}>Reset Error</button>
+          </div>
+        )} onError={logError}>
               <ReactFlowProvider>
                 <Content className="dndflow">
                   <ReactFlowBase
@@ -287,7 +295,13 @@ const WorkflowCreator = () => {
               </ReactFlowProvider>
             </ErrorBoundary>
           </Layout>
-          <ErrorBoundary FallbackComponent={ErrorFallback} onError={logError}>
+          <ErrorBoundary fallbackRender={({error, resetErrorBoundary}) => (
+          <div>
+            <h1>Error occured in Sidebar.tsx</h1>
+            <details>{error.message}</details>
+            <button onClick={resetErrorBoundary}>Reset Error</button>
+          </div>
+        )} onError={logError}>
             <Sidebar
               theme={lightMode}
               children={
