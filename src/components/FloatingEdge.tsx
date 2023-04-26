@@ -29,13 +29,13 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
     shallow
   );
 
-  const [edgeType, nodes, setNodes, activeProcess, colorTheme] = useMainStore(
+  const [edgeType, nodes, setNodes, activeProcess, lightMode] = useMainStore(
     (state) => [
       state.edgeType,
       state.nodes,
       state.setNodes,
       state.activeProcessName,
-      state.colorTheme,
+      state.lightMode,
     ],
     shallow
   );
@@ -124,11 +124,11 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
     if (isHover !== null && isHover) {
       color = "#0ff";
     }
-    if (!colorTheme) {
+    if (!lightMode) {
       color = "white";
     }
     return color;
-  }, [colorTheme, isHover]);
+  }, [lightMode, isHover]);
 
   return (
     <>
@@ -161,7 +161,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
             className="edgebutton"
             onClick={(event) => onEdgeClick(event, id)}
             icon={
-              colorTheme ? (
+              lightMode ? (
                 <CloseCircleOutlined className="dumb-icon" />
               ) : (
                 <CloseCircleFilled

@@ -76,8 +76,8 @@ const storeSelector = (state: MainActions & MainState) => ({
   addNewStateItem: state.addNewStateItem,
   edgeType: state.edgeType,
   setEdgeType: state.setEdgeType,
-  colorTheme: state.colorTheme,
-  setColorTheme: state.setColorScheme,
+  lightMode: state.lightMode,
+  setlightMode: state.setColorScheme,
 });
 
 const WorkflowCreator = () => {
@@ -106,8 +106,8 @@ const WorkflowCreator = () => {
     addNewStateItem,
     edgeType,
     setEdgeType,
-    colorTheme,
-    setColorTheme,
+    lightMode,
+    setlightMode,
   } = useMainStore(storeSelector, shallow);
 
   const filteredStates = useMainStore(
@@ -115,7 +115,7 @@ const WorkflowCreator = () => {
   );
 
   const headerStyle: CSSProperties = {
-    backgroundColor: colorTheme ? "#6E7888" : "#001529",
+    backgroundColor: lightMode ? "#6E7888" : "#001529",
     padding: "25px",
     height: "80px",
     display: "inline-flex",
@@ -236,7 +236,7 @@ const WorkflowCreator = () => {
   return (
     <ConfigProvider
       theme={
-        colorTheme
+        lightMode
           ? { algorithm: theme.defaultAlgorithm }
           : { algorithm: theme.darkAlgorithm }
       }
@@ -284,13 +284,13 @@ const WorkflowCreator = () => {
               </Content>
             </Layout>
             <Sidebar
-              theme={colorTheme}
+              theme={lightMode}
               children={
                 <>
                   <StateCollapseBox
                     items={filteredStates(nodes)}
                     addNew={addNewStateItem}
-                    colorTheme={colorTheme}
+                    lightMode={lightMode}
                   />
                   <SelectBox
                     addNew={addNewRole}
@@ -307,7 +307,7 @@ const WorkflowCreator = () => {
                     style={{
                       maxHeight: "20em",
                       overflow: "scroll",
-                      color: colorTheme ? "black" : "white",
+                      color: lightMode ? "black" : "white",
                     }}
                   >
                     {JSON.stringify(
@@ -330,19 +330,19 @@ const WorkflowCreator = () => {
                       <Icon
                         style={{
                           fontSize: "20pt",
-                          color: colorTheme ? "black" : "white",
+                          color: lightMode ? "black" : "white",
                         }}
                         component={SunSvg}
                       />
                       <Switch
                         size="small"
-                        onChange={() => setColorTheme()}
+                        onChange={() => setlightMode()}
                         style={{ margin: "10px" }}
                       />
                       <Icon
                         style={{
                           fontSize: "20pt",
-                          color: colorTheme ? "black" : "white",
+                          color: lightMode ? "black" : "white",
                         }}
                         component={MoonSvg}
                       />

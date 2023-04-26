@@ -40,7 +40,7 @@ export interface MainState {
   edges: Edge[];
   edgeType: string;
   contextMenuItems: MenuProps["items"];
-  colorTheme: boolean;
+  lightMode: boolean;
 }
 
 export interface MainActions {
@@ -78,8 +78,8 @@ export interface MainActions {
 const useMainStore = create<MainState & MainActions>()(
   persist(
     (set, get) => ({
-      colorTheme: true,
-      setColorScheme: () => set({ colorTheme: !get().colorTheme }),
+      lightMode: true,
+      setColorScheme: () => set({ lightMode: !get().lightMode }),
       nodes: [],
       edges: [],
       onNodesChange: (changes: NodeChange[]) => {

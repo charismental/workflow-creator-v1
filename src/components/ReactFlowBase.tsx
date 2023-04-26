@@ -41,7 +41,7 @@ const selector = (state: MainState & MainActions) => ({
   setAllEdges: state.setAllEdges,
   onConnect: state.onConnect,
   edgeType: state.edgeType,
-  colorTheme: state.colorTheme,
+  lightMode: state.lightMode,
   contextMenuItems: state.contextMenuItems,
   activeProcessName: state.activeProcessName,
 });
@@ -78,14 +78,14 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     allEdges,
     setAllEdges,
     onConnect,
-    colorTheme,
+    lightMode,
     contextMenuItems,
     activeProcessName,
   } = useMainStore(selector, shallow);
 
   const connectionLineStyle = {
     strokeWidth: 1.5,
-    stroke: colorTheme ? "black" : "white",
+    stroke: lightMode ? "black" : "white",
   };
 
   const {
