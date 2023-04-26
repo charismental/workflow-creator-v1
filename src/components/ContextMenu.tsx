@@ -1,19 +1,18 @@
-import { FC, useMemo } from "react";
+import React, { FC, memo } from "react";
 import { Dropdown } from "antd";
 import useMainStore from "store";
 
 interface ContextMenuProps {
-  children: React.ReactNode;
+  children: any;
+  items: any;
 }
 
-const ContextMenu: FC<ContextMenuProps> = ({ children }) => {
-  const items = useMainStore((state) => state.contextMenuItems);
-
+const ContextMenu: FC<ContextMenuProps> = ({ items, children }) => {
   return (
-    <Dropdown trigger={["contextMenu"]} menu={{ items }}>
+    <Dropdown trigger={["contextMenu"]} menu={{ items }} destroyPopupOnHide>
       {children}
     </Dropdown>
   );
 };
 
-export default ContextMenu;
+export default memo(ContextMenu);

@@ -10,7 +10,8 @@ import {
   Typography,
   theme,
 } from "antd";
-
+import { ErrorBoundary } from "react-error-boundary";
+import ErrorFallback from "components/ErrorFallbackUI";
 import { MoonSvg, SunSvg } from "assets/icons/icons";
 import ActiveRoleSettings from "components/ActiveRoleSettings";
 import ModalInstance from "components/ModalInstance";
@@ -196,7 +197,7 @@ const WorkflowCreator = () => {
       centered: true,
 
       footer: [
-        <Space style={{marginTop: '20px'}}>
+        <Space style={{ marginTop: "20px" }}>
           <Button
             onClick={() => {
               console.log("return");
@@ -244,33 +245,34 @@ const WorkflowCreator = () => {
         <ReactFlowProvider>
           <Layout style={layoutContainer}>
             <Layout>
-              <Header style={headerStyle}>
-                <SelectBox
-                  useStyle={{ flexGrow: 1, maxWidth: "360px" }}
-                  selectOnChange={setActiveProcessName}
-                  addNew={addNewProcessAndSelect}
-                  type="process"
-                  selectValue={activeProcessName}
-                  items={availableProcesses}
-                  placeholder="Select Process"
-                  hasColorInput={false}
-                />
-                <Title level={2} style={activeRoleTitleStyle}>
-                  {activeRole}
-                </Title>
-                <ActiveRoleSettings
-                  roleIsToggled={
-                    !!activeProcess?.roles?.some(
-                      (r) => r.RoleName === activeRole
-                    )
-                  }
-                  updateColor={updateColor}
-                  color={roleColors[activeRole]}
-                  toggleRole={() => toggleRoleForProcess(activeRole)}
-                  useStyle={{ flexGrow: 1, color: "white" }}
-                />
-              </Header>
-
+              <ErrorBoundary FallbackComponent={ErrorFallback}>
+                <Header style={headerStyle}>
+                  <SelectBox
+                    useStyle={{ flexGrow: 1, maxWidth: "360px" }}
+                    selectOnChange={setActiveProcessName}
+                    addNew={addNewProcessAndSelect}
+                    type="process"
+                    selectValue={activeProcessName}
+                    items={availableProcesses}
+                    placeholder="Select Process"
+                    hasColorInput={false}
+                  />
+                  <Title level={2} style={activeRoleTitleStyle}>
+                    {activeRole}
+                  </Title>
+                  <ActiveRoleSettings
+                    roleIsToggled={
+                      !!activeProcess?.roles?.some(
+                        (r) => r.RoleName === activeRole
+                      )
+                    }
+                    updateColor={updateColor}
+                    color={roleColors[activeRole]}
+                    toggleRole={() => toggleRoleForProcess(activeRole)}
+                    useStyle={{ flexGrow: 1, color: "white" }}
+                  />
+                </Header>
+              </ErrorBoundary>
               <Content className="dndflow">
                 <ReactFlowBase
                   allSelfConnectingEdges={allSelfConnectingEdges}

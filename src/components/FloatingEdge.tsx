@@ -1,4 +1,4 @@
-import { CloseCircleOutlined } from "@ant-design/icons";
+import { CloseCircleOutlined, CloseCircleFilled } from "@ant-design/icons";
 import { getSmartEdge } from "@tisoap/react-flow-smart-edge";
 import { Button } from "antd";
 import { FunctionComponent, useCallback, useEffect, useState } from "react";
@@ -160,7 +160,16 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
           <Button
             className="edgebutton"
             onClick={(event) => onEdgeClick(event, id)}
-            icon={<CloseCircleOutlined className="dumb-icon" />}
+            icon={
+              colorTheme ? (
+                <CloseCircleOutlined className="dumb-icon" />
+              ) : (
+                <CloseCircleFilled
+                  className="dumb-icon"
+                  style={{ color: "gray" }}
+                />
+              )
+            }
           />
         </div>
       </foreignObject>

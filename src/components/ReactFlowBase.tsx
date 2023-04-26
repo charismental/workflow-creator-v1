@@ -5,6 +5,7 @@ import ReactFlow, {
   ReactFlowInstance,
   NodeTypes,
   Edge,
+  ConnectionMode,
 } from "reactflow";
 import { Typography } from "antd";
 import { DragOutlined } from "@ant-design/icons";
@@ -20,6 +21,8 @@ import getItem from "utils/getItem";
 import "../css/style.css";
 import "reactflow/dist/style.css";
 import ContextMenu from "./ContextMenu";
+import { ErrorBoundary } from "react-error-boundary";
+import ErrorFallbackUI from "./ErrorFallbackUI";
 
 const { Text } = Typography;
 
@@ -39,6 +42,8 @@ const selector = (state: MainState & MainActions) => ({
   onConnect: state.onConnect,
   edgeType: state.edgeType,
   colorTheme: state.colorTheme,
+  contextMenuItems: state.contextMenuItems,
+  activeProcessName: state.activeProcessName,
 });
 
 interface ReactFlowBaseProps {
@@ -59,6 +64,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
   // reactFlowInstance should only change on init. I think...
   useEffect(() => {
+    console.log("react flow instance");
     if (reactFlowInstance) reactFlowInstance.fitView();
   }, [reactFlowInstance]);
 
@@ -73,8 +79,10 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     setAllEdges,
     onConnect,
     colorTheme,
+    contextMenuItems,
+    activeProcessName,
   } = useMainStore(selector, shallow);
-  
+
   const connectionLineStyle = {
     strokeWidth: 1.5,
     stroke: colorTheme ? "black" : "white",
@@ -92,10 +100,28 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     useCallback((state) => state.setMenuItems, [])
   );
 
-  const openEdgeContextMenu = useCallback((e: React.MouseEvent, el: Edge) => {
+  const onPaneContextMenu = (e: React.MouseEvent<Element, MouseEvent>) => {
     e.preventDefault();
+    return setMenuItems([
+      getItem(
+        <Text style={{ fontSize: "18px" }}>
+          Process Name: {activeProcessName}
+        </Text>,
+        1,
+        null
+      ),
+      getItem(
+        <Text style={{ fontSize: "18px" }}>Active Role: {activeRole}</Text>,
+        2,
+        null
+      ),
+    ]);
+  };
 
-    setMenuItems([
+  const openEdgeContextMenu = (e: React.MouseEvent, el: Edge) => {
+    console.log("edge context");
+    e.preventDefault();
+    return setMenuItems([
       getItem(
         <Text style={{ fontSize: "18px" }}>Source: {el.source}</Text>,
         1,
@@ -107,9 +133,11 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
         null
       ),
     ]);
-  }, []);
+  };
 
-  const openNodeContextMenu = useCallback((e: React.MouseEvent, node: any) => {
+  const openNodeContextMenu = (e: React.MouseEvent, node: any) => {
+    console.log("node context");
+    console.log(node);
     e.preventDefault();
     setMenuItems([
       getItem("Position", 1, <DragOutlined />, [
@@ -117,11 +145,11 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
         getItem(<Text>Y: {node.position.y}</Text>, "y", null),
       ]),
       getItem("Dimensions", 2, <DragOutlined rotate={45} />, [
-        getItem(`width: ${node.style.width} `, "w", null),
-        getItem(`height: ${node.style.height}`, "h", null),
+        getItem(`width: ${node.width} `, "w", null),
+        getItem(`height: ${node.height}`, "h", null),
       ]),
     ]);
-  }, []);
+  };
 
   const toggleSelfConnected = useCallback(
     (stateId: string) => {
@@ -147,27 +175,30 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
   // TODO: handle these behaviors intentionally
   useEffect(() => {
+    console.log("set edges");
     if (
       nodes.length &&
       nodes.some((n: any) => n?.data.color !== roleColors[activeRole])
     ) {
       updateNodesColor();
     }
-    // compare edges before doing this?
-    setEdges(allEdges?.[activeRole] || []);
+
+    if (!isEqual(edges, allEdges[activeRole])) {
+      setEdges(allEdges?.[activeRole] || []);
+    }
   }, [activeRole, nodes, allEdges[activeRole]]);
+
+  const uniqueEdges = (arr: any) => {
+    return arr.filter(
+      (v: any, i: any, a: any) =>
+        a.findIndex((v2: any) =>
+          ["target", "source"].every((k) => v2[k] === v[k])
+        ) === i
+    );
+  };
 
   // TODO: handle this intentionally on all edge changes
   useEffect(() => {
-    const uniqueEdges = (arr: any) => {
-      return arr.filter(
-        (v: any, i: any, a: any) =>
-          a.findIndex((v2: any) =>
-            ["target", "source"].every((k) => v2[k] === v[k])
-          ) === i
-      );
-    };
-
     const updatedEdges = {
       ...allEdges,
       [activeRole]: uniqueEdges(edges),
@@ -227,41 +258,45 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   return (
     <>
       <div className="reactflow-wrapper" ref={reactFlowWrapper}>
-        <ContextMenu>
-          <ReactFlow
-            nodes={nodes.map((node: any) => ({
-              ...node,
-              data: {
-                ...node.data,
-                toggleSelfConnected,
-                selfConnected: allSelfConnectingEdges?.[activeRole]?.some(
-                  ({ target }: any) => target === node.id
-                ),
-              },
-            }))}
-            edges={allEdges?.[activeRole] || []}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            onInit={setReactFlowInstance}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            fitView
-            nodeTypes={nodeTypes}
-            edgeTypes={edgeTypes}
-            defaultEdgeOptions={defaultEdgeOptions}
-            connectionLineComponent={CustomConnectionLine}
-            connectionLineStyle={connectionLineStyle}
-            // onEdgeContextMenu={e => console.log('onEdgeContext')}
-            // onNodeContextMenu={e => console.log('onNodeContext')}
-            // onPaneContextMenu={e => openNodeContextMenu(e, null)}
-            onEdgeContextMenu={openEdgeContextMenu}
-            onNodeContextMenu={openNodeContextMenu}
-          >
-            <Background variant={BackgroundVariant.Dots} />
-            <CustomControls />
-          </ReactFlow>
-        </ContextMenu>
+        <ErrorBoundary FallbackComponent={ErrorFallbackUI}>
+          <ContextMenu items={contextMenuItems}>
+            <ReactFlow
+              nodes={nodes.map((node: any) => ({
+                ...node,
+                data: {
+                  ...node.data,
+                  toggleSelfConnected,
+                  selfConnected: allSelfConnectingEdges?.[activeRole]?.some(
+                    ({ target }: any) => target === node.id
+                  ),
+                },
+              }))}
+              edges={allEdges?.[activeRole] || []}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              onInit={setReactFlowInstance}
+              onError={(e) => console.log("ReactFlow error: ", e)}
+              connectionMode={ConnectionMode.Loose} // 'strict' (only source to target connections are possible) or 'loose' (source to source and target to target connections are allowed)
+              onDrop={onDrop}
+              onDragOver={onDragOver}
+              fitView
+              nodeTypes={nodeTypes}
+              edgeTypes={edgeTypes}
+              defaultEdgeOptions={defaultEdgeOptions}
+              connectionLineComponent={CustomConnectionLine}
+              connectionLineStyle={connectionLineStyle}
+              // onEdgeContextMenu={e => console.log('onEdgeContext')}
+              // onNodeContextMenu={e => console.log('onNodeContext')}
+              onPaneContextMenu={onPaneContextMenu}
+              onEdgeContextMenu={openEdgeContextMenu}
+              onNodeContextMenu={openNodeContextMenu}
+            >
+              <Background variant={BackgroundVariant.Dots} />
+              <CustomControls />
+            </ReactFlow>
+          </ContextMenu>
+        </ErrorBoundary>
       </div>
     </>
   );
