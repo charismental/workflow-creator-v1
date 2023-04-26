@@ -30,6 +30,7 @@ import OutputJSON from "utils/OutputJSON";
 import { shallow } from "zustand/shallow";
 import Sidebar from "./components/Sidebar";
 import "./css/style.css";
+import logError from "utils/logError";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -62,7 +63,6 @@ const storeSelector = (state: MainActions & MainState) => ({
   activeRole: state.activeRole,
   setActiveRole: state.setActiveRole,
   allEdges: state.allEdges,
-  setAllEdges: state.setAllEdges,
   roles: state.roles,
   setRoles: state.setRoles,
   nodes: state.nodes,
@@ -77,7 +77,7 @@ const storeSelector = (state: MainActions & MainState) => ({
   edgeType: state.edgeType,
   setEdgeType: state.setEdgeType,
   lightMode: state.lightMode,
-  setlightMode: state.setColorScheme,
+  setlightMode: state.toggleLightMode,
 });
 
 const WorkflowCreator = () => {
@@ -92,7 +92,6 @@ const WorkflowCreator = () => {
     activeRole,
     setActiveRole,
     allEdges,
-    setAllEdges,
     roles,
     setRoles,
     nodes,
@@ -102,7 +101,6 @@ const WorkflowCreator = () => {
     allSelfConnectingEdges,
     setAllSelfConnectingEdges,
     currentStates,
-    setCurrentStates,
     addNewStateItem,
     edgeType,
     setEdgeType,
@@ -190,34 +188,36 @@ const WorkflowCreator = () => {
   });
 
   const addNewProcessAndSelect = ({ name }: { name: string }) => {
-    const modalOptions: ModalFuncProps = {
-      title: "Unsaved Changes Detected!",
-      content: "Save Changes Before Creating New Process?",
-      width: 700,
-      centered: true,
+    // const modalOptions: ModalFuncProps = {
+    //   title: "Unsaved Changes Detected!",
+    //   content: "Save Changes Before Creating New Process?",
+    //   width: 700,
+    //   centered: true,
 
-      footer: [
-        <Space style={{ marginTop: "20px" }}>
-          <Button
-            onClick={() => {
-              console.log("return");
-            }}
-          >
-            Return to Current Process
-          </Button>
-          <Button type="primary" danger>
-            Continue Without Saving
-          </Button>
-          <Button
-            onClick={() => (addProcess(name), setActiveProcessName(name))}
-            type="primary"
-          >
-            Save Progress And Continue
-          </Button>
-        </Space>,
-      ],
-    };
-    return ModalInstance({ modalType: "confirm", modalOptions });
+    //   footer: [
+    //     <Space style={{ marginTop: "20px" }}>
+    //       <Button
+    //         onClick={() => {
+    //           console.log("return");
+    //         }}
+    //       >
+    //         Return to Current Process
+    //       </Button>
+    //       <Button type="primary" danger>
+    //         Continue Without Saving
+    //       </Button>
+    //       <Button
+    //         onClick={() => (addProcess(name), setActiveProcessName(name))}
+    //         type="primary"
+    //       >
+    //         Save Progress And Continue
+    //       </Button>
+    //     </Space>,
+    //   ],
+    // };
+    // return ModalInstance({ modalType: "confirm", modalOptions });
+    addProcess(name);
+    setActiveProcessName(name);
   };
 
   if (!hasHydrated) {
@@ -242,47 +242,52 @@ const WorkflowCreator = () => {
       }
     >
       <Space direction="vertical" style={spaceContainer}>
-        <ReactFlowProvider>
-          <Layout style={layoutContainer}>
-            <Layout>
-              <ErrorBoundary FallbackComponent={ErrorFallback}>
-                <Header style={headerStyle}>
-                  <SelectBox
-                    useStyle={{ flexGrow: 1, maxWidth: "360px" }}
-                    selectOnChange={setActiveProcessName}
-                    addNew={addNewProcessAndSelect}
-                    type="process"
-                    selectValue={activeProcessName}
-                    items={availableProcesses}
-                    placeholder="Select Process"
-                    hasColorInput={false}
-                  />
-                  <Title level={2} style={activeRoleTitleStyle}>
-                    {activeRole}
-                  </Title>
-                  <ActiveRoleSettings
-                    roleIsToggled={
-                      !!activeProcess?.roles?.some(
-                        (r) => r.RoleName === activeRole
-                      )
-                    }
-                    updateColor={updateColor}
-                    color={roleColors[activeRole]}
-                    toggleRole={() => toggleRoleForProcess(activeRole)}
-                    useStyle={{ flexGrow: 1, color: "white" }}
-                  />
-                </Header>
-              </ErrorBoundary>
-              <Content className="dndflow">
-                <ReactFlowBase
-                  allSelfConnectingEdges={allSelfConnectingEdges}
-                  setAllSelfConnectingEdges={setAllSelfConnectingEdges}
-                  roleColors={roleColors}
-                  updateNodesColor={updateNodesColor}
-                  activeRole={activeRole}
+        <Layout style={layoutContainer}>
+          <Layout>
+            <ErrorBoundary FallbackComponent={ErrorFallback} onError={logError}>
+              <Header style={headerStyle}>
+                <SelectBox
+                  useStyle={{ flexGrow: 1, maxWidth: "360px" }}
+                  selectOnChange={setActiveProcessName}
+                  addNew={addNewProcessAndSelect}
+                  type="process"
+                  selectValue={activeProcessName}
+                  items={availableProcesses}
+                  placeholder="Select Process"
+                  hasColorInput={false}
                 />
-              </Content>
-            </Layout>
+                <Title level={2} style={activeRoleTitleStyle}>
+                  {activeRole}
+                </Title>
+
+                <ActiveRoleSettings
+                  roleIsToggled={
+                    !!activeProcess?.roles?.some(
+                      (r) => r.RoleName === activeRole
+                    )
+                  }
+                  updateColor={updateColor}
+                  color={roleColors[activeRole]}
+                  toggleRole={() => toggleRoleForProcess(activeRole)}
+                  useStyle={{ flexGrow: 1, color: "white" }}
+                />
+              </Header>
+            </ErrorBoundary>
+            <ErrorBoundary FallbackComponent={ErrorFallback} onError={logError}>
+              <ReactFlowProvider>
+                <Content className="dndflow">
+                  <ReactFlowBase
+                    allSelfConnectingEdges={allSelfConnectingEdges}
+                    setAllSelfConnectingEdges={setAllSelfConnectingEdges}
+                    roleColors={roleColors}
+                    updateNodesColor={updateNodesColor}
+                    activeRole={activeRole}
+                  />
+                </Content>
+              </ReactFlowProvider>
+            </ErrorBoundary>
+          </Layout>
+          <ErrorBoundary FallbackComponent={ErrorFallback} onError={logError}>
             <Sidebar
               theme={lightMode}
               children={
@@ -351,8 +356,8 @@ const WorkflowCreator = () => {
                 </>
               }
             />
-          </Layout>
-        </ReactFlowProvider>
+          </ErrorBoundary>
+        </Layout>
       </Space>
     </ConfigProvider>
   );

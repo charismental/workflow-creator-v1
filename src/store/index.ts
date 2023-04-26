@@ -72,14 +72,14 @@ export interface MainActions {
   onConnect: OnConnect;
   setEdgeType: (el: string) => void;
   setMenuItems: (items: MenuProps["items"]) => void;
-  setColorScheme: () => void;
+  toggleLightMode: () => void;
 }
 
 const useMainStore = create<MainState & MainActions>()(
   persist(
     (set, get) => ({
       lightMode: true,
-      setColorScheme: () => set({ lightMode: !get().lightMode }),
+      toggleLightMode: () => set({ lightMode: !get().lightMode }),
       nodes: [],
       edges: [],
       onNodesChange: (changes: NodeChange[]) => {

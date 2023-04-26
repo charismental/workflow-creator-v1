@@ -6,6 +6,7 @@ import ReactFlow, {
   NodeTypes,
   Edge,
   ConnectionMode,
+  SelectionMode,
 } from "reactflow";
 import { Typography } from "antd";
 import { DragOutlined } from "@ant-design/icons";
@@ -23,6 +24,7 @@ import "reactflow/dist/style.css";
 import ContextMenu from "./ContextMenu";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorFallbackUI from "./ErrorFallbackUI";
+import logError from "utils/logError";
 
 const { Text } = Typography;
 
@@ -64,8 +66,8 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
   // reactFlowInstance should only change on init. I think...
   useEffect(() => {
-    console.log("react flow instance");
-    if (reactFlowInstance) reactFlowInstance.fitView();
+    if (reactFlowInstance && reactFlowInstance.viewportInitialized)
+      reactFlowInstance.fitView();
   }, [reactFlowInstance]);
 
   const {
@@ -174,8 +176,8 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   );
 
   // TODO: handle these behaviors intentionally
+
   useEffect(() => {
-    console.log("set edges");
     if (
       nodes.length &&
       nodes.some((n: any) => n?.data.color !== roleColors[activeRole])
@@ -184,9 +186,9 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     }
 
     if (!isEqual(edges, allEdges[activeRole])) {
-      setEdges(allEdges?.[activeRole] || []);
+      return setEdges(allEdges?.[activeRole] || []);
     }
-  }, [activeRole, nodes, allEdges[activeRole]]);
+  }, [activeRole, allEdges[activeRole]]);
 
   const uniqueEdges = (arr: any) => {
     return arr.filter(
@@ -199,13 +201,14 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
   // TODO: handle this intentionally on all edge changes
   useEffect(() => {
+    console.log("set edges");
     const updatedEdges = {
       ...allEdges,
       [activeRole]: uniqueEdges(edges),
     };
 
     if (!isEqual(allEdges, updatedEdges)) {
-      setAllEdges(updatedEdges);
+      return setAllEdges(updatedEdges);
     }
   }, [edges]);
 
@@ -258,7 +261,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   return (
     <>
       <div className="reactflow-wrapper" ref={reactFlowWrapper}>
-        <ErrorBoundary FallbackComponent={ErrorFallbackUI}>
+        <ErrorBoundary FallbackComponent={ErrorFallbackUI} onError={logError}>
           <ContextMenu items={contextMenuItems}>
             <ReactFlow
               nodes={nodes.map((node: any) => ({
@@ -276,6 +279,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}
               onInit={setReactFlowInstance}
+              selectionMode={SelectionMode.Partial}
               onError={(e) => console.log("ReactFlow error: ", e)}
               connectionMode={ConnectionMode.Loose} // 'strict' (only source to target connections are possible) or 'loose' (source to source and target to target connections are allowed)
               onDrop={onDrop}
@@ -286,8 +290,6 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
               defaultEdgeOptions={defaultEdgeOptions}
               connectionLineComponent={CustomConnectionLine}
               connectionLineStyle={connectionLineStyle}
-              // onEdgeContextMenu={e => console.log('onEdgeContext')}
-              // onNodeContextMenu={e => console.log('onNodeContext')}
               onPaneContextMenu={onPaneContextMenu}
               onEdgeContextMenu={openEdgeContextMenu}
               onNodeContextMenu={openNodeContextMenu}
