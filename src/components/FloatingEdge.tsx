@@ -30,7 +30,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
   );
 
   const [edgeType, nodes, setNodes, activeProcess, processes] = useMainStore(
-    (state) => [state.edgeType, state.nodes, state.setNodes, state.activeProcessName, state.processes],
+    (state) => [state.edgeType, state.nodes, state.setNodes, state.activeProcess, state.processes],
     shallow
   );
   const [isHover, setIsHover] = useState<boolean | null>(null);
@@ -47,9 +47,9 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
       node.id === filteredSourceNode?.id || node.id === filteredTargetNode?.id
         ? { ...node, style: { ...(node?.style || {}), boxShadow: shadow } }
         : node
-    ), activeProcess)
+    ), activeProcess?.ProcessName)
 
-  }, [nodes, activeProcess])
+  }, [nodes, activeProcess?.ProcessName])
 
   
 

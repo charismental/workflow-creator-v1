@@ -48,6 +48,7 @@ interface ReactFlowBaseProps {
   roleColors: any;
   activeRole: any;
   updateNodesColor: any;
+  roleIsToggled: boolean;
 }
 const edgeTypes: any = {
   floating: FloatingEdge,
@@ -81,6 +82,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     roleColors,
     activeRole,
     updateNodesColor,
+    roleIsToggled,
   } = props;
 
   const [items, setItems] = useState<MenuProps["items"]>();
@@ -215,38 +217,39 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   return (
     <>
       <div className="reactflow-wrapper" ref={reactFlowWrapper}>
-        <Dropdown menu={{ items }} trigger={["contextMenu"]}>
-          <ReactFlow
-            nodes={nodes.map((node: any) => ({
-              ...node,
-              data: {
-                ...node.data,
-                toggleSelfConnected,
-                selfConnected: allSelfConnectingEdges?.[activeRole]?.some(
-                  ({ target }: any) => target === node.id
-                ),
-              },
-            }))}
-            edges={allEdges?.[activeRole] || []}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            onInit={setReactFlowInstance}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            fitView
-            nodeTypes={nodeTypes}
-            edgeTypes={edgeTypes}
-            defaultEdgeOptions={defaultEdgeOptions}
-            connectionLineComponent={CustomConnectionLine}
-            connectionLineStyle={connectionLineStyle}
-            onEdgeContextMenu={openEdgeContextMenu}
-            onNodeContextMenu={openNodeContextMenu}
-          >
-            <Background variant={BackgroundVariant.Dots} />
-            <Controls />
-          </ReactFlow>
-        </Dropdown>
+        {/* <Dropdown menu={{ items }} trigger={["contextMenu"]}> */}
+        <ReactFlow
+          nodes={nodes.map((node: any) => ({
+            ...node,
+            data: {
+              ...node.data,
+              toggleSelfConnected,
+              selfConnected: allSelfConnectingEdges?.[activeRole]?.some(
+                ({ target }: any) => target === node.id
+              ),
+            },
+          }))}
+          edges={allEdges?.[activeRole] || []}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onInit={setReactFlowInstance}
+          onDrop={onDrop}
+          onDragOver={onDragOver}
+          fitView
+          nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
+          defaultEdgeOptions={defaultEdgeOptions}
+          connectionLineComponent={CustomConnectionLine}
+          connectionLineStyle={connectionLineStyle}
+          onEdgeContextMenu={openEdgeContextMenu}
+          onNodeContextMenu={openNodeContextMenu}
+        >
+          {!roleIsToggled && <div style={{ zIndex: 5000000, backgroundColor: 'darkGrey', opacity: .5, width: '100%', height: '100%', position: 'relative', cursor: 'not-allowed' }} />}
+          <Background variant={BackgroundVariant.Dots} />
+          <Controls />
+        </ReactFlow>
+        {/* </Dropdown> */}
       </div>
     </>
   );

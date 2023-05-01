@@ -12,17 +12,19 @@ interface StateCollapsebox {
   items: string[];
   useStyle?: any;
   addNew?: any;
+  disabled?: boolean;
 }
 
 const StateCollapseBox: React.FC<StateCollapsebox> = ({
   items,
   addNew,
+  disabled = false,
   useStyle = {},
 }) => {
   const [name, setName] = useState("");
   const inputRef = useRef<InputRef>(null);
   const [activeRole, roleColors] = useMainStore(
-    (state) => [state.activeRole, state.roleColors],
+    (state) => [state.activeRole, {}],
     shallow
   );
 
@@ -36,7 +38,8 @@ const StateCollapseBox: React.FC<StateCollapsebox> = ({
   };
 
   const itemColor = () => {
-    return roleColors[activeRole];
+    // return roleColors[activeRole];
+    return '#ddd'
   };
 
   const addNewItem = (
@@ -53,7 +56,7 @@ const StateCollapseBox: React.FC<StateCollapsebox> = ({
   return (
     <Collapse
       accordion
-      style={{ width: "100%", ...useStyle }}
+      style={{ width: "100%", maxHeight: "400px", overflowY: "auto", ...useStyle }}
       size="small"
       expandIconPosition="end"
     >
@@ -62,7 +65,7 @@ const StateCollapseBox: React.FC<StateCollapsebox> = ({
           <div
             key={item}
             className={styles.stateItem}
-            style={{ backgroundColor: itemColor() }}
+            style={{ backgroundColor: itemColor(), ...(disabled && { pointerEvents: 'none' }) }}
             onMouseDown={(e) => {
               e.stopPropagation();
             }}

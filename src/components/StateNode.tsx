@@ -48,7 +48,7 @@ const StateNode: FunctionComponent<NodeProps> = ({
 
     Object.keys(updatedEdges).forEach((key: string) => {
       updatedEdges[key] = updatedEdges[key].filter(({ source, target }: { source: string; target: string }) => ![source, target].includes(id))
-      updatedAllSelfConnectingEdges[key] = (updatedAllSelfConnectingEdges?.[key] || []).filter(({ source, target }: { source: string; target: string }) => ![source, target].includes(id))
+      updatedAllSelfConnectingEdges[key] = (updatedAllSelfConnectingEdges?.[key] || []).filter(({ FromStateName, ToStateName }: { FromStateName: string; ToStateName: string }) => ![FromStateName, ToStateName].includes(id))
     })
 
     setAllSelfConnectingEdges(updatedAllSelfConnectingEdges)
@@ -56,6 +56,7 @@ const StateNode: FunctionComponent<NodeProps> = ({
     setNodes(updatedNodes);
   }, [allEdges, setAlledges, nodes, setNodes, allSelfConnectingEdges, setAllSelfConnectingEdges]);
 
+  // do something here => initial width: 200, minWidth: 50?
   const minWidth = 200;
   const minHeight = 30;
 

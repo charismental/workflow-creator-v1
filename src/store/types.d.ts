@@ -1,34 +1,34 @@
-import { Edge, Node } from "reactflow";
-
 export interface WorkflowConnection {
-    source: string;
-    target: string;
+    StateTransitionId?: number;
+    FromStateId?: number;
+    ToStateId?: number;
+    ProcessId?: number;
+    FromStateName: string;
+    ToStateName: string;
 }
 
 export interface WorkflowState {
-    StateID: number;
+    StateId?: number;
     StateName: string;
-    RequiresUserAssignment: BooleanNumber | number;
-    RequiresRoleAssignment: BooleanNumber | number;
-    DisplayOrder: number;
+    Properties?: {
+        x?: number;
+        y?: number;
+        h?: number;
+        w?: number;
+    };
 }
 
 export interface WorkflowRole {
-    RoleID: number;
+    RoleId?: number;
+    ProcessId?: number;
     RoleName: string;
-    IsUniversal: BooleanNumber | number;
-    isCluster: BooleanNumber | number;
+    Properties?: { color: string };
+    Transitions?: WorkflowConnection[];
 }
 
 export interface WorkflowProcess {
-    ProcessID: number;
+    ProcessID?: number;
     ProcessName: string;
-    CatID?: number;
-    states?: Array<WorkflowState>; // ?
-    roles?: Array<WorkflowRole>;
-    connections?: Array<Edge>;
-    colors?: { [role: string]: string };
-    nodes?: Array<Node>
+    States?: Array<WorkflowState>;
+    Roles?: Array<WorkflowRole>;
 }
-
-type BooleanNumber = 0 | 1;
