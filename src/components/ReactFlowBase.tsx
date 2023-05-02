@@ -19,7 +19,7 @@ import StateNode from "../components/StateNode";
 
 import "../css/style.css";
 import "reactflow/dist/style.css";
-import { transformTransitionsToEdges } from "utils";
+import { nodeByState, transformTransitionsToEdges } from "utils";
 import { WorkflowProcess } from "store/types";
 
 const connectionLineStyle = {
@@ -32,10 +32,9 @@ const nodeTypes: NodeTypes = {
 };
 
 const selector = (state: MainState & MainActions) => ({
-  nodes: state.nodes,
+  // nodes: state.nodes,
   activeProcess: state.activeProcess,
   onNodesChange: state.onNodesChange,
-  onEdgesChange: state.onEdgesChange,
   setNodes: state.setNodes,
   onConnect: state.onConnect,
   edgeType: state.edgeType,
@@ -64,10 +63,9 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   }, [reactFlowInstance]);
 
   const {
-    nodes,
+    // nodes,
     setNodes,
     onNodesChange,
-    onEdgesChange,
     onConnect,
     activeProcess
   } = useMainStore(selector, shallow);
@@ -84,9 +82,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
   const edges = transformTransitionsToEdges(activeProcess?.Roles?.find(r => r.RoleName === activeRole)?.Transitions || []);
 
-  // const edgeContextMenuItems = (el: Edge): MenuProps['items'] => {
-  //   return [{label: `Source: ${el.source}`, key: 1}, {label: `Target: ${el.target}`, key:2}]
-  // }
+  const nodes = [...(activeProcess?.States || [])].sort((a, b) => a?.DisplayOrder || 1 - (b?.DisplayOrder || 0)).map((s, i, arr) => nodeByState(s, i, arr.length));
 
   const openEdgeContextMenu = useCallback((e: React.MouseEvent, el: Edge) => {
     e.preventDefault();
@@ -230,7 +226,6 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
           // edges={allEdges?.[activeRole] || []}
           edges={edges}
           onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onInit={setReactFlowInstance}
           onDrop={onDrop}

@@ -1,5 +1,5 @@
-import { Edge, MarkerType, Position, EdgeMarkerType, Connection } from 'reactflow';
-import { WorkflowConnection } from 'store/types';
+import { Edge, MarkerType, Position, Node, Connection } from 'reactflow';
+import { WorkflowConnection, WorkflowState } from 'store/types';
 
 interface IntersectionNodeType {
   width: any;
@@ -130,33 +130,80 @@ export function transformTransitionsToEdges(transitions: WorkflowConnection[]): 
       targetHandle: null,
       source,
       target,
-      id: `reactflow__edge-${source}-${target}`,
+      id: edgeIdByNodes({ source, target }),
     }
   };
 
   return transitions.map(mapper);
 }
 
-export function transformEdgesToTransitions(edges: Edge[], existingTransitions: WorkflowConnection[]): WorkflowConnection[] {
-  const mapper = (edge: Edge): WorkflowConnection => {
-    const { source, target } = edge;
+// export function transformEdgesToTransitions(edges: Edge[], existingTransitions: WorkflowConnection[]): WorkflowConnection[] {
+//   const mapper = (edge: Edge): WorkflowConnection => {
+//     const { source, target } = edge;
 
-    const foundTransition = existingTransitions.find(({ FromStateName, ToStateName }) => source === FromStateName && target === ToStateName)
+//     const foundTransition = existingTransitions.find(({ FromStateName, ToStateName }) => source === FromStateName && target === ToStateName)
 
-    return {
-      ...foundTransition,
-      FromStateName: source,
-      ToStateName: target,
-    }
-  };
+//     return {
+//       ...foundTransition,
+//       FromStateName: source,
+//       ToStateName: target,
+//     }
+//   };
 
-  return edges.map(mapper);
-}
+//   return edges.map(mapper);
+// }
 
 export function transformNewConnectionToTransition(connection: Connection, existingTransitions: WorkflowConnection[]): WorkflowConnection | null {
   const { source, target } = connection;
-  
+
   const foundTransition = existingTransitions.find(({ FromStateName, ToStateName }) => source === FromStateName && target === ToStateName)
 
   return foundTransition || (source && target ? { FromStateName: source, ToStateName: target } : null);
 }
+
+export function edgeIdByNodes({ source, target }: { source: string; target: string }): string {
+  return `reactflow__edge-${source}-${target}`;
+}
+
+export function nodeByState(state: WorkflowState, index: number, allNodesLength: number): Node {
+  const { StateName, Properties = {} } = state;
+  const defaultW = 200;
+  const defaultH = 30;
+  const defaultXPadding = 30;
+  const defaultYPadding = 20;
+  const divisor = 5; // todo
+
+  const { x: propX, y: propY, w: width = defaultW, h: height = defaultH } = Properties;
+
+  const x = propX || index % divisor * (defaultW + defaultXPadding);
+  const y = propY || Math.floor(index / divisor) * (defaultH + defaultYPadding);
+
+  return {
+    id: StateName,
+    dragHandle: '.drag-handle',
+    type: 'custom',
+    position: {
+      x,
+      y
+    },
+    data: {
+      label: StateName
+    },
+    positionAbsolute: {
+      x,
+      y
+    },
+    width,
+    height,
+    selected: true,
+    dragging: false
+  }
+};
+
+export function stateByNode({ node, allStates }: { node: Node | any; allStates: WorkflowState[] }): WorkflowState {
+  const { id: StateName, positionAbsolute = { x: 1, y: 1 }, width: w = 200, height: h = 30 } = node;
+  const foundState = allStates.find(s => s?.StateName === StateName) || {};
+  const Properties = { ...positionAbsolute, h, w }
+
+  return { ...foundState, StateName, Properties };
+};

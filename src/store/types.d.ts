@@ -10,6 +10,7 @@ export interface WorkflowConnection {
 export interface WorkflowState {
     StateId?: number;
     StateName: string;
+    DisplayOrder?: number;
     Properties?: {
         x?: number;
         y?: number;

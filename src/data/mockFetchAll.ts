@@ -897,6 +897,18 @@ const roles = [
     {
         RoleId: 16,
         RoleName: "Case-Manager-Supervisor"
+    },
+    {
+        RoleId: 17,
+        RoleName: "Review-Specialist"
+    },
+    {
+        RoleId: 18,
+        RoleName: "QA\/QC-Specialist"
+    },
+    {
+        RoleId: 19,
+        RoleName: "QA\/QC-Lead"
     }
 ];
 
@@ -1016,6 +1028,10 @@ const states = [
     {
         StateId: 52,
         StateName: "Graduated"
+    },
+    {
+        StateId: 53,
+        StateName: "Review"
     }
 ];
 

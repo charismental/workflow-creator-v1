@@ -24,34 +24,41 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
   markerEnd,
   style,
 }) => {
-  const [edges, setEdges] = useMainStore(
-    (state) => [state.edges, state.setEdges],
+
+  const edgeType = useMainStore(
+    (state) => state.edgeType,
     shallow
   );
 
-  const [edgeType, nodes, setNodes, activeProcess, processes] = useMainStore(
-    (state) => [state.edgeType, state.nodes, state.setNodes, state.activeProcess, state.processes],
+  const removeTransition = useMainStore(
+    (state) => state.removeTransition,
     shallow
   );
+
+  const nodes = useMainStore(
+    (state) => state.nodes,
+    shallow
+  );
+
   const [isHover, setIsHover] = useState<boolean | null>(null);
 
 
- //  updates node style, but resizes nodes, will revert manually resized nodes
+  //  updates node style, but resizes nodes, will revert manually resized nodes
 
-  const updateNodeStyle = useCallback(() => {
-    const filteredSourceNode = nodes.find((node) => node.id === sourceNode?.id);
-    const filteredTargetNode = nodes.find((node) => node.id === targetNode?.id);
-    const shadow = isHover ? "" : '0 0 4px 4px #0ff'
-    
-    setNodes(nodes.map((node: Node) =>
-      node.id === filteredSourceNode?.id || node.id === filteredTargetNode?.id
-        ? { ...node, style: { ...(node?.style || {}), boxShadow: shadow } }
-        : node
-    ), activeProcess?.ProcessName)
+  // const updateNodeStyle = useCallback(() => {
+  //   const filteredSourceNode = nodes.find((node) => node.id === sourceNode?.id);
+  //   const filteredTargetNode = nodes.find((node) => node.id === targetNode?.id);
+  //   const shadow = isHover ? "" : '0 0 4px 4px #0ff'
 
-  }, [nodes, activeProcess?.ProcessName])
+  //   setNodes(nodes.map((node: Node) =>
+  //     node.id === filteredSourceNode?.id || node.id === filteredTargetNode?.id
+  //       ? { ...node, style: { ...(node?.style || {}), boxShadow: shadow } }
+  //       : node
+  //   ), activeProcess?.ProcessName)
 
-  
+  // }, [nodes, activeProcess?.ProcessName])
+
+
 
   // does not resize nodes, but does not update node style, will revert manually resized nodes
 
@@ -73,12 +80,12 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
   //   );
   // }, []);
 
-  useEffect(() => {
-    if (isHover !== null) updateNodeStyle()
-  },[isHover])
+  // useEffect(() => {
+  //   if (isHover !== null) updateNodeStyle()
+  // }, [isHover])
 
   // const handleMouseOver = () => {
-   
+
   //   updateNodeStyle();
   // };
 
@@ -92,8 +99,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
     id: string
   ) => {
     event.stopPropagation();
-    const filtered = edges.filter((ed: any) => ed.id !== id);
-    setEdges(filtered);
+    removeTransition({ source, target })
     setIsHover(false);
   };
 
@@ -124,8 +130,8 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
       edgeType === 'Straight'
         ? straightResult
         : edgeType === 'Bezier'
-        ? bezierResult
-        : stepResult,
+          ? bezierResult
+          : stepResult,
   });
 
   const [edgePath, labelX, labelY] = getStraightPath({
@@ -152,10 +158,10 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
         id={id}
         className="edge_path"
         d={edgeType === 'Straight' ? edgePath : svgPathString}
-        markerEnd={markerEnd}  
+        markerEnd={markerEnd}
         // style={style}
-        stroke={isHover ? '#0ff': 'black'}
-      />    
+        stroke={isHover ? '#0ff' : 'black'}
+      />
       <foreignObject
         onMouseOver={() => setIsHover(true)}
         onMouseLeave={() => setIsHover(false)}

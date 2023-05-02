@@ -12,7 +12,6 @@ import {
 import {
   Node,
   OnConnect,
-  OnEdgesChange,
   OnNodesChange,
   Edge,
   addEdge,
@@ -26,7 +25,8 @@ import {
 import mockFetchAll from "data/mockFetchAll";
 import { transformNewConnectionToTransition } from "utils";
 
-const initialRole = "Intake-Specialist";
+// const initialRole = "Intake-Specialist";
+const initialRole = "system";
 
 export interface MainState {
   globalLoading: boolean;
@@ -65,8 +65,8 @@ export interface MainActions {
   addNewStateItem: (name: string) => void;
   setHasHydrated: (state: boolean) => void;
   onNodesChange: OnNodesChange;
-  onEdgesChange: OnEdgesChange;
   onConnect: OnConnect;
+  removeTransition: any; // todo
   setEdgeType: (el: string) => void;
   setActiveProcess: (processName: string) => void;
 }
@@ -104,16 +104,8 @@ const useMainStore = create<MainState & MainActions>()(
           "onNodesChange"
         );
       },
-      onEdgesChange: (changes: EdgeChange[]) => {
-        set(
-          {
-            edges: applyEdgeChanges(changes, get().edges),
-          },
-          false,
-          "onEdgesChange"
-        );
-      },
       onConnect: (connection: Connection) => {
+        console.log('onconnect', connection)
         const { activeRole, activeProcess } = get();
 
         const { Roles = [] } = activeProcess || {};
@@ -145,6 +137,33 @@ const useMainStore = create<MainState & MainActions>()(
             },
             false,
             "onConnect"
+          );
+        }
+      },
+      removeTransition: ({ source, target }: { source: string; target: string }) => {
+        const { activeRole, activeProcess } = get();
+
+        const { Roles = [] } = activeProcess || {};
+
+        const foundRoleIndex = Roles.findIndex(
+          ({ RoleName }) => RoleName === activeRole
+        );
+
+        if (foundRoleIndex !== -1 && activeProcess) {
+          const { Transitions = [] } = Roles[foundRoleIndex];
+
+          const updatedTransitions = Transitions.filter(({ FromStateName, ToStateName }) => FromStateName !== source && ToStateName !== target);
+
+          const updatedRoles = Roles.map((r, i) =>
+            i === foundRoleIndex ? { ...r, Transitions: updatedTransitions } : r
+          );
+
+          set(
+            {
+              activeProcess: { ...activeProcess, Roles: updatedRoles },
+            },
+            false,
+            "removeTransitions",
           );
         }
       },
