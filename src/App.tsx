@@ -45,7 +45,6 @@ const storeSelector = (state: MainActions & MainState) => ({
   setActiveProcess: state.setActiveProcess,
   activeRole: state.activeRole,
   setActiveRole: state.setActiveRole,
-  allEdges: state.allEdges,
   roles: state.roles,
   setRoles: state.setRoles,
   nodes: state.nodes,
@@ -74,7 +73,6 @@ const WorkflowCreator = () => {
     setActiveProcess,
     activeRole,
     setActiveRole,
-    allEdges,
     roles,
     setRoles,
     nodes,
@@ -227,7 +225,6 @@ const WorkflowCreator = () => {
                   {JSON.stringify(
                     OutputJSON({
                       activeRole,
-                      allEdges,
                       allSelfConnectingEdges,
                       findStateNameByNode,
                     }),

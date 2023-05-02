@@ -18,6 +18,7 @@ import {
 } from "reactflow";
 
 import mockFetchAll from "data/mockFetchAll";
+import { transformNewConnectionToTransition } from "utils";
 
 const initialRole = "Intake-Specialist";
 
@@ -26,7 +27,6 @@ export interface MainState {
   activeRole: string;
   states: Array<WorkflowState>;
   processes: Array<WorkflowProcess>;
-  allEdges: any;
   allSelfConnectingEdges: { [roleName: string]: WorkflowConnection[] };
   // roleColors: { [key: string]: string };
   roles: Array<WorkflowRole>;
@@ -47,10 +47,6 @@ export interface MainActions {
     process: WorkflowProcess;
   }) => void;
   deleteProcess: (processName: string) => void;
-  setAllEdges: (
-    allEdges: { [roleName: string]: Edge[] },
-    processName?: string
-  ) => void;
   setAllSelfConnectingEdges: (allSelfConnectingEdges: {
     [roleName: string]: WorkflowConnection[];
   }) => void;
@@ -99,13 +95,26 @@ const useMainStore = create<MainState & MainActions>()(
       });
     },
     onConnect: (connection: Connection) => {
-      const { allEdges, activeRole } = get();
+      const { activeRole, activeProcess } = get();
 
-      const updatedEdges = [...(allEdges?.[activeRole] || [])];
+      const { Roles = [] } = activeProcess || {};
 
-      set({
-        edges: addEdge(connection, updatedEdges),
-      });
+      const foundRoleIndex = Roles.findIndex(({ RoleName }) => RoleName === activeRole);
+
+      if (foundRoleIndex !== -1 && activeProcess) {
+        const { Transitions = [] } = Roles[foundRoleIndex];
+
+        const newTransition = transformNewConnectionToTransition(connection, Transitions);
+        
+        const updatedTransitions = [...Transitions, ...(newTransition ? [newTransition] : [])]
+        
+        const updatedRoles = Roles.map((r, i) => i === foundRoleIndex ? { ...r, Transitions: updatedTransitions } : r)
+        
+        set({
+          activeProcess: { ...activeProcess, Roles: updatedRoles }
+        });
+      }
+
     },
     setActiveProcess: (processName: string) => set(({ processes, setNodes, roles, setEdges }) => {
       const process = processes.find((p) => p.ProcessName === processName);
@@ -130,23 +139,6 @@ const useMainStore = create<MainState & MainActions>()(
           el,
         };
         return { states: newStateObj };
-      }),
-    allEdges: {},
-    setAllEdges: (allEdges) =>
-      set(({ activeProcess, processes, updateProcess, activeRole }) => {
-        const processIndex = processes.findIndex(
-          (p) => p.ProcessName === activeProcess?.ProcessName
-        );
-
-        // TODO: check against nodes for process, filter invalid connections
-        const process = {
-          ...processes[processIndex],
-          connections: [...(allEdges?.[activeRole] || [])],
-        };
-
-        updateProcess({ processIndex, process });
-
-        return { allEdges };
       }),
     allSelfConnectingEdges: {},
     setAllSelfConnectingEdges: (allSelfConnectingEdges) =>
@@ -207,7 +199,7 @@ const useMainStore = create<MainState & MainActions>()(
 
         return { processes: processes.concat(newProcess) };
       }),
-      // fix
+    // fix
     deleteProcess: (processName) =>
       set(({ processes }) => ({
         processes: processes.filter((p) => p.ProcessName !== processName),

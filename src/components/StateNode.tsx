@@ -31,7 +31,6 @@ const StateNode: FunctionComponent<NodeProps> = ({
 }): JSX.Element => {
   const [isMouseOver, setIsMouseOver] = useState(false);
   const [nodes, setNodes] = useMainStore((state) => [state.nodes, state.setNodes], shallow)
-  const [allEdges, setAlledges] = useMainStore((state) => [state.allEdges, state.setAllEdges], shallow)
   const [allSelfConnectingEdges, setAllSelfConnectingEdges] = useMainStore((state) => [state.allSelfConnectingEdges, state.setAllSelfConnectingEdges], shallow)
   const { toggleSelfConnected, selfConnected = false } = data;
 
@@ -40,21 +39,21 @@ const StateNode: FunctionComponent<NodeProps> = ({
 
   const targetHandleStyle = { zIndex: isTarget ? 3 : 1 };
 
-  const removeNode = useCallback(() => {
-    const updatedNodes = nodes.filter(node => node.id !== id);
+  // const removeNode = useCallback(() => {
+  //   const updatedNodes = nodes.filter(node => node.id !== id);
 
-    const updatedEdges = { ...allEdges };
-    const updatedAllSelfConnectingEdges = { ...allSelfConnectingEdges };
+  //   // const updatedEdges = { ...allEdges };
+  //   const updatedAllSelfConnectingEdges = { ...allSelfConnectingEdges };
 
-    Object.keys(updatedEdges).forEach((key: string) => {
-      updatedEdges[key] = updatedEdges[key].filter(({ source, target }: { source: string; target: string }) => ![source, target].includes(id))
-      updatedAllSelfConnectingEdges[key] = (updatedAllSelfConnectingEdges?.[key] || []).filter(({ FromStateName, ToStateName }: { FromStateName: string; ToStateName: string }) => ![FromStateName, ToStateName].includes(id))
-    })
+  //   Object.keys(updatedEdges).forEach((key: string) => {
+  //     updatedEdges[key] = updatedEdges[key].filter(({ source, target }: { source: string; target: string }) => ![source, target].includes(id))
+  //     updatedAllSelfConnectingEdges[key] = (updatedAllSelfConnectingEdges?.[key] || []).filter(({ FromStateName, ToStateName }: { FromStateName: string; ToStateName: string }) => ![FromStateName, ToStateName].includes(id))
+  //   })
 
-    setAllSelfConnectingEdges(updatedAllSelfConnectingEdges)
-    setAlledges(updatedEdges);
-    setNodes(updatedNodes);
-  }, [allEdges, setAlledges, nodes, setNodes, allSelfConnectingEdges, setAllSelfConnectingEdges]);
+  //   setAllSelfConnectingEdges(updatedAllSelfConnectingEdges)
+  //   setAlledges(updatedEdges);
+  //   setNodes(updatedNodes);
+  // }, [allEdges, setAlledges, nodes, setNodes, allSelfConnectingEdges, setAllSelfConnectingEdges]);
 
   // do something here => initial width: 200, minWidth: 50?
   const minWidth = 200;
@@ -86,7 +85,9 @@ const StateNode: FunctionComponent<NodeProps> = ({
             checked={selfConnected}
             onChange={() => toggleSelfConnected(id)}
           />
-          <div className="state-delete-button" onClick={removeNode} />
+          {/* <div className="state-delete-button" onClick={removeNode} />
+           */}
+          <div className="state-delete-button" />
         </>
       )}
 

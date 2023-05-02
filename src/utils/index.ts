@@ -1,4 +1,5 @@
-import { MarkerType, Position } from 'reactflow';
+import { Edge, MarkerType, Position, EdgeMarkerType, Connection } from 'reactflow';
+import { WorkflowConnection } from 'store/types';
 
 interface IntersectionNodeType {
   width: any;
@@ -109,4 +110,53 @@ export function createNodesAndEdges() {
   }
 
   return { nodes, edges };
+}
+
+export function transformTransitionsToEdges(transitions: WorkflowConnection[]): Edge[] {
+  const mapper = (transition: WorkflowConnection): Edge | any => {
+    const { FromStateName: source, ToStateName: target } = transition;
+
+    return {
+      style: {
+        strokeWidth: 1.5,
+        stroke: "black"
+      },
+      type: "floating",
+      markerEnd: {
+        type: "arrowclosed",
+        color: "black"
+      },
+      sourceHandle: null,
+      targetHandle: null,
+      source,
+      target,
+      id: `reactflow__edge-${source}-${target}`,
+    }
+  };
+
+  return transitions.map(mapper);
+}
+
+export function transformEdgesToTransitions(edges: Edge[], existingTransitions: WorkflowConnection[]): WorkflowConnection[] {
+  const mapper = (edge: Edge): WorkflowConnection => {
+    const { source, target } = edge;
+
+    const foundTransition = existingTransitions.find(({ FromStateName, ToStateName }) => source === FromStateName && target === ToStateName)
+
+    return {
+      ...foundTransition,
+      FromStateName: source,
+      ToStateName: target,
+    }
+  };
+
+  return edges.map(mapper);
+}
+
+export function transformNewConnectionToTransition(connection: Connection, existingTransitions: WorkflowConnection[]): WorkflowConnection | null {
+  const { source, target } = connection;
+  
+  const foundTransition = existingTransitions.find(({ FromStateName, ToStateName }) => source === FromStateName && target === ToStateName)
+
+  return foundTransition || (source && target ? { FromStateName: source, ToStateName: target } : null);
 }

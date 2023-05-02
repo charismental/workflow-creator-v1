@@ -19,6 +19,8 @@ import StateNode from "../components/StateNode";
 
 import "../css/style.css";
 import "reactflow/dist/style.css";
+import { transformTransitionsToEdges } from "utils";
+import { WorkflowProcess } from "store/types";
 
 const connectionLineStyle = {
   strokeWidth: 1.5,
@@ -31,13 +33,10 @@ const nodeTypes: NodeTypes = {
 
 const selector = (state: MainState & MainActions) => ({
   nodes: state.nodes,
-  edges: state.edges,
+  activeProcess: state.activeProcess,
   onNodesChange: state.onNodesChange,
   onEdgesChange: state.onEdgesChange,
   setNodes: state.setNodes,
-  setEdges: state.setEdges,
-  allEdges: state.allEdges,
-  setAllEdges: state.setAllEdges,
   onConnect: state.onConnect,
   edgeType: state.edgeType,
 });
@@ -68,12 +67,9 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     nodes,
     setNodes,
     onNodesChange,
-    edges,
-    setEdges,
     onEdgesChange,
-    allEdges,
-    setAllEdges,
     onConnect,
+    activeProcess
   } = useMainStore(selector, shallow);
 
   const {
@@ -84,8 +80,9 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     updateNodesColor,
     roleIsToggled,
   } = props;
-
   const [items, setItems] = useState<MenuProps["items"]>();
+
+  const edges = transformTransitionsToEdges(activeProcess?.Roles?.find(r => r.RoleName === activeRole)?.Transitions || []);
 
   // const edgeContextMenuItems = (el: Edge): MenuProps['items'] => {
   //   return [{label: `Source: ${el.source}`, key: 1}, {label: `Target: ${el.target}`, key:2}]
@@ -136,37 +133,38 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   );
 
   // TODO: handle these behaviors intentionally
-  useEffect(() => {
-    if (
-      nodes.length &&
-      nodes.some((n: any) => n?.data.color !== roleColors[activeRole])
-    ) {
-      updateNodesColor();
-    }
-    // compare edges before doing this?
-    setEdges(allEdges?.[activeRole] || []);
-  }, [activeRole, nodes, allEdges[activeRole]]);
+  // useEffect(() => {
+  //   if (
+  //     nodes.length &&
+  //     nodes.some((n: any) => n?.data.color !== roleColors[activeRole])
+  //   ) {
+  //     updateNodesColor();
+  //   }
+  //   // compare edges before doing this?
+  //   setEdges(allEdges?.[activeRole] || []);
+  // }, [activeRole, nodes, allEdges[activeRole]]);
 
   // TODO: handle this intentionally on all edge changes
-  useEffect(() => {
-    const uniqueEdges = (arr: any) => {
-      return arr.filter(
-        (v: any, i: any, a: any) =>
-          a.findIndex((v2: any) =>
-            ["target", "source"].every((k) => v2[k] === v[k])
-          ) === i
-      );
-    };
+  // useEffect(() => {
+  //   const uniqueEdges = (arr: any) => {
+  //     return arr.filter(
+  //       (v: any, i: any, a: any) =>
+  //         a.findIndex((v2: any) =>
+  //           ["target", "source"].every((k) => v2[k] === v[k])
+  //         ) === i
+  //     );
+  //   };
 
-    const updatedEdges = {
-      ...allEdges,
-      [activeRole]: uniqueEdges(edges),
-    };
+  //   const updatedEdges = {
+  //     ...allEdges,
+  //     [activeRole]: uniqueEdges(edges),
+  //   };
 
-    if (!isEqual(allEdges, updatedEdges)) {
-      setAllEdges(updatedEdges);
-    }
-  }, [edges]);
+  //   if (!isEqual(allEdges, updatedEdges)) {
+  //     console.log(JSON.stringify(updatedEdges, null, 2))
+  //     setAllEdges(updatedEdges);
+  //   }
+  // }, [edges]);
 
   const onDragOver = useCallback((event: any) => {
     event.preventDefault();
@@ -229,7 +227,8 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
               ),
             },
           }))}
-          edges={allEdges?.[activeRole] || []}
+          // edges={allEdges?.[activeRole] || []}
+          edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
