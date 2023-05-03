@@ -33,7 +33,6 @@ const selector = (state: MainState & MainActions) => ({
   onNodesChange: state.onNodesChange,
   setStatesForActiveProcess: state.setStatesForActiveProcess,
   onConnect: state.onConnect,
-  edgeType: state.edgeType,
 });
 
 interface ReactFlowBaseProps {
@@ -63,7 +62,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     setStatesForActiveProcess,
     onNodesChange,
     onConnect,
-    activeProcess
+    activeProcess,
   } = useMainStore(selector, shallow);
 
   const {
@@ -77,9 +76,14 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   } = props;
   const [items, setItems] = useState<MenuProps["items"]>();
 
-  const edges = transformTransitionsToEdges(activeProcess?.Roles?.find(r => r.RoleName === activeRole)?.Transitions || []);
+  const edges = transformTransitionsToEdges(
+    activeProcess?.Roles?.find((r) => r.RoleName === activeRole)?.Transitions ||
+      []
+  );
 
-  const nodes = [...(activeProcess?.States || [])].sort((a, b) => a?.DisplayOrder || 1 - (b?.DisplayOrder || 0)).map((s, i, arr) => nodeByState({ state: s, index: i, allNodesLength: arr.length, color: activeRoleColor }));
+  const nodes = [...(activeProcess?.States || [])]
+    .sort((a, b) => a?.DisplayOrder || 1 - (b?.DisplayOrder || 0))
+    .map((state, index, arr) => nodeByState({ state, index, allNodesLength: arr.length, color: activeRoleColor }));
 
   const openEdgeContextMenu = useCallback((e: React.MouseEvent, el: Edge) => {
     e.preventDefault();
@@ -235,7 +239,19 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
           onEdgeContextMenu={openEdgeContextMenu}
           onNodeContextMenu={openNodeContextMenu}
         >
-          {!roleIsToggled && <div style={{ zIndex: 5000000, backgroundColor: 'darkGrey', opacity: .5, width: '100%', height: '100%', position: 'relative', cursor: 'not-allowed' }} />}
+          {!roleIsToggled && (
+            <div
+              style={{
+                zIndex: 5000000,
+                backgroundColor: "darkGrey",
+                opacity: 0.5,
+                width: "100%",
+                height: "100%",
+                position: "relative",
+                cursor: "not-allowed",
+              }}
+            />
+          )}
           <Background variant={BackgroundVariant.Dots} />
           <Controls />
         </ReactFlow>

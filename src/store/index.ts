@@ -23,7 +23,11 @@ import {
 } from "reactflow";
 
 import mockFetchAll from "data/mockFetchAll";
-import { nodeByState, stateByNode, transformNewConnectionToTransition } from "utils";
+import {
+  nodeByState,
+  stateByNode,
+  transformNewConnectionToTransition,
+} from "utils";
 
 // const initialRole = "Intake-Specialist";
 const initialRole = "system";
@@ -39,7 +43,6 @@ export interface MainState {
   _hasHydrated: boolean;
   nodes: Node[];
   edges: Edge[];
-  edgeType: string;
   activeProcess: WorkflowProcess | null;
 }
 
@@ -163,7 +166,13 @@ const useMainStore = create<MainState & MainActions>()(
           );
         }
       },
-      removeTransition: ({ source, target }: { source: string; target: string }) => {
+      removeTransition: ({
+        source,
+        target,
+      }: {
+        source: string;
+        target: string;
+      }) => {
         const { activeRole, activeProcess } = get();
 
         const { Roles = [] } = activeProcess || {};
@@ -175,7 +184,10 @@ const useMainStore = create<MainState & MainActions>()(
         if (foundRoleIndex !== -1 && activeProcess) {
           const { Transitions = [] } = Roles[foundRoleIndex];
 
-          const updatedTransitions = Transitions.filter(({ FromStateName, ToStateName }) => FromStateName !== source || ToStateName !== target);
+          const updatedTransitions = Transitions.filter(
+            ({ FromStateName, ToStateName }) =>
+              FromStateName !== source && ToStateName !== target
+          );
 
           const updatedRoles = Roles.map((r, i) =>
             i === foundRoleIndex ? { ...r, Transitions: updatedTransitions } : r
@@ -186,7 +198,7 @@ const useMainStore = create<MainState & MainActions>()(
               activeProcess: { ...activeProcess, Roles: updatedRoles },
             },
             false,
-            "removeTransitions",
+            "removeTransitions"
           );
         }
       },
@@ -338,8 +350,6 @@ const useMainStore = create<MainState & MainActions>()(
           false,
           "addNewStateItem"
         ),
-      edgeType: "Straight",
-      setEdgeType: (el: string) => set({ edgeType: el }, false, "setEdgeType"),
     }),
     {
       name: "Main-Store",
