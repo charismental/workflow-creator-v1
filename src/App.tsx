@@ -55,8 +55,6 @@ const storeSelector = (state: MainActions & MainState) => ({
   setAllSelfConnectingEdges: state.setAllSelfConnectingEdges,
   currentStates: state.states,
   addNewStateItem: state.addNewStateItem,
-  edgeType: state.edgeType,
-  setEdgeType: state.setEdgeType,
   fetchAll: state.fetchAll,
   loading: state.globalLoading,
 });
@@ -82,8 +80,6 @@ const WorkflowCreator = () => {
     setAllSelfConnectingEdges,
     currentStates,
     addNewStateItem,
-    edgeType,
-    setEdgeType,
     fetchAll,
     loading,
   } = useMainStore(storeSelector, shallow);
@@ -145,7 +141,8 @@ const WorkflowCreator = () => {
   const roleList = roles.map(({ RoleName }) => {
     return {
       label: RoleName,
-      value: activeProcess?.Roles?.some((r) => r.RoleName === RoleName) || false,
+      value:
+        activeProcess?.Roles?.some((r) => r.RoleName === RoleName) || false,
     };
   });
 
@@ -155,7 +152,17 @@ const WorkflowCreator = () => {
   };
 
   if (loading) {
-    return <Spin size="large" style={{ position: 'absolute', top: '50%', left: '50%' }} tip={<Title level={4} style={{ color: 'blue' }}>...Loading State</Title>} />
+    return (
+      <Spin
+        size="large"
+        style={{ position: "absolute", top: "50%", left: "50%" }}
+        tip={
+          <Title level={4} style={{ color: "blue" }}>
+            ...Loading State
+          </Title>
+        }
+      />
+    );
   }
 
   return (
@@ -182,7 +189,7 @@ const WorkflowCreator = () => {
                   !!activeProcess?.Roles?.some((r) => r.RoleName === activeRole)
                 }
                 updateColor={updateColor}
-                color={'#ddd'}
+                color={"#ddd"}
                 toggleRole={() => toggleRoleForProcess(activeRole)}
                 useStyle={{ flexGrow: 1 }}
               />
@@ -206,7 +213,11 @@ const WorkflowCreator = () => {
                 <StateCollapseBox
                   items={filteredStates(nodes)}
                   addNew={addNewStateItem}
-                  disabled={!activeProcess?.Roles?.some((r) => r.RoleName === activeRole)}
+                  disabled={
+                    !activeProcess?.Roles?.some(
+                      (r) => r.RoleName === activeRole
+                    )
+                  }
                 />
                 <SelectBox
                   addNew={addNewRole}
@@ -219,21 +230,6 @@ const WorkflowCreator = () => {
                   multiselectHandler={(el) => toggleRoleForProcess(el.label)}
                   selectOnChange={setActiveRole}
                 />
-                {/* <pre style={{ maxHeight: "20em", overflow: "scroll" }}>
-                  {JSON.stringify(
-                    OutputJSON({
-                      activeRole,
-                      allSelfConnectingEdges,
-                      findStateNameByNode,
-                    }),
-                    null,
-                    2
-                  )}
-                </pre>
-                <ToggleEdgeTypes
-                  edgeType={edgeType}
-                  setEdgeType={setEdgeType}
-                /> */}
               </>
             }
           />
