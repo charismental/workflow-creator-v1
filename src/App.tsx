@@ -1,21 +1,17 @@
 import { Layout, Space, Spin, Typography } from "antd";
+import { CSSProperties, useCallback, useEffect, useState } from "react";
+import { ReactFlowProvider } from "reactflow";
+import useMainStore from "store";
+import { shallow } from "zustand/shallow";
 import ActiveRoleSettings from "components/ActiveRoleSettings";
 import ReactFlowBase from "components/ReactFlowBase";
 import SelectBox from "components/SelectBox";
 import StateCollapseBox from "components/StateCollapseBox";
-import {
-  CSSProperties,
-  useCallback,
-  useEffect
-} from "react";
-import { ReactFlowProvider } from "reactflow";
-import "reactflow/dist/style.css";
-import type { MainActions, MainState } from "store";
-import useMainStore from "store";
-import { roleColor } from "utils";
-import { shallow } from "zustand/shallow";
 import Sidebar from "./components/Sidebar";
+import "reactflow/dist/style.css";
 import "./css/style.css";
+import type { MainActions, MainState } from "store";
+import { roleColor } from "utils";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -48,13 +44,12 @@ const storeSelector = (state: MainActions & MainState) => ({
   activeRole: state.activeRole,
   setActiveRole: state.setActiveRole,
   roles: state.roles,
-  addNewRole: state.addNewRole,
-  setStatesForActiveProcess: state.setStatesForActiveProcess,
   setColorForActiveRole: state.setColorForActiveRole,
   allSelfConnectingEdges: state.allSelfConnectingEdges,
   setAllSelfConnectingEdges: state.setAllSelfConnectingEdges,
   currentStates: state.states,
   addNewState: state.addNewState,
+  addNewRole: state.addNewRole,
   fetchAll: state.fetchAll,
   loading: state.globalLoading,
 });
@@ -71,13 +66,12 @@ const WorkflowCreator = () => {
     activeRole,
     setActiveRole,
     roles,
-    addNewRole,
-    setStatesForActiveProcess,
     setColorForActiveRole,
     allSelfConnectingEdges,
     setAllSelfConnectingEdges,
     currentStates,
     addNewState,
+    addNewRole,
     fetchAll,
     loading,
   } = useMainStore(storeSelector, shallow);
@@ -90,13 +84,6 @@ const WorkflowCreator = () => {
     fetchAll();
   }, []);
 
-  const addRole = ({ color, name }: { color: string; name?: string }) => {
-    if (!name) return;
-    addNewRole(color, name)
-    toggleRoleForProcess(name);
-    setActiveRole(name);
-  };
-
   const activeRoleColor = roleColor({
     roleName: activeRole,
     allRoles: activeProcess?.Roles || [],
@@ -106,20 +93,23 @@ const WorkflowCreator = () => {
 
   const availableProcesses = processes.map((p) => p.ProcessName);
 
-  const roleList = useCallback(() => {
-    const currentRoles = roles.map(({ RoleName }) => {
-      return {
-        label: RoleName,
-        value:
-          activeProcess?.Roles?.some((r) => r.RoleName === RoleName) || false,
-      };
-    });
-    return currentRoles;
-  },[roles]);
+  const roleList = roles.map(({ RoleName }) => {
+    return {
+      label: RoleName,
+      value:
+        activeProcess?.Roles?.some((r) => r.RoleName === RoleName) || false,
+    };
+  });
 
   const addNewProcessAndSelect = ({ name }: { name: string }) => {
     addProcess(name);
     setActiveProcess(name);
+  };
+
+  const addNewRoleAndToggle = ({ name, color }: { name: string; color: string}) => {
+    addNewRole(name);
+    toggleRoleForProcess(name, color);
+    setActiveRole(name)
   };
 
   if (loading) {
@@ -191,10 +181,10 @@ const WorkflowCreator = () => {
                   }
                 />
                 <SelectBox
-                  addNew={addRole}
+                  addNew={addNewRoleAndToggle}
                   placeholder="Select Role"
                   selectValue={activeRole}
-                  items={roleList()}
+                  items={roleList}
                   type={"role"}
                   hasColorInput
                   useStyle={{ width: "100%" }}

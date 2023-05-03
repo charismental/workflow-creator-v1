@@ -3,12 +3,12 @@ import { defaultColors } from "data";
 import { create } from "zustand";
 // import { persist } from 'zustand/middleware';
 import {
-  Connection,
-  Edge,
-  NodeChange,
   OnConnect,
   OnNodesChange,
-  applyNodeChanges
+  Edge,
+  applyNodeChanges,
+  NodeChange,
+  Connection,
 } from "reactflow";
 import { devtools } from "zustand/middleware";
 import {
@@ -53,10 +53,10 @@ export interface MainActions {
   setAllSelfConnectingEdges: (allSelfConnectingEdges: {
     [roleName: string]: WorkflowConnection[];
   }) => void;
-  toggleRoleForProcess: (role: string) => void;
+  toggleRoleForProcess: (role: string, color?: string) => void;
   filteredStates: (existingStates: WorkflowState[]) => string[];
   addNewState: (name: string) => void;
-  addNewRole: (name: string, color?: string) => void;
+  addNewRole: (role: string) => void;
   setHasHydrated: (state: boolean) => void;
   onNodesChange: OnNodesChange;
   onConnect: OnConnect;
@@ -280,7 +280,7 @@ const useMainStore = create<MainState & MainActions>()(
           false,
           "deleteProcess"
         ),
-      toggleRoleForProcess: (role) => {
+      toggleRoleForProcess: (role, color) => {
         const { activeProcess } = get();
 
         if (activeProcess) {
@@ -294,7 +294,7 @@ const useMainStore = create<MainState & MainActions>()(
             const newRole = {
               RoleName: role,
               Properties: {
-                color: roleColor({ roleName: role, allRoles: Roles, index: Roles.length }),
+                color: color || roleColor({ roleName: role, allRoles: Roles, index: Roles.length }),
               },
               Transitions: [],
             };
@@ -344,14 +344,6 @@ const useMainStore = create<MainState & MainActions>()(
               !existingStates.some((s) => s.StateName === stateName)
           );
       },
-      addNewRole: (name, color) =>
-        set(({ roles }) => {
-          const newRole = {
-            RoleName: name,
-            Properties: { color: color }
-          };
-          return { roles: roles.concat(newRole) }
-        }, false, 'addNewrole'),
       addNewState: (name) =>
         set(
           ({ states }) => {
@@ -364,6 +356,18 @@ const useMainStore = create<MainState & MainActions>()(
           },
           false,
           "addNewState"
+        ),
+      addNewRole: (role: string) =>
+        set(
+          ({ roles }) => {
+            const newRole = {
+              RoleName: role,
+            };
+
+            return { roles: roles.concat(newRole) };
+          },
+          false,
+          "addNewRole"
         ),
     }),
     {
