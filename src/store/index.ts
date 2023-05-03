@@ -56,7 +56,7 @@ export interface MainActions {
   toggleRoleForProcess: (role: string) => void;
   filteredStates: (existingStates: WorkflowState[]) => string[];
   addNewState: (name: string) => void;
-  addNewRole: (color?: string, name: string) => void;
+  addNewRole: (name: string, color?: string) => void;
   setHasHydrated: (state: boolean) => void;
   onNodesChange: OnNodesChange;
   onConnect: OnConnect;
@@ -344,7 +344,7 @@ const useMainStore = create<MainState & MainActions>()(
               !existingStates.some((s) => s.StateName === stateName)
           );
       },
-      addNewRole: (color, name) =>
+      addNewRole: (name, color) =>
         set(({ roles }) => {
           const newRole = {
             RoleName: name,

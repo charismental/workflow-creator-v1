@@ -114,7 +114,6 @@ const WorkflowCreator = () => {
           activeProcess?.Roles?.some((r) => r.RoleName === RoleName) || false,
       };
     });
-    console.log(roles)
     return currentRoles;
   },[roles]);
 
