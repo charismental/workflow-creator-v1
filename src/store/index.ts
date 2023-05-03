@@ -66,7 +66,6 @@ export interface MainActions {
   onConnect: OnConnect;
   removeTransition: (payload: { source: string; target: string }) => void;
   setStatesForActiveProcess: (states: WorkflowState[]) => void;
-  setEdgeType: (el: string) => void;
   setActiveProcess: (processName: string) => void;
 }
 
@@ -97,19 +96,38 @@ const useMainStore = create<MainState & MainActions>()(
       onNodesChange: (changes: NodeChange[]) => {
         const { activeProcess, activeRole } = get();
         if (activeProcess) {
-          const activeRoleIndex = (activeProcess?.Roles || []).findIndex(({ RoleName }) => RoleName === activeRole);
-          const { Properties = {} } = activeProcess.Roles?.[activeRoleIndex] || {};
+          const activeRoleIndex = (activeProcess?.Roles || []).findIndex(
+            ({ RoleName }) => RoleName === activeRole
+          );
+          const { Properties = {} } =
+            activeProcess.Roles?.[activeRoleIndex] || {};
 
-          const nodeColor = Properties?.color || defaultColors?.[activeRoleIndex];
+          const nodeColor =
+            Properties?.color || defaultColors?.[activeRoleIndex];
 
           const { States: allStates = [] } = activeProcess || {};
 
-          const nodes = allStates.map((s, i, arr) => nodeByState({ state: s, index: i, allNodesLength: arr.length, color: nodeColor }));
+          const nodes = allStates.map((s, i, arr) =>
+            nodeByState({
+              state: s,
+              index: i,
+              allNodesLength: arr.length,
+              color: nodeColor,
+            })
+          );
           const updatedNodes = applyNodeChanges(changes, nodes);
 
           set(
             {
-              activeProcess: { ...activeProcess, States: updatedNodes.map((node) => stateByNode({ node: { ...node, data: { ...node.data, color: nodeColor } }, allStates })) },
+              activeProcess: {
+                ...activeProcess,
+                States: updatedNodes.map((node) =>
+                  stateByNode({
+                    node: { ...node, data: { ...node.data, color: nodeColor } },
+                    allStates,
+                  })
+                ),
+              },
             },
             false,
             "onNodesChange"
@@ -325,7 +343,7 @@ const useMainStore = create<MainState & MainActions>()(
             return { states: newStatesObj };
           },
           false,
-          "addNewStateItem",
+          "addNewStateItem"
         ),
     }),
     {
