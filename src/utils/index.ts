@@ -1,5 +1,6 @@
+import { defaultColors } from 'data';
 import { Edge, MarkerType, Position, Node, Connection } from 'reactflow';
-import { WorkflowConnection, WorkflowState } from 'store/types';
+import { WorkflowConnection, WorkflowRole, WorkflowState } from 'store/types';
 
 interface IntersectionNodeType {
   width: any;
@@ -206,4 +207,16 @@ export function stateByNode({ node, allStates }: { node: Node | any; allStates: 
   const Properties = { ...positionAbsolute, h, w }
 
   return { ...foundState, StateName, Properties };
+};
+
+export function roleColor({ roleName, allRoles, index }: { roleName: string; allRoles: WorkflowRole[]; index?: any }): string {
+  const availableDefaultColors = defaultColors;
+
+  const roleIndex = index || allRoles.findIndex(({ RoleName }) => RoleName === roleName);
+
+  if (roleIndex !== -1) {
+    return allRoles[roleIndex]?.Properties?.color || availableDefaultColors[roleIndex % availableDefaultColors.length]
+  }
+
+  return '#d4d4d4';
 };

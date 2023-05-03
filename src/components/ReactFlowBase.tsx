@@ -33,12 +33,12 @@ const selector = (state: MainState & MainActions) => ({
   onNodesChange: state.onNodesChange,
   setStatesForActiveProcess: state.setStatesForActiveProcess,
   onConnect: state.onConnect,
+  activeProcessStates: state.activeProcess?.States || [],
 });
 
 interface ReactFlowBaseProps {
   allSelfConnectingEdges: any;
   setAllSelfConnectingEdges: any;
-  roleColors: any;
   activeRoleColor?: string;
   activeRole: any;
   updateNodesColor: any;
@@ -63,12 +63,12 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     onNodesChange,
     onConnect,
     activeProcess,
+    activeProcessStates
   } = useMainStore(selector, shallow);
 
   const {
     allSelfConnectingEdges,
     setAllSelfConnectingEdges,
-    roleColors,
     activeRole,
     activeRoleColor,
     updateNodesColor,
@@ -177,34 +177,21 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
       const type = event.dataTransfer.getData("application/reactflow");
 
       // check if the dropped element is valid
-      if (typeof type === "undefined" || !type) {
-        return;
-      }
-
-      if (!reactFlowInstance || !reactFlowBounds) {
-        return;
-      }
+      if (!type || !reactFlowInstance || !reactFlowBounds) return;
 
       const position = reactFlowInstance.project({
         x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top,
       });
 
-      const newNode = {
-        id: type,
-        dragHandle: ".drag-handle",
-        type: "custom",
-        position,
-        data: {
-          label: type,
-          color: roleColors[activeRole], // todo
-          toggleSelfConnected,
-        },
-        positionAbsolute: { ...position },
+      const newState = {
+        StateName: type,
+        DisplayOrder: Math.max(...activeProcessStates.map(({ DisplayOrder }) => DisplayOrder || 0)) + 10,
+        Properties: { ...position },
       };
 
-      const updatedNodes = nodes.concat(newNode);
-      setStatesForActiveProcess([]);
+      const updatedStates = activeProcessStates.concat(newState);
+      setStatesForActiveProcess(updatedStates);
     },
     [reactFlowInstance, setStatesForActiveProcess, activeRole, nodes]
   );

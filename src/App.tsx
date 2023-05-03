@@ -15,7 +15,7 @@ import OutputJSON from "components/OutputJSON";
 import ToggleEdgeTypes from "components/ToggleEdgeTypes";
 import type { MainActions, MainState } from "store";
 import { defaultColors } from "data";
-import { nodeByState } from "utils";
+import { nodeByState, roleColor } from "utils";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -106,9 +106,7 @@ const WorkflowCreator = () => {
     setActiveRole(name);
   };
 
-  const activeRoleIndex = (activeProcess?.Roles || []).findIndex(({ RoleName }) => RoleName === activeRole);
-
-  const activeRoleColor = activeProcess?.Roles?.[activeRoleIndex]?.Properties?.color || defaultColors?.[activeRoleIndex];
+  const activeRoleColor = roleColor({ roleName: activeRole, allRoles: activeProcess?.Roles || []})
 
   const updateNodesColor = useCallback(() => {
     // setStatesForActiveProcess(
@@ -197,7 +195,6 @@ const WorkflowCreator = () => {
                 }
                 allSelfConnectingEdges={allSelfConnectingEdges}
                 setAllSelfConnectingEdges={setAllSelfConnectingEdges}
-                roleColors={{}}
                 activeRoleColor={activeRoleColor}
                 updateNodesColor={updateNodesColor}
                 activeRole={activeRole}

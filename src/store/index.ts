@@ -25,6 +25,7 @@ import {
 import mockFetchAll from "data/mockFetchAll";
 import {
   nodeByState,
+  roleColor,
   stateByNode,
   transformNewConnectionToTransition,
 } from "utils";
@@ -285,41 +286,38 @@ const useMainStore = create<MainState & MainActions>()(
           false,
           "deleteProcess"
         ),
-      // fix
-      toggleRoleForProcess: (role) =>
-        set(
-          ({ processes, activeProcess, roles: globalRoles }) => {
-            const foundProcessIndex = processes.findIndex(
-              (process) => process.ProcessName === activeProcess?.ProcessName
-            );
+      toggleRoleForProcess: (role) => {
+        const { activeProcess } = get();
 
-            const updatedProcesses = [...processes];
+        if (activeProcess) {
+          const { Roles = [] } = activeProcess;
 
-            if (foundProcessIndex !== -1) {
-              const updatedProcess = processes[foundProcessIndex];
-              const { Roles = [] } = updatedProcess;
-              const foundRole = Roles.find((r) => r?.RoleName === role);
+          let updatedRoles = Roles;
 
-              if (foundRole) {
-                updatedProcess.Roles = Roles.filter((r) => r.RoleName !== role);
-              } else {
-                const { RoleId } =
-                  globalRoles.find((el) => el.RoleName === role) || {};
-                const newRole = {
-                  ...(RoleId && { RoleId }),
-                  RoleName: role,
-                  Transitions: [],
-                };
+          if (Roles.some(({ RoleName }) => RoleName === role)) {
+            updatedRoles = Roles.filter(({ RoleName }) => RoleName !== role);
+          } else {
+            const newRole = {
+              RoleName: role,
+              Properties: {
+                color: roleColor({ roleName: role, allRoles: Roles, index: Roles.length }),
+              },
+              Transitions: [],
+            };
 
-                updatedProcess.Roles = Roles.concat(newRole);
-              }
-            }
+            updatedRoles = Roles.concat(newRole);
+          }
 
-            return { processes: updatedProcesses };
-          },
-          false,
-          "toggleRoleForProcess"
-        ),
+
+          set(
+            {
+              activeProcess: { ...activeProcess, Roles: updatedRoles },
+            },
+            false,
+            "toggleRoleForProcess"
+          );
+        }
+      },
       filteredStates: (existingStates) => {
         const { states } = get();
 

@@ -72,7 +72,6 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
         className="edge_path"
         d={edgePath}
         markerEnd={markerEnd}
-        // style={style}
         stroke={isHover ? "#0ff" : "black"}
       />
       <foreignObject
@@ -89,7 +88,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
           <Button
             className="edgebutton"
             onClick={onEdgeClick}
-            icon={<CloseCircleOutlined />}
+            icon={<CloseCircleOutlined className="dumb-icon" />}
           />
         </div>
       </foreignObject>
