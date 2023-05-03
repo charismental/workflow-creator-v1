@@ -130,9 +130,7 @@ const WorkflowCreator = () => {
     [activeRole, updateNodesColor]
   );
 
-  // const availableStates = filteredStates(activeProcess?.States || [])
-  const availableStates = []
-
+  const availableStates = filteredStates(activeProcess?.States || [])
 
   const availableProcesses = processes.map((p) => p.ProcessName);
 
