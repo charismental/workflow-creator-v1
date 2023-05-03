@@ -23,7 +23,7 @@ import {
 } from "reactflow";
 
 import mockFetchAll from "data/mockFetchAll";
-import { transformNewConnectionToTransition } from "utils";
+import { nodeByState, stateByNode, transformNewConnectionToTransition } from "utils";
 
 // const initialRole = "Intake-Specialist";
 const initialRole = "system";
@@ -46,7 +46,6 @@ export interface MainState {
 export interface MainActions {
   fetchAll: (env?: string) => Promise<any>;
   setActiveRole: (role: string) => void;
-  setStates: (el: any) => void;
   addProcess: (processName: string) => void;
   updateProcess: (payload: {
     processIndex: number;
@@ -96,16 +95,24 @@ const useMainStore = create<MainState & MainActions>()(
       nodes: [],
       edges: [],
       onNodesChange: (changes: NodeChange[]) => {
-        set(
-          {
-            nodes: applyNodeChanges(changes, get().nodes),
-          },
-          false,
-          "onNodesChange"
-        );
+        const { activeProcess } = get();
+
+        const { States: allStates = [] } = activeProcess || {};
+
+        const nodes = allStates.map((s, i, arr) => nodeByState(s, i, arr.length));
+        const updatedNodes = applyNodeChanges(changes, nodes);
+
+        if (activeProcess) {
+          set(
+            {
+              activeProcess: { ...activeProcess, States: updatedNodes.map((node) => stateByNode({ node, allStates })) },
+            },
+            false,
+            "onNodesChange"
+          );
+        }
       },
       onConnect: (connection: Connection) => {
-        console.log('onconnect', connection)
         const { activeRole, activeProcess } = get();
 
         const { Roles = [] } = activeProcess || {};
@@ -152,7 +159,7 @@ const useMainStore = create<MainState & MainActions>()(
         if (foundRoleIndex !== -1 && activeProcess) {
           const { Transitions = [] } = Roles[foundRoleIndex];
 
-          const updatedTransitions = Transitions.filter(({ FromStateName, ToStateName }) => FromStateName !== source && ToStateName !== target);
+          const updatedTransitions = Transitions.filter(({ FromStateName, ToStateName }) => FromStateName !== source || ToStateName !== target);
 
           const updatedRoles = Roles.map((r, i) =>
             i === foundRoleIndex ? { ...r, Transitions: updatedTransitions } : r
@@ -191,18 +198,6 @@ const useMainStore = create<MainState & MainActions>()(
       setActiveRole: (role) =>
         set(() => ({ activeRole: role }), false, "setActiveRole"),
       states: [],
-      setStates: (el) =>
-        set(
-          ({ states }) => {
-            const newStateObj = {
-              ...states,
-              el,
-            };
-            return { states: newStateObj };
-          },
-          false,
-          "setStates"
-        ),
       allSelfConnectingEdges: {},
       setAllSelfConnectingEdges: (allSelfConnectingEdges) =>
         set(

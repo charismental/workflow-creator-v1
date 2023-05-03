@@ -17,6 +17,9 @@ export interface WorkflowState {
         h?: number;
         w?: number;
     };
+    // tempChangeProps?: {
+    //     [key: string]: any;
+    // };
 }
 
 export interface WorkflowRole {

@@ -6,9 +6,8 @@ import {
   getStraightPath,
   useStore as useReactFlowStore,
   Position,
-  Node,
 } from 'reactflow';
-import { getEdgeParams } from '../utils';
+import { getEdgeParams, nodeByState } from '../utils';
 import { getSmartEdge } from '@tisoap/react-flow-smart-edge';
 
 import useMainStore from 'store';
@@ -35,10 +34,9 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
     shallow
   );
 
-  const nodes = useMainStore(
-    (state) => state.nodes,
-    shallow
-  );
+  const states = useMainStore((state) => state.activeProcess?.States || []);
+
+  const nodes = states.map((node, i) => nodeByState(node, i, states.length));
 
   const [isHover, setIsHover] = useState<boolean | null>(null);
 
@@ -96,20 +94,20 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
 
   const onEdgeClick = (
     event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>,
-    id: string
   ) => {
     event.stopPropagation();
     removeTransition({ source, target })
     setIsHover(false);
   };
-
   const sourceNode = useReactFlowStore(
     useCallback((store) => store.nodeInternals.get(source), [source])
   );
 
+  
   const targetNode = useReactFlowStore(
     useCallback((store) => store.nodeInternals.get(target), [target])
   );
+    
 
   if (!sourceNode || !targetNode) {
     return null;
@@ -118,13 +116,13 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
   const { sx, sy, tx, ty } = getEdgeParams(sourceNode, targetNode);
 
   const getSmartEdgeResponse = getSmartEdge({
-    sourcePosition: sourceNode.sourcePosition || Position.Top,
-    targetPosition: targetNode.sourcePosition || Position.Bottom,
+    sourcePosition: Position.Top,
+    targetPosition: Position.Bottom,
     sourceX: sx,
     sourceY: sy,
     targetX: tx,
     targetY: ty,
-    nodes: nodes,
+    nodes,
     // Pass down options in the getSmartEdge object
     options:
       edgeType === 'Straight'
@@ -181,7 +179,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
         <div>
           <Button
             className="edgebutton"
-            onClick={(event) => onEdgeClick(event, id)}
+            onClick={onEdgeClick}
             icon={<CloseCircleOutlined />}
           />
         </div>

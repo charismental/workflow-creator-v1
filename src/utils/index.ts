@@ -169,8 +169,8 @@ export function nodeByState(state: WorkflowState, index: number, allNodesLength:
   const { StateName, Properties = {} } = state;
   const defaultW = 200;
   const defaultH = 30;
-  const defaultXPadding = 30;
-  const defaultYPadding = 20;
+  const defaultXPadding = 50;
+  const defaultYPadding = 40;
   const divisor = 5; // todo
 
   const { x: propX, y: propY, w: width = defaultW, h: height = defaultH } = Properties;
@@ -195,7 +195,6 @@ export function nodeByState(state: WorkflowState, index: number, allNodesLength:
     },
     width,
     height,
-    selected: true,
     dragging: false
   }
 };

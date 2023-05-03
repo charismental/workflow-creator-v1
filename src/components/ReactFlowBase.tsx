@@ -8,12 +8,10 @@ import ReactFlow, {
   Edge,
 } from "reactflow";
 import defaultEdgeOptions from "data/defaultEdgeOptions";
-import isEqual from "lodash.isequal";
 import { shallow } from "zustand/shallow";
 import useMainStore, { MainActions, MainState } from "store";
 import CustomConnectionLine from "../components/CustomConnectionLine";
 import FloatingEdge from "../components/FloatingEdge";
-import { Dropdown } from "antd";
 import type { MenuProps } from "antd";
 import StateNode from "../components/StateNode";
 
@@ -32,7 +30,6 @@ const nodeTypes: NodeTypes = {
 };
 
 const selector = (state: MainState & MainActions) => ({
-  // nodes: state.nodes,
   activeProcess: state.activeProcess,
   onNodesChange: state.onNodesChange,
   setNodes: state.setNodes,
@@ -63,7 +60,6 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   }, [reactFlowInstance]);
 
   const {
-    // nodes,
     setNodes,
     onNodesChange,
     onConnect,
@@ -196,7 +192,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
         position,
         data: {
           label: type,
-          color: roleColors[activeRole],
+          color: roleColors[activeRole], // todo
           toggleSelfConnected,
         },
         positionAbsolute: { ...position },
@@ -223,7 +219,6 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
               ),
             },
           }))}
-          // edges={allEdges?.[activeRole] || []}
           edges={edges}
           onNodesChange={onNodesChange}
           onConnect={onConnect}
