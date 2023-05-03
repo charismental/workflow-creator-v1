@@ -62,6 +62,7 @@ export interface MainActions {
   onNodesChange: OnNodesChange;
   onConnect: OnConnect;
   removeTransition: (payload: { source: string; target: string }) => void;
+  removeState: (stateName: string) => void;
   setStatesForActiveProcess: (states: WorkflowState[]) => void;
   setActiveProcess: (processName: string) => void;
   setColorForActiveRole: (newColor: string) => void;
@@ -214,6 +215,32 @@ const useMainStore = create<MainState & MainActions>()(
             },
             false,
             "removeTransition"
+          );
+        }
+      },
+      removeState: (stateName: string) => {
+        const { activeProcess } = get();
+
+        const { Roles = [] } = activeProcess || {};
+
+        if (activeProcess) {
+          const transitionsFilter = (transitions: WorkflowConnection[]) => {
+            return transitions.filter(
+              ({ FromStateName, ToStateName }) =>
+                FromStateName !== stateName && ToStateName !== stateName
+            );
+          }
+
+          const updatedRoles = Roles.map(r => ({ ...r, Transitions: transitionsFilter(r?.Transitions || []) }));
+
+          const updatedStates = activeProcess.States?.filter(s => s.StateName !== stateName);
+
+          set(
+            {
+              activeProcess: { ...activeProcess, Roles: updatedRoles, States: updatedStates },
+            },
+            false,
+            "removeState"
           );
         }
       },

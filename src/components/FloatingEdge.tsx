@@ -1,17 +1,14 @@
 import { CloseCircleOutlined } from "@ant-design/icons";
 import { Button } from "antd";
-import { FunctionComponent, useCallback, useEffect, useState } from "react";
+import { FunctionComponent, useCallback, useState } from "react";
 import {
   EdgeProps,
   getStraightPath,
   useStore as useReactFlowStore,
-  Position,
 } from "reactflow";
 import { getEdgeParams, nodeByState } from "../utils";
-import { getSmartEdge } from "@tisoap/react-flow-smart-edge";
 import useMainStore from "store";
 import { shallow } from "zustand/shallow";
-// import { bezierResult, stepResult, straightResult } from "data/edgeOptions";
 
 const foreignObjectSize = 40;
 

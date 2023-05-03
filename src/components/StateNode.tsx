@@ -9,6 +9,8 @@ import {
   Position,
   useStore as useReactFlowStore,
 } from "reactflow";
+import useMainStore from 'store';
+import { shallow } from 'zustand/shallow';
 
 const checkboxStyle: CSSProperties = {
   position: "absolute",
@@ -27,6 +29,10 @@ const StateNode: FunctionComponent<NodeProps> = ({
   isConnectable,
   data,
 }): JSX.Element => {
+  const removeState = useMainStore(
+    (state) => state.removeState,
+    shallow
+  );
   const [isMouseOver, setIsMouseOver] = useState(false);
   const { toggleSelfConnected, selfConnected = false } = data;
 
@@ -81,9 +87,7 @@ const StateNode: FunctionComponent<NodeProps> = ({
             checked={selfConnected}
             onChange={() => toggleSelfConnected(id)}
           />
-          {/* <div className="state-delete-button" onClick={removeNode} />
-           */}
-          <div className="state-delete-button" />
+          <div className="state-delete-button" onClick={() => removeState(data.label)} />
         </>
       )}
 
