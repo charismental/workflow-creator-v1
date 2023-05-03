@@ -2,6 +2,14 @@
 import { defaultColors } from "data";
 import { create } from "zustand";
 // import { persist } from 'zustand/middleware';
+import {
+  Connection,
+  Edge,
+  NodeChange,
+  OnConnect,
+  OnNodesChange,
+  applyNodeChanges
+} from "reactflow";
 import { devtools } from "zustand/middleware";
 import {
   WorkflowConnection,
@@ -9,18 +17,6 @@ import {
   WorkflowRole,
   WorkflowState,
 } from "./types";
-import {
-  Node,
-  OnConnect,
-  OnNodesChange,
-  Edge,
-  addEdge,
-  applyNodeChanges,
-  applyEdgeChanges,
-  NodeChange,
-  EdgeChange,
-  Connection,
-} from "reactflow";
 
 import mockFetchAll from "data/mockFetchAll";
 import {
@@ -60,6 +56,7 @@ export interface MainActions {
   toggleRoleForProcess: (role: string) => void;
   filteredStates: (existingStates: WorkflowState[]) => string[];
   addNewState: (name: string) => void;
+  addNewRole: (name: string, color?: string) => void;
   setHasHydrated: (state: boolean) => void;
   onNodesChange: OnNodesChange;
   onConnect: OnConnect;
@@ -347,6 +344,14 @@ const useMainStore = create<MainState & MainActions>()(
               !existingStates.some((s) => s.StateName === stateName)
           );
       },
+      addNewRole: (name, color) =>
+        set(({ roles }) => {
+          const newRole = {
+            RoleName: name,
+            Properties: { color: color }
+          };
+          return { roles: roles.concat(newRole) }
+        }, false, 'addNewrole'),
       addNewState: (name) =>
         set(
           ({ states }) => {
