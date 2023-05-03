@@ -36,13 +36,12 @@ const initialRole = "system";
 export interface MainState {
   globalLoading: boolean;
   activeRole: string;
-  states: Array<WorkflowState>;
-  processes: Array<WorkflowProcess>;
   allSelfConnectingEdges: { [roleName: string]: WorkflowConnection[] };
-  roles: Array<WorkflowRole>;
   _hasHydrated: boolean;
-  nodes: Node[];
+  processes: WorkflowProcess[];
   edges: Edge[];
+  states: WorkflowState[];
+  roles: WorkflowRole[];
   activeProcess: WorkflowProcess | null;
 }
 
@@ -58,7 +57,6 @@ export interface MainActions {
   setAllSelfConnectingEdges: (allSelfConnectingEdges: {
     [roleName: string]: WorkflowConnection[];
   }) => void;
-  setRoles: (roles: Array<WorkflowRole>) => void;
   toggleRoleForProcess: (role: string) => void;
   filteredStates: (existingStates: WorkflowState[]) => string[];
   addNewStateItem: (name: string) => void;
@@ -68,6 +66,7 @@ export interface MainActions {
   removeTransition: (payload: { source: string; target: string }) => void;
   setStatesForActiveProcess: (states: WorkflowState[]) => void;
   setActiveProcess: (processName: string) => void;
+  setColorForActiveRole: (newColor: string) => void;
 }
 
 const useMainStore = create<MainState & MainActions>()(
@@ -92,8 +91,9 @@ const useMainStore = create<MainState & MainActions>()(
       globalLoading: false,
       _hasHydrated: false,
       setHasHydrated: (state) => set({ _hasHydrated: state }),
-      nodes: [],
       edges: [],
+      states: [],
+      roles: [],
       onNodesChange: (changes: NodeChange[]) => {
         const { activeProcess, activeRole } = get();
         if (activeProcess) {
@@ -234,7 +234,6 @@ const useMainStore = create<MainState & MainActions>()(
       activeRole: initialRole,
       setActiveRole: (role) =>
         set(() => ({ activeRole: role }), false, "setActiveRole"),
-      states: [],
       allSelfConnectingEdges: {},
       setAllSelfConnectingEdges: (allSelfConnectingEdges) =>
         set(
@@ -242,8 +241,6 @@ const useMainStore = create<MainState & MainActions>()(
           false,
           "setAllSelfConnectingEdges"
         ),
-      roles: [],
-      setRoles: (roles) => set(() => ({ roles }), false, "setRoles"),
       processes: [],
       updateProcess: ({
         processIndex,
@@ -316,6 +313,28 @@ const useMainStore = create<MainState & MainActions>()(
             false,
             "toggleRoleForProcess"
           );
+        }
+      },
+      setColorForActiveRole: (color: string) => {
+        const { activeProcess, activeRole } = get();
+
+        if (activeProcess) {
+          const { Roles = [] } = activeProcess;
+
+          const activeRoleIndex = Roles.findIndex(({ RoleName }) => RoleName === activeRole)
+
+          if (activeRoleIndex !== -1) {
+            const foundRole = Roles[activeRoleIndex];
+            const updatedRoles = Roles.map((r, i) => i !== activeRoleIndex ? r : { ...foundRole, Properties: { ...foundRole.Properties, color } })
+
+            set(
+              {
+                activeProcess: { ...activeProcess, Roles: updatedRoles },
+              },
+              false,
+              "setColorForActiveRole"
+            );
+          }
         }
       },
       filteredStates: (existingStates) => {

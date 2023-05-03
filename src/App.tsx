@@ -2,7 +2,6 @@ import { Layout, Space, Spin, Typography } from "antd";
 import { CSSProperties, useCallback, useEffect, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
 import useMainStore from "store";
-import { WorkflowProcess } from "store/types";
 import { shallow } from "zustand/shallow";
 import ActiveRoleSettings from "components/ActiveRoleSettings";
 import ReactFlowBase from "components/ReactFlowBase";
@@ -11,10 +10,7 @@ import StateCollapseBox from "components/StateCollapseBox";
 import Sidebar from "./components/Sidebar";
 import "reactflow/dist/style.css";
 import "./css/style.css";
-import OutputJSON from "components/OutputJSON";
-import ToggleEdgeTypes from "components/ToggleEdgeTypes";
 import type { MainActions, MainState } from "store";
-import { defaultColors } from "data";
 import { nodeByState, roleColor } from "utils";
 
 const { Header, Content } = Layout;
@@ -48,10 +44,8 @@ const storeSelector = (state: MainActions & MainState) => ({
   activeRole: state.activeRole,
   setActiveRole: state.setActiveRole,
   roles: state.roles,
-  setRoles: state.setRoles,
   setStatesForActiveProcess: state.setStatesForActiveProcess,
-  // roleColors: state.roleColors,
-  // setRoleColors: state.setRoleColors,
+  setColorForActiveRole: state.setColorForActiveRole,
   allSelfConnectingEdges: state.allSelfConnectingEdges,
   setAllSelfConnectingEdges: state.setAllSelfConnectingEdges,
   currentStates: state.states,
@@ -72,10 +66,8 @@ const WorkflowCreator = () => {
     activeRole,
     setActiveRole,
     roles,
-    setRoles,
     setStatesForActiveProcess,
-    // roleColors,
-    // setRoleColors,
+    setColorForActiveRole,
     allSelfConnectingEdges,
     setAllSelfConnectingEdges,
     currentStates,
@@ -107,26 +99,6 @@ const WorkflowCreator = () => {
   };
 
   const activeRoleColor = roleColor({ roleName: activeRole, allRoles: activeProcess?.Roles || []})
-
-  const updateNodesColor = useCallback(() => {
-    // setStatesForActiveProcess(
-    //   nodes.map((n: any) => ({
-    //     ...n,
-    //     data: {
-    //       ...n?.data,
-    //       // color: roleColors?.[activeRole] || "#d4d4d4",
-    //     },
-    //   }))
-    // );
-  }, [activeRole]);
-
-  const updateColor = useCallback(
-    (updatedColor: string) => {
-      // setRoleColors({ ...roleColors, [activeRole]: updatedColor });
-      updateNodesColor();
-    },
-    [activeRole, updateNodesColor]
-  );
 
   const availableStates = filteredStates(activeProcess?.States || [])
 
@@ -182,8 +154,8 @@ const WorkflowCreator = () => {
                 roleIsToggled={
                   !!activeProcess?.Roles?.some((r) => r.RoleName === activeRole)
                 }
-                updateColor={updateColor}
-                color={"#ddd"}
+                updateColor={setColorForActiveRole}
+                color={activeRoleColor}
                 toggleRole={() => toggleRoleForProcess(activeRole)}
                 useStyle={{ flexGrow: 1 }}
               />
@@ -196,7 +168,6 @@ const WorkflowCreator = () => {
                 allSelfConnectingEdges={allSelfConnectingEdges}
                 setAllSelfConnectingEdges={setAllSelfConnectingEdges}
                 activeRoleColor={activeRoleColor}
-                updateNodesColor={updateNodesColor}
                 activeRole={activeRole}
               />
             </Content>

@@ -41,7 +41,6 @@ interface ReactFlowBaseProps {
   setAllSelfConnectingEdges: any;
   activeRoleColor?: string;
   activeRole: any;
-  updateNodesColor: any;
   roleIsToggled: boolean;
 }
 const edgeTypes: any = {
@@ -71,7 +70,6 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     setAllSelfConnectingEdges,
     activeRole,
     activeRoleColor,
-    updateNodesColor,
     roleIsToggled,
   } = props;
   const [items, setItems] = useState<MenuProps["items"]>();
@@ -128,40 +126,6 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     },
     [activeRole, allSelfConnectingEdges, setAllSelfConnectingEdges]
   );
-
-  // TODO: handle these behaviors intentionally
-  // useEffect(() => {
-  //   if (
-  //     nodes.length &&
-  //     nodes.some((n: any) => n?.data.color !== roleColors[activeRole])
-  //   ) {
-  //     updateNodesColor();
-  //   }
-  //   // compare edges before doing this?
-  //   setEdges(allEdges?.[activeRole] || []);
-  // }, [activeRole, nodes, allEdges[activeRole]]);
-
-  // TODO: handle this intentionally on all edge changes
-  // useEffect(() => {
-  //   const uniqueEdges = (arr: any) => {
-  //     return arr.filter(
-  //       (v: any, i: any, a: any) =>
-  //         a.findIndex((v2: any) =>
-  //           ["target", "source"].every((k) => v2[k] === v[k])
-  //         ) === i
-  //     );
-  //   };
-
-  //   const updatedEdges = {
-  //     ...allEdges,
-  //     [activeRole]: uniqueEdges(edges),
-  //   };
-
-  //   if (!isEqual(allEdges, updatedEdges)) {
-  //     console.log(JSON.stringify(updatedEdges, null, 2))
-  //     setAllEdges(updatedEdges);
-  //   }
-  // }, [edges]);
 
   const onDragOver = useCallback((event: any) => {
     event.preventDefault();
