@@ -15,6 +15,7 @@ import OutputJSON from "components/OutputJSON";
 import ToggleEdgeTypes from "components/ToggleEdgeTypes";
 import type { MainActions, MainState } from "store";
 import { defaultColors } from "data";
+import { nodeByState } from "utils";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -48,7 +49,6 @@ const storeSelector = (state: MainActions & MainState) => ({
   setActiveRole: state.setActiveRole,
   roles: state.roles,
   setRoles: state.setRoles,
-  nodes: state.nodes,
   setStatesForActiveProcess: state.setStatesForActiveProcess,
   // roleColors: state.roleColors,
   // setRoleColors: state.setRoleColors,
@@ -73,7 +73,6 @@ const WorkflowCreator = () => {
     setActiveRole,
     roles,
     setRoles,
-    nodes,
     setStatesForActiveProcess,
     // roleColors,
     // setRoleColors,
@@ -107,15 +106,6 @@ const WorkflowCreator = () => {
     setActiveRole(name);
   };
 
-  const findStateNameByNode = useCallback(
-    (nodeId: string): string | undefined => {
-      const foundNode = nodes.find((node) => node.id === nodeId);
-
-      return foundNode?.data?.label;
-    },
-    [nodes]
-  );
-
   const activeRoleIndex = (activeProcess?.Roles || []).findIndex(({ RoleName }) => RoleName === activeRole);
 
   const activeRoleColor = activeProcess?.Roles?.[activeRoleIndex]?.Properties?.color || defaultColors?.[activeRoleIndex];
@@ -130,7 +120,7 @@ const WorkflowCreator = () => {
     //     },
     //   }))
     // );
-  }, [activeRole, nodes]);
+  }, [activeRole]);
 
   const updateColor = useCallback(
     (updatedColor: string) => {
@@ -139,6 +129,10 @@ const WorkflowCreator = () => {
     },
     [activeRole, updateNodesColor]
   );
+
+  // const availableStates = filteredStates(activeProcess?.States || [])
+  const availableStates = []
+
 
   const availableProcesses = processes.map((p) => p.ProcessName);
 
@@ -216,7 +210,7 @@ const WorkflowCreator = () => {
             children={
               <>
                 <StateCollapseBox
-                  items={filteredStates(nodes)}
+                  items={availableStates}
                   addNew={addNewStateItem}
                   disabled={
                     !activeProcess?.Roles?.some(

@@ -38,7 +38,6 @@ export interface MainState {
   states: Array<WorkflowState>;
   processes: Array<WorkflowProcess>;
   allSelfConnectingEdges: { [roleName: string]: WorkflowConnection[] };
-  // roleColors: { [key: string]: string };
   roles: Array<WorkflowRole>;
   _hasHydrated: boolean;
   nodes: Node[];
@@ -58,10 +57,9 @@ export interface MainActions {
   setAllSelfConnectingEdges: (allSelfConnectingEdges: {
     [roleName: string]: WorkflowConnection[];
   }) => void;
-  // setRoleColors: (el: { [key: string]: string }, processName?: string) => void;
   setRoles: (roles: Array<WorkflowRole>) => void;
   toggleRoleForProcess: (role: string) => void;
-  filteredStates: (nodes: Node[]) => string[];
+  filteredStates: (existingStates: WorkflowState[]) => string[];
   addNewStateItem: (name: string) => void;
   setHasHydrated: (state: boolean) => void;
   onNodesChange: OnNodesChange;
@@ -208,13 +206,6 @@ const useMainStore = create<MainState & MainActions>()(
             const process = processes.find(
               (p) => p.ProcessName === processName
             );
-            // const updatedColors: any = { ...(process?.colors || initialColors) };
-            // Object.keys(roles).forEach((role: string) => {
-            // if (!updatedColors[role]) {
-            // updatedColors[role] = defaultColor;
-            // }
-            // });
-            // setRoleColors(updatedColors, processName);
 
             return { activeProcess: process };
           },
@@ -232,20 +223,6 @@ const useMainStore = create<MainState & MainActions>()(
           false,
           "setAllSelfConnectingEdges"
         ),
-      // roleColors: { ...initialColors },
-      // setRoleColors: (colors, processName) =>
-      //   set(({ activeProcessName, processes, updateProcess }) => {
-      //     const processNameToUse = processName || activeProcessName;
-      //     const processIndex = processes.findIndex(
-      //       (p) => p.processName === processNameToUse
-      //     );
-
-      //     const process = { ...processes[processIndex], colors };
-
-      //     updateProcess({ processIndex, process });
-
-      //     return { roleColors: colors };
-      //   }),
       roles: [],
       setRoles: (roles) => set(() => ({ roles }), false, "setRoles"),
       processes: [],
@@ -271,7 +248,6 @@ const useMainStore = create<MainState & MainActions>()(
         set(
           ({ processes }) => {
             const newProcess = {
-              // ProcessId: processes.length + 1,
               ProcessName: name,
               Roles: [],
               States: [],
@@ -291,6 +267,7 @@ const useMainStore = create<MainState & MainActions>()(
           false,
           "deleteProcess"
         ),
+      // fix
       toggleRoleForProcess: (role) =>
         set(
           ({ processes, activeProcess, roles: globalRoles }) => {
@@ -325,14 +302,14 @@ const useMainStore = create<MainState & MainActions>()(
           false,
           "toggleRoleForProcess"
         ),
-      filteredStates: (nodes) => {
+      filteredStates: (existingStates) => {
         const { states } = get();
 
         return states
           .map((el) => el.StateName)
           .filter(
             (stateName: string) =>
-              !nodes.some((n) => n?.data?.label === stateName)
+              !existingStates.some((s) => s.StateName === stateName)
           );
       },
       // fix
@@ -348,7 +325,7 @@ const useMainStore = create<MainState & MainActions>()(
             return { states: newStatesObj };
           },
           false,
-          "addNewStateItem"
+          "addNewStateItem",
         ),
     }),
     {

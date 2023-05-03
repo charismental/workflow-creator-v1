@@ -52,7 +52,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
     useCallback((store) => store.nodeInternals.get(target), [target])
   );
 
-  if (!sourceNode || !targetNode) {
+  if (!sourceNode || !targetNode || (source === target)) {
     return null;
   }
 
