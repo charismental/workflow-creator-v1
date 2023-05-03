@@ -30,8 +30,6 @@ const StateNode: FunctionComponent<NodeProps> = ({
   data,
 }): JSX.Element => {
   const [isMouseOver, setIsMouseOver] = useState(false);
-  const [nodes, setNodes] = useMainStore((state) => [state.nodes, state.setNodes], shallow)
-  const [allSelfConnectingEdges, setAllSelfConnectingEdges] = useMainStore((state) => [state.allSelfConnectingEdges, state.setAllSelfConnectingEdges], shallow)
   const { toggleSelfConnected, selfConnected = false } = data;
 
   const connectionNodeId = useReactFlowStore(connectionNodeIdSelector);

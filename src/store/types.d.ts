@@ -26,7 +26,7 @@ export interface WorkflowRole {
     RoleId?: number;
     ProcessId?: number;
     RoleName: string;
-    Properties?: { color: string };
+    Properties?: { color?: string };
     Transitions?: WorkflowConnection[];
 }
 

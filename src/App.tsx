@@ -14,6 +14,7 @@ import "./css/style.css";
 import OutputJSON from "components/OutputJSON";
 import ToggleEdgeTypes from "components/ToggleEdgeTypes";
 import type { MainActions, MainState } from "store";
+import { defaultColors } from "data";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -48,7 +49,7 @@ const storeSelector = (state: MainActions & MainState) => ({
   roles: state.roles,
   setRoles: state.setRoles,
   nodes: state.nodes,
-  setNodes: state.setNodes,
+  setStatesForActiveProcess: state.setStatesForActiveProcess,
   // roleColors: state.roleColors,
   // setRoleColors: state.setRoleColors,
   allSelfConnectingEdges: state.allSelfConnectingEdges,
@@ -75,7 +76,7 @@ const WorkflowCreator = () => {
     roles,
     setRoles,
     nodes,
-    setNodes,
+    setStatesForActiveProcess,
     // roleColors,
     // setRoleColors,
     allSelfConnectingEdges,
@@ -93,7 +94,6 @@ const WorkflowCreator = () => {
   );
 
   useEffect(() => {
-    // setNodes(initialNodes);
     fetchAll();
   }, []);
 
@@ -120,17 +120,21 @@ const WorkflowCreator = () => {
     [nodes]
   );
 
+  const activeRoleIndex = (activeProcess?.Roles || []).findIndex(({ RoleName }) => RoleName === activeRole);
+
+  const activeRoleColor = activeProcess?.Roles?.[activeRoleIndex]?.Properties?.color || defaultColors?.[activeRoleIndex];
+
   const updateNodesColor = useCallback(() => {
-    setNodes(
-      nodes.map((n: any) => ({
-        ...n,
-        data: {
-          ...n?.data,
-          // color: roleColors?.[activeRole] || "#d4d4d4",
-        },
-      }))
-    );
-  }, [activeRole, setNodes, nodes]);
+    // setStatesForActiveProcess(
+    //   nodes.map((n: any) => ({
+    //     ...n,
+    //     data: {
+    //       ...n?.data,
+    //       // color: roleColors?.[activeRole] || "#d4d4d4",
+    //     },
+    //   }))
+    // );
+  }, [activeRole, nodes]);
 
   const updateColor = useCallback(
     (updatedColor: string) => {
@@ -195,6 +199,7 @@ const WorkflowCreator = () => {
                 allSelfConnectingEdges={allSelfConnectingEdges}
                 setAllSelfConnectingEdges={setAllSelfConnectingEdges}
                 roleColors={{}}
+                activeRoleColor={activeRoleColor}
                 updateNodesColor={updateNodesColor}
                 activeRole={activeRole}
               />

@@ -57,15 +57,14 @@ export interface MainActions {
   }) => void;
   // setRoleColors: (el: { [key: string]: string }, processName?: string) => void;
   setRoles: (roles: Array<WorkflowRole>) => void;
-  setNodes: (nodes: Node[], processName?: string) => void;
-  setEdges: (edges: Edge[]) => void;
   toggleRoleForProcess: (role: string) => void;
   filteredStates: (nodes: Node[]) => string[];
   addNewStateItem: (name: string) => void;
   setHasHydrated: (state: boolean) => void;
   onNodesChange: OnNodesChange;
   onConnect: OnConnect;
-  removeTransition: any; // todo
+  removeTransition: (payload: { source: string; target: string }) => void;
+  setStatesForActiveProcess: (states: WorkflowState[]) => void;
   setEdgeType: (el: string) => void;
   setActiveProcess: (processName: string) => void;
 }
@@ -95,20 +94,37 @@ const useMainStore = create<MainState & MainActions>()(
       nodes: [],
       edges: [],
       onNodesChange: (changes: NodeChange[]) => {
+        const { activeProcess, activeRole } = get();
+        if (activeProcess) {
+          const activeRoleIndex = (activeProcess?.Roles || []).findIndex(({ RoleName }) => RoleName === activeRole);
+          const { Properties = {} } = activeProcess.Roles?.[activeRoleIndex] || {};
+
+          const nodeColor = Properties?.color || defaultColors?.[activeRoleIndex];
+
+          const { States: allStates = [] } = activeProcess || {};
+
+          const nodes = allStates.map((s, i, arr) => nodeByState({ state: s, index: i, allNodesLength: arr.length, color: nodeColor }));
+          const updatedNodes = applyNodeChanges(changes, nodes);
+
+          set(
+            {
+              activeProcess: { ...activeProcess, States: updatedNodes.map((node) => stateByNode({ node: { ...node, data: { ...node.data, color: nodeColor } }, allStates })) },
+            },
+            false,
+            "onNodesChange"
+          );
+        }
+      },
+      setStatesForActiveProcess: (states: WorkflowState[]) => {
         const { activeProcess } = get();
-
-        const { States: allStates = [] } = activeProcess || {};
-
-        const nodes = allStates.map((s, i, arr) => nodeByState(s, i, arr.length));
-        const updatedNodes = applyNodeChanges(changes, nodes);
 
         if (activeProcess) {
           set(
             {
-              activeProcess: { ...activeProcess, States: updatedNodes.map((node) => stateByNode({ node, allStates })) },
+              activeProcess: { ...activeProcess, States: states },
             },
             false,
-            "onNodesChange"
+            "setStatesForActiveProcess"
           );
         }
       },
@@ -176,7 +192,7 @@ const useMainStore = create<MainState & MainActions>()(
       },
       setActiveProcess: (processName: string) =>
         set(
-          ({ processes, setNodes, roles, setEdges }) => {
+          ({ processes }) => {
             const process = processes.find(
               (p) => p.ProcessName === processName
             );
@@ -186,7 +202,6 @@ const useMainStore = create<MainState & MainActions>()(
             // updatedColors[role] = defaultColor;
             // }
             // });
-            // setNodes(process?.nodes || [], processName);
             // setRoleColors(updatedColors, processName);
 
             return { activeProcess: process };
@@ -221,24 +236,6 @@ const useMainStore = create<MainState & MainActions>()(
       //   }),
       roles: [],
       setRoles: (roles) => set(() => ({ roles }), false, "setRoles"),
-      setNodes: (nodes, processName) =>
-        set(
-          ({ activeProcess, processes, updateProcess }) => {
-            const processNameToUse = processName || activeProcess?.ProcessName;
-            const processIndex = processes.findIndex(
-              (p) => p.ProcessName === processNameToUse
-            );
-
-            const process = { ...processes[processIndex], nodes };
-
-            updateProcess({ processIndex, process });
-
-            return { nodes };
-          },
-          false,
-          "setNodes"
-        ),
-      setEdges: (edges) => set(() => ({ edges }), false, "setEdges"),
       processes: [],
       updateProcess: ({
         processIndex,

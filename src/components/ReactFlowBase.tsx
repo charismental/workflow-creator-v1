@@ -18,7 +18,6 @@ import StateNode from "../components/StateNode";
 import "../css/style.css";
 import "reactflow/dist/style.css";
 import { nodeByState, transformTransitionsToEdges } from "utils";
-import { WorkflowProcess } from "store/types";
 
 const connectionLineStyle = {
   strokeWidth: 1.5,
@@ -32,7 +31,7 @@ const nodeTypes: NodeTypes = {
 const selector = (state: MainState & MainActions) => ({
   activeProcess: state.activeProcess,
   onNodesChange: state.onNodesChange,
-  setNodes: state.setNodes,
+  setStatesForActiveProcess: state.setStatesForActiveProcess,
   onConnect: state.onConnect,
   edgeType: state.edgeType,
 });
@@ -41,6 +40,7 @@ interface ReactFlowBaseProps {
   allSelfConnectingEdges: any;
   setAllSelfConnectingEdges: any;
   roleColors: any;
+  activeRoleColor?: string;
   activeRole: any;
   updateNodesColor: any;
   roleIsToggled: boolean;
@@ -60,7 +60,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
   }, [reactFlowInstance]);
 
   const {
-    setNodes,
+    setStatesForActiveProcess,
     onNodesChange,
     onConnect,
     activeProcess
@@ -71,6 +71,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
     setAllSelfConnectingEdges,
     roleColors,
     activeRole,
+    activeRoleColor,
     updateNodesColor,
     roleIsToggled,
   } = props;
@@ -78,7 +79,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
   const edges = transformTransitionsToEdges(activeProcess?.Roles?.find(r => r.RoleName === activeRole)?.Transitions || []);
 
-  const nodes = [...(activeProcess?.States || [])].sort((a, b) => a?.DisplayOrder || 1 - (b?.DisplayOrder || 0)).map((s, i, arr) => nodeByState(s, i, arr.length));
+  const nodes = [...(activeProcess?.States || [])].sort((a, b) => a?.DisplayOrder || 1 - (b?.DisplayOrder || 0)).map((s, i, arr) => nodeByState({ state: s, index: i, allNodesLength: arr.length, color: activeRoleColor }));
 
   const openEdgeContextMenu = useCallback((e: React.MouseEvent, el: Edge) => {
     e.preventDefault();
@@ -199,9 +200,9 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
       };
 
       const updatedNodes = nodes.concat(newNode);
-      setNodes(updatedNodes);
+      setStatesForActiveProcess([]);
     },
-    [reactFlowInstance, setNodes, activeRole, nodes]
+    [reactFlowInstance, setStatesForActiveProcess, activeRole, nodes]
   );
 
   return (

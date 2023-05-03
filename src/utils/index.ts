@@ -165,13 +165,13 @@ export function edgeIdByNodes({ source, target }: { source: string; target: stri
   return `reactflow__edge-${source}-${target}`;
 }
 
-export function nodeByState(state: WorkflowState, index: number, allNodesLength: number): Node {
+export function nodeByState({ state, index, allNodesLength, color }: { state: WorkflowState, index: number, allNodesLength?: number, color?: string }): Node {
   const { StateName, Properties = {} } = state;
   const defaultW = 200;
   const defaultH = 30;
   const defaultXPadding = 50;
   const defaultYPadding = 40;
-  const divisor = 5; // todo
+  const divisor = 5; // todo: dynamic value based on allNodesLength if provided
 
   const { x: propX, y: propY, w: width = defaultW, h: height = defaultH } = Properties;
 
@@ -187,7 +187,8 @@ export function nodeByState(state: WorkflowState, index: number, allNodesLength:
       y
     },
     data: {
-      label: StateName
+      label: StateName,
+      ...(color && { color }),
     },
     positionAbsolute: {
       x,

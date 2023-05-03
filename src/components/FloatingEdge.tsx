@@ -36,7 +36,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({
 
   const states = useMainStore((state) => state.activeProcess?.States || []);
 
-  const nodes = states.map((node, i) => nodeByState(node, i, states.length));
+  const nodes = states.map((state, index) => nodeByState({ state, index, allNodesLength: states.length }));
 
   const [isHover, setIsHover] = useState<boolean | null>(null);
 
