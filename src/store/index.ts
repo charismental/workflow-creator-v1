@@ -186,7 +186,7 @@ const useMainStore = create<MainState & MainActions>()(
 
           const updatedTransitions = Transitions.filter(
             ({ FromStateName, ToStateName }) =>
-              FromStateName !== source && ToStateName !== target
+              FromStateName !== source || ToStateName !== target
           );
 
           const updatedRoles = Roles.map((r, i) =>
@@ -198,7 +198,7 @@ const useMainStore = create<MainState & MainActions>()(
               activeProcess: { ...activeProcess, Roles: updatedRoles },
             },
             false,
-            "removeTransitions"
+            "removeTransition"
           );
         }
       },
