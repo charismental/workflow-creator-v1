@@ -64,6 +64,7 @@ export interface MainActions {
   removeTransition: (payload: { source: string; target: string }) => void;
   removeState: (stateName: string) => void;
   setStatesForActiveProcess: (states: WorkflowState[]) => void;
+  updateStateProperties: (payload: { stateName: string; properties: { x?: number; y?: number; h?: number; w?: number }}) => void;
   setActiveProcess: (processName: string) => void;
   setColorForActiveRole: (newColor: string) => void;
 }
@@ -115,6 +116,7 @@ const useMainStore = create<MainState & MainActions>()(
               color: nodeColor,
             })
           );
+
           const updatedNodes = applyNodeChanges(changes, nodes);
 
           set(
@@ -132,6 +134,17 @@ const useMainStore = create<MainState & MainActions>()(
             false,
             "onNodesChange"
           );
+        }
+      },
+      updateStateProperties: ({ stateName, properties }: { stateName: string; properties: { x?: number; y?: number; h?: number; w?: number } }) => {
+        const { activeProcess, setStatesForActiveProcess } = get();
+
+        const { States = [] } = activeProcess || {};
+
+        const foundStateIndex = States.findIndex(({ StateName }) => StateName === stateName);
+
+        if (foundStateIndex !== -1) {
+          setStatesForActiveProcess(States.map((s, i) => i !== foundStateIndex ? s : { ...States[foundStateIndex], Properties: { ...States[foundStateIndex].Properties, ...properties  } }));
         }
       },
       setStatesForActiveProcess: (states: WorkflowState[]) => {

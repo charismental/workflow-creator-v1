@@ -174,10 +174,12 @@ export function nodeByState({ state, index, allNodesLength, color }: { state: Wo
   const defaultYPadding = 40;
   const divisor = 5; // todo: dynamic value based on allNodesLength if provided
 
-  const { x: propX, y: propY, w: width = defaultW, h: height = defaultH } = Properties;
+  const { x: propX, y: propY, w: propW, h: propH } = Properties;
 
   const x = propX || index % divisor * (defaultW + defaultXPadding);
   const y = propY || Math.floor(index / divisor) * (defaultH + defaultYPadding);
+  const width = propW || defaultW;
+  const height = propH || defaultH;
 
   return {
     id: StateName,
@@ -190,6 +192,8 @@ export function nodeByState({ state, index, allNodesLength, color }: { state: Wo
     data: {
       label: StateName,
       ...(color && { color }),
+      w: width,
+      h: height,
     },
     positionAbsolute: {
       x,
@@ -197,7 +201,6 @@ export function nodeByState({ state, index, allNodesLength, color }: { state: Wo
     },
     width,
     height,
-    dragging: false
   }
 };
 

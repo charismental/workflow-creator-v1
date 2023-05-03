@@ -33,6 +33,17 @@ const StateNode: FunctionComponent<NodeProps> = ({
     (state) => state.removeState,
     shallow
   );
+
+  const updateStateProperties = useMainStore(
+    (state) => state.updateStateProperties,
+    shallow
+  );
+
+  const onResize = (_: any, payload: any) => {
+    const { height: h, width: w, x, y } = payload;
+    updateStateProperties({ stateName: data.label, properties: { x, y, h, w } });
+  }
+
   const [isMouseOver, setIsMouseOver] = useState(false);
   const { toggleSelfConnected, selfConnected = false } = data;
 
@@ -40,22 +51,6 @@ const StateNode: FunctionComponent<NodeProps> = ({
   const isTarget = connectionNodeId && connectionNodeId !== id;
 
   const targetHandleStyle = { zIndex: isTarget ? 3 : 1 };
-
-  // const removeNode = useCallback(() => {
-  //   const updatedNodes = nodes.filter(node => node.id !== id);
-
-  //   // const updatedEdges = { ...allEdges };
-  //   const updatedAllSelfConnectingEdges = { ...allSelfConnectingEdges };
-
-  //   Object.keys(updatedEdges).forEach((key: string) => {
-  //     updatedEdges[key] = updatedEdges[key].filter(({ source, target }: { source: string; target: string }) => ![source, target].includes(id))
-  //     updatedAllSelfConnectingEdges[key] = (updatedAllSelfConnectingEdges?.[key] || []).filter(({ FromStateName, ToStateName }: { FromStateName: string; ToStateName: string }) => ![FromStateName, ToStateName].includes(id))
-  //   })
-
-  //   setAllSelfConnectingEdges(updatedAllSelfConnectingEdges)
-  //   setAlledges(updatedEdges);
-  //   setNodes(updatedNodes);
-  // }, [allEdges, setAlledges, nodes, setNodes, allSelfConnectingEdges, setAllSelfConnectingEdges]);
 
   // do something here => initial width: 200, minWidth: 50?
   const minWidth = 200;
@@ -71,11 +66,14 @@ const StateNode: FunctionComponent<NodeProps> = ({
         minWidth,
         borderStyle: isTarget ? "dashed" : "solid",
         backgroundColor: isTarget ? "#ffcce3" : data?.color || "#ccd9f6",
+        ...(data?.w && { width: data.w }),
+        ...(data?.h && { height: data.h }),
       }}
     >
       {selfConnected && <RollbackOutlined rotate={270} style={{ color: 'black', fontSize: '32px', position: 'absolute', top: '-28px', right: '12px' }} />}
       <NodeResizer
-        isVisible
+        onResize={onResize}
+        isVisible={isMouseOver}
         minWidth={minWidth}
         minHeight={minHeight}
         handleStyle={{ zIndex: 400 }}
