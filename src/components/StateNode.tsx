@@ -9,8 +9,6 @@ import {
   Position,
   useStore as useReactFlowStore,
 } from "reactflow";
-import useMainStore from "store";
-import { shallow } from "zustand/shallow";
 
 const checkboxStyle: CSSProperties = {
   position: "absolute",
