@@ -25,6 +25,7 @@ import {
   stateByNode,
   transformNewConnectionToTransition,
 } from "utils";
+import isEqual from "lodash.isequal";
 
 // const initialRole = "Intake-Specialist";
 const initialRole = "system";
@@ -218,12 +219,20 @@ const useMainStore = create<MainState & MainActions>()(
       },
       setActiveProcess: (processName: string) =>
         set(
-          ({ processes }) => {
-            const process = processes.find(
+          ({ processes, activeProcess }) => {
+            const processToSet = processes.find(
               (p) => p.ProcessName === processName
             );
 
-            return { activeProcess: process };
+            const previousProcessIndex = processes.findIndex(p => p.ProcessName === activeProcess?.ProcessName);
+
+            if (activeProcess && previousProcessIndex !== -1 && !isEqual(processes[previousProcessIndex], activeProcess)) {
+              const updatedProcesses = processes.map((p, i) => i !== previousProcessIndex ? { ...p } : { ...activeProcess })
+
+              return { activeProcess: processToSet, processes: updatedProcesses }
+            }
+
+            return { activeProcess: processToSet }
           },
           false,
           "setActiveProcess"
