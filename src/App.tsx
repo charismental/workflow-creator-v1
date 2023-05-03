@@ -178,6 +178,7 @@ const WorkflowCreator = () => {
                 <StateCollapseBox
                   items={availableStates}
                   addNew={addNewState}
+                  roleColor={activeRoleColor}
                   disabled={
                     !activeProcess?.Roles?.some(
                       (r) => r.RoleName === activeRole

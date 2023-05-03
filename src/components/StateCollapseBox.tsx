@@ -1,8 +1,6 @@
 import { PlusCircleOutlined, PlusCircleTwoTone } from "@ant-design/icons";
-import { Collapse, Divider, InputRef, Space, AutoComplete } from "antd";
+import { Collapse, Divider, InputRef, Space, Input } from "antd";
 import React, { useRef, useState } from "react";
-import useMainStore from "store";
-import { shallow } from "zustand/shallow";
 import AddNewInput from "./AddNewInput";
 import styles from "./StateCollapseBox.module.css";
 
@@ -13,6 +11,7 @@ interface StateCollapsebox {
   useStyle?: any;
   addNew?: any;
   disabled?: boolean;
+  roleColor?: string;
 }
 
 const StateCollapseBox: React.FC<StateCollapsebox> = ({
@@ -20,12 +19,12 @@ const StateCollapseBox: React.FC<StateCollapsebox> = ({
   addNew,
   disabled = false,
   useStyle = {},
+  roleColor = '#d4d4d4',
 }) => {
   const [newStateName, setNewStateName] = useState("");
   const [searchStateName, setSearchStateName] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const inputRef = useRef<InputRef>(null);
-  const [activeRole] = useMainStore((state) => [state.activeRole], shallow);
 
   const onDragStart = (event: any, nodeType: any) => {
     event.dataTransfer.setData("application/reactflow", nodeType);
@@ -36,23 +35,15 @@ const StateCollapseBox: React.FC<StateCollapsebox> = ({
     setNewStateName(event.target.value);
   };
 
-  const handleSearch = (value: string) => {
-    return items.find((el) => el.startsWith(value));
-  };
-
-  const onSearchChange = (value: string) => {
-    setSearchStateName(value);
-  };
-  const itemColor = () => {
-    // return roleColors[activeRole];
-    return "#ddd";
+  const onSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchStateName(event.target.value);
   };
 
   const addNewItem = (
     e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
   ) => {
     e.preventDefault();
-    addNew && addNew(name);
+    addNew && addNew(newStateName);
     setNewStateName("");
     setTimeout(() => {
       inputRef.current?.focus();
@@ -76,30 +67,18 @@ const StateCollapseBox: React.FC<StateCollapsebox> = ({
           expandIconPosition="end"
         >
           <Panel header={"Add/Select State"} key="1">
-            <AutoComplete
-              placeholder={"Search States"}
-              allowClear
-              onSearch={(val) => handleSearch(val)}
-              onChange={onSearchChange}
-              value={searchStateName}
-              open={searchStateName.length > 0}
-              style={{ width: 200 }}
-              onSelect={(value) => console.log("selected", value)}
-              dropdownMatchSelectWidth={190}
-              options={items.map((el) => ({ value: el }))}
-              filterOption={(inputValue, item) =>
-                (item &&
-                  item.value.toUpperCase().indexOf(inputValue.toUpperCase()) !==
-                    -1) ||
-                false
-              }
-            />
-            {items.map((item) => (
+          <Input
+            style={{ width: '100%' }}
+            placeholder="Search States"
+            value={searchStateName}
+            onChange={onSearchChange}
+          />
+            {items.filter(item => item.toLowerCase().includes(searchStateName.toLowerCase())).map((item) => (
               <div
                 key={item}
                 className={styles.stateItem}
                 style={{
-                  backgroundColor: itemColor(),
+                  backgroundColor: roleColor,
                   ...(disabled && { pointerEvents: "none" }),
                 }}
                 onMouseDown={(e) => {
