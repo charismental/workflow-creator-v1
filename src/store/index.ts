@@ -59,7 +59,7 @@ export interface MainActions {
   }) => void;
   toggleRoleForProcess: (role: string) => void;
   filteredStates: (existingStates: WorkflowState[]) => string[];
-  addNewStateItem: (name: string) => void;
+  addNewState: (name: string) => void;
   setHasHydrated: (state: boolean) => void;
   onNodesChange: OnNodesChange;
   onConnect: OnConnect;
@@ -347,20 +347,18 @@ const useMainStore = create<MainState & MainActions>()(
               !existingStates.some((s) => s.StateName === stateName)
           );
       },
-      // fix
-      addNewStateItem: (name) =>
+      addNewState: (name) =>
         set(
           ({ states }) => {
-            const highestId = Math.max(...states.map((el) => el.StateId || 0));
-            const newId = highestId + 1;
-            const newStatesObj = {
-              ...states,
-              [name]: newId,
+            const newState = {
+              StateName: name,
+              DisplayOrder: Math.max(...states.map(({ DisplayOrder }) => DisplayOrder || 0)) + 10,
             };
-            return { states: newStatesObj };
+
+            return { states: states.concat(newState) };
           },
           false,
-          "addNewStateItem"
+          "addNewState"
         ),
     }),
     {

@@ -49,7 +49,7 @@ const storeSelector = (state: MainActions & MainState) => ({
   allSelfConnectingEdges: state.allSelfConnectingEdges,
   setAllSelfConnectingEdges: state.setAllSelfConnectingEdges,
   currentStates: state.states,
-  addNewStateItem: state.addNewStateItem,
+  addNewState: state.addNewState,
   fetchAll: state.fetchAll,
   loading: state.globalLoading,
 });
@@ -71,7 +71,7 @@ const WorkflowCreator = () => {
     allSelfConnectingEdges,
     setAllSelfConnectingEdges,
     currentStates,
-    addNewStateItem,
+    addNewState,
     fetchAll,
     loading,
   } = useMainStore(storeSelector, shallow);
@@ -177,7 +177,7 @@ const WorkflowCreator = () => {
               <>
                 <StateCollapseBox
                   items={availableStates}
-                  addNew={addNewStateItem}
+                  addNew={addNewState}
                   disabled={
                     !activeProcess?.Roles?.some(
                       (r) => r.RoleName === activeRole
