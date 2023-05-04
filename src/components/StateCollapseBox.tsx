@@ -69,7 +69,7 @@ const StateCollapseBox: React.FC<StateCollapsebox> = ({
 						key="1"
 					>
 						<Input
-							style={{ width: "100%" }}
+							style={{ width: "100%", position: "sticky", top: 0 }}
 							placeholder="Search States"
 							value={searchStateName}
 							onChange={onSearchChange}
