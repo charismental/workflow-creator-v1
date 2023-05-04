@@ -165,7 +165,6 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 				className="reactflow-wrapper"
 				ref={reactFlowWrapper}
 			>
-				{/* <Dropdown menu={{ items }} trigger={["contextMenu"]}> */}
 				<ReactFlow
 					nodes={nodes.map((node: any) => ({
 						...node,
@@ -208,7 +207,6 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 					<Background variant={BackgroundVariant.Dots} />
 					<Controls />
 				</ReactFlow>
-				{/* </Dropdown> */}
 			</div>
 		</>
 	);

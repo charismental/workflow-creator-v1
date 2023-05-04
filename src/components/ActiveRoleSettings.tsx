@@ -30,6 +30,7 @@ const ActiveRoleSettings: React.FC<ActiveRoleSettingsProps> = ({
 			)}
 			{updateColor && (
 				<input
+					disabled={!roleIsToggled}
 					type="color"
 					name="color"
 					id="colorRef"
