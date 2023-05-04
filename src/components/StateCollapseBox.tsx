@@ -1,4 +1,9 @@
-import { PlusCircleOutlined, PlusCircleTwoTone } from "@ant-design/icons";
+import {
+	PlusCircleOutlined,
+	PlusCircleTwoTone,
+	CaretDownOutlined,
+	CaretRightOutlined,
+} from "@ant-design/icons";
 import { Collapse, Divider, InputRef, Space, Input } from "antd";
 import React, { useRef, useState } from "react";
 import AddNewInput from "./AddNewInput";
@@ -63,6 +68,13 @@ const StateCollapseBox: React.FC<StateCollapsebox> = ({
 					}}
 					size="small"
 					expandIconPosition="end"
+					expandIcon={(props) =>
+						props.isActive ? (
+							<CaretRightOutlined style={{ fontSize: "18px" }} />
+						) : (
+							<CaretDownOutlined style={{ fontSize: "18px" }} />
+						)
+					}
 				>
 					<Panel
 						header={"Add/Select State"}
@@ -97,9 +109,9 @@ const StateCollapseBox: React.FC<StateCollapsebox> = ({
 				</Collapse>
 			</div>
 			{isOpen && (
-				<div>
-					<Divider style={{ margin: "8px 0" }} />
-					<Space style={{ padding: "0 8px 4px" }}>
+				<div style={{ backgroundColor: "#e3e3e3" }}>
+					<Divider style={{ margin: "15px 0" }} />
+					<Space style={{ padding: "0 8px 4px", marginBottom: "15px" }}>
 						<AddNewInput
 							hasColorInput={false}
 							changeEvent={onNewStateName}
