@@ -1,4 +1,4 @@
-import { Layout, Space, Spin, Typography } from "antd";
+import { Layout, Space, Spin, Typography, ConfigProvider, theme } from "antd";
 import { CSSProperties, useCallback, useEffect } from "react";
 import { ReactFlowProvider } from "reactflow";
 import useMainStore from "store";
@@ -13,6 +13,8 @@ import "./css/style.css";
 import type { MainActions, MainState } from "store";
 import { roleColor } from "utils";
 import CustomControls from "components/CustomControls";
+import { MoonSvg, SunSvg } from "assets/icons";
+import Icon from "@ant-design/icons";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -20,14 +22,7 @@ const { Title } = Typography;
 const spaceContainer: CSSProperties = {
 	width: "100%",
 };
-const headerStyle: CSSProperties = {
-	backgroundColor: "#fff",
-	padding: "25px",
-	height: "80px",
-	display: "inline-flex",
-	justifyContent: "space-between",
-	alignItems: "center",
-};
+
 const activeRoleTitleStyle: CSSProperties = {
 	flexGrow: 2,
 	textAlign: "center",
@@ -52,6 +47,8 @@ const storeSelector = (state: MainActions & MainState) => ({
 	fetchAll: state.fetchAll,
 	loading: state.globalLoading,
 	reactFlowInstance: state.reactFlowInstance,
+	isLightTheme: state.isLightTheme,
+	toggleLightTheme: state.toggleLightTheme,
 });
 
 const WorkflowCreator = () => {
@@ -71,7 +68,18 @@ const WorkflowCreator = () => {
 		fetchAll,
 		loading,
 		reactFlowInstance,
+		isLightTheme,
+		toggleLightTheme,
 	} = useMainStore(storeSelector, shallow);
+
+	const headerStyle: CSSProperties = {
+		backgroundColor: isLightTheme ? "#6E7888" : "#001529",
+		padding: "25px",
+		height: "80px",
+		display: "inline-flex",
+		justifyContent: "space-between",
+		alignItems: "center",
+	};
 
 	const filteredStates = useMainStore(
 		useCallback((state) => state.filteredStates, [currentStates])
@@ -128,76 +136,111 @@ const WorkflowCreator = () => {
 	}
 
 	return (
-		<Space
-			direction="vertical"
-			style={spaceContainer}
+		<ConfigProvider
+			theme={
+				isLightTheme ? { algorithm: theme.defaultAlgorithm } : { algorithm: theme.darkAlgorithm }
+			}
 		>
-			<Layout style={layoutContainer}>
-				<Layout>
-					<Header style={headerStyle}>
-						<SelectBox
-							useStyle={{ flexGrow: 1, maxWidth: "360px" }}
-							selectOnChange={setActiveProcess}
-							addNew={addNewProcessAndSelect}
-							type="process"
-							selectValue={activeProcess?.processName}
-							items={availableProcesses}
-							placeholder="Select Process"
-							hasColorInput={false}
-						/>
-						<Title
-							level={2}
-							style={activeRoleTitleStyle}
-						>
-							{activeRole}
-						</Title>
-						<ActiveRoleSettings
-							roleIsToggled={roleIsToggled}
-							updateColor={setColorForActiveRole}
-							color={activeRoleColor}
-							toggleRole={() => toggleRoleForProcess(activeRole)}
-							useStyle={{ flexGrow: 1 }}
-						/>
-					</Header>
-					<ReactFlowProvider>
-						<Content className="dndflow">
-							<ReactFlowBase
-								roleIsToggled={roleIsToggled}
-								activeRoleColor={activeRoleColor}
-								activeRole={activeRole}
-							/>
-						</Content>
-						<CustomControls
-							getCurrentEdges={reactFlowInstance?.getEdges}
-							getCurrentNodes={reactFlowInstance?.getNodes}
-						/>
-					</ReactFlowProvider>
-				</Layout>
-				<Sidebar
-					children={
-						<>
-							<StateCollapseBox
-								items={availableStates}
-								addNew={addNewState}
-								roleColor={activeRoleColor}
-								disabled={!activeProcess?.roles?.some((r) => r.roleName === activeRole)}
-							/>
+			<Space
+				direction="vertical"
+				style={spaceContainer}
+			>
+				<Layout style={layoutContainer}>
+					<Layout>
+						<Header style={headerStyle}>
 							<SelectBox
-								addNew={addNewRoleAndToggle}
-								placeholder="Select Role"
-								selectValue={activeRole}
-								items={roleList}
-								type={"role"}
-								hasColorInput
-								useStyle={{ width: "100%" }}
-								multiselectHandler={(el) => toggleRoleForProcess(el.label)}
-								selectOnChange={setActiveRole}
+								useStyle={{ flexGrow: 1, maxWidth: "360px" }}
+								selectOnChange={setActiveProcess}
+								addNew={addNewProcessAndSelect}
+								type="process"
+								selectValue={activeProcess?.processName}
+								items={availableProcesses}
+								placeholder="Select Process"
+								hasColorInput={false}
 							/>
-						</>
-					}
-				/>
-			</Layout>
-		</Space>
+							<Title
+								level={2}
+								style={activeRoleTitleStyle}
+							>
+								{activeRole}
+							</Title>
+							<ActiveRoleSettings
+								roleIsToggled={roleIsToggled}
+								updateColor={setColorForActiveRole}
+								color={activeRoleColor}
+								toggleRole={() => toggleRoleForProcess(activeRole)}
+								useStyle={{ flexGrow: 1 }}
+							/>
+						</Header>
+						<ReactFlowProvider>
+							<Content className="dndflow">
+								<ReactFlowBase
+									roleIsToggled={roleIsToggled}
+									activeRoleColor={activeRoleColor}
+									activeRole={activeRole}
+								/>
+							</Content>
+							<CustomControls
+								getCurrentEdges={reactFlowInstance?.getEdges}
+								getCurrentNodes={reactFlowInstance?.getNodes}
+							/>
+						</ReactFlowProvider>
+					</Layout>
+					<Sidebar
+						theme={isLightTheme}
+						children={
+							<>
+								<StateCollapseBox
+									theme={isLightTheme}
+									items={availableStates}
+									addNew={addNewState}
+									roleColor={activeRoleColor}
+									disabled={!activeProcess?.roles?.some((r) => r.roleName === activeRole)}
+								/>
+								<SelectBox
+									addNew={addNewRoleAndToggle}
+									placeholder="Select Role"
+									selectValue={activeRole}
+									items={roleList}
+									type={"role"}
+									hasColorInput
+									useStyle={{
+										width: "100%",
+										maxHeight: "20em",
+										overflow: "scroll",
+										color: isLightTheme ? "black" : "white",
+									}}
+									multiselectHandler={(el) => toggleRoleForProcess(el.label)}
+									selectOnChange={setActiveRole}
+								/>
+								<Icon
+									style={{
+										fontSize: "20pt",
+										color: colorTheme ? "black" : "white",
+										color: lightMode ? "black" : "white",
+									}}
+									component={SunSvg}
+								/>
+								<Switch
+									size="small"
+									onChange={() => setColorTheme()}
+									onChange={() => setlightMode()}
+									style={{ margin: "10px" }}
+								/>
+								<Icon
+									style={{
+										fontSize: "20pt",
+										color: colorTheme ? "black" : "white",
+										color: lightMode ? "black" : "white",
+									}}
+									component={MoonSvg}
+								/>
+							</>
+						}
+					/>
+				</Layout>
+			</Space>
+		</ConfigProvider>
 	);
 };
 

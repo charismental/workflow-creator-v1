@@ -17,6 +17,7 @@ interface StateCollapsebox {
 	addNew?: any;
 	disabled?: boolean;
 	roleColor?: string;
+	isLightTheme: boolean;
 }
 
 const StateCollapseBox: React.FC<StateCollapsebox> = ({
@@ -25,6 +26,7 @@ const StateCollapseBox: React.FC<StateCollapsebox> = ({
 	disabled = false,
 	useStyle = {},
 	roleColor = "#d4d4d4",
+	isLightTheme,
 }) => {
 	const [newStateName, setNewStateName] = useState("");
 	const [searchStateName, setSearchStateName] = useState("");
@@ -79,6 +81,7 @@ const StateCollapseBox: React.FC<StateCollapsebox> = ({
 					<Panel
 						header={"Add/Select State"}
 						key="1"
+						style={isLightTheme ? { backgroundColor: "lightgray" } : {}}
 					>
 						<Input
 							style={{ width: "100%", position: "sticky", top: 0 }}
@@ -94,6 +97,7 @@ const StateCollapseBox: React.FC<StateCollapsebox> = ({
 									className={styles.stateItem}
 									style={{
 										backgroundColor: roleColor,
+
 										...(disabled && { pointerEvents: "none" }),
 									}}
 									onMouseDown={(e) => {

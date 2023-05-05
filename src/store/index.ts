@@ -31,6 +31,7 @@ export interface MainState {
 	roles: WorkflowRole[];
 	activeProcess: WorkflowProcess | null;
 	reactFlowInstance: ReactFlowInstance | undefined;
+	isLightTheme: boolean;
 }
 
 export interface MainActions {
@@ -56,6 +57,7 @@ export interface MainActions {
 	setActiveProcess: (processName: string) => void;
 	setColorForActiveRole: (newColor: string) => void;
 	setReactFlowInstance: (instance: ReactFlowInstance) => void;
+	toggleLightTheme: () => void;
 }
 
 const useMainStore = create<MainState & MainActions>()(
@@ -400,6 +402,8 @@ const useMainStore = create<MainState & MainActions>()(
 				),
 			reactFlowInstance: undefined,
 			setReactFlowInstance: (instance: ReactFlowInstance) => set({ reactFlowInstance: instance }),
+			isLightTheme: false,
+			toggleLightTheme: () => set({ isLightTheme: !get().isLightTheme }, false, "toggleLightTheme"),
 		}),
 		{
 			name: "Main-Store",

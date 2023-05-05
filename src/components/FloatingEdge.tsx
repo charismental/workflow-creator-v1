@@ -1,4 +1,4 @@
-import { CloseCircleOutlined } from "@ant-design/icons";
+import { CloseCircleOutlined, CloseCircleFilled } from "@ant-design/icons";
 import { Button } from "antd";
 import { FunctionComponent, useCallback, useState } from "react";
 import { EdgeProps, getStraightPath, useStore as useReactFlowStore } from "reactflow";
@@ -9,7 +9,10 @@ import { shallow } from "zustand/shallow";
 const foreignObjectSize = 40;
 
 const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd, style }) => {
-	const removeTransition = useMainStore((state) => state.removeTransition, shallow);
+	const [removeTransition, isLightTheme] = useMainStore(
+		(state) => [state.removeTransition, state.isLightTheme],
+		shallow
+	);
 	const [isHover, setIsHover] = useState<boolean | null>(null);
 
 	// useEffect(() => {
@@ -42,6 +45,14 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 		targetY: ty,
 	});
 
+	const strokeColor = useCallback(() => {
+		let color = "black";
+		if (!isLightTheme) {
+			color = "white";
+		}
+		return color;
+	}, [isLightTheme]);
+
 	return (
 		<>
 			<path
@@ -49,7 +60,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 				className="edge_path"
 				d={edgePath}
 				markerEnd={markerEnd}
-				stroke={isHover ? "#0ff" : "black"}
+				stroke={strokeColor()}
 			/>
 			<foreignObject
 				onMouseOver={() => setIsHover(true)}
@@ -65,7 +76,9 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 					<Button
 						className="edgebutton"
 						onClick={onEdgeClick}
-						icon={<CloseCircleOutlined className="dumb-icon" />}
+						icon={
+							isLightTheme ? <CloseCircleOutlined className="dumb-icon" /> : <CloseCircleFilled />
+						}
 					/>
 				</div>
 			</foreignObject>

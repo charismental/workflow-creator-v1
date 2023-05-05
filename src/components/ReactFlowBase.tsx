@@ -19,11 +19,6 @@ import "../css/style.css";
 import "reactflow/dist/style.css";
 import { nodeByState, transformTransitionsToEdges } from "utils";
 
-const connectionLineStyle = {
-	strokeWidth: 1.5,
-	stroke: "black",
-};
-
 const nodeTypes: NodeTypes = {
 	custom: StateNode,
 };
@@ -36,6 +31,7 @@ const selector = (state: MainState & MainActions) => ({
 	activeProcessStates: state.activeProcess?.states || [],
 	reactFlowInstance: state.reactFlowInstance,
 	setReactFlowInstance: state.setReactFlowInstance,
+	isLightTheme: state.isLightTheme,
 });
 
 interface ReactFlowBaseProps {
@@ -59,19 +55,21 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		activeProcessStates,
 		reactFlowInstance,
 		setReactFlowInstance,
+		isLightTheme,
 	} = useMainStore(selector, shallow);
 
-	const {
-		activeRole,
-		activeRoleColor,
-		roleIsToggled,
-	} = props;
+	const { activeRole, activeRoleColor, roleIsToggled } = props;
 	const [items, setItems] = useState<MenuProps["items"]>();
 
 	// reactFlowInstance should only change on init. I think...
 	useEffect(() => {
 		if (reactFlowInstance) reactFlowInstance.fitView();
 	}, [reactFlowInstance]);
+
+	const connectionLineStyle = {
+		strokeWidth: 1.5,
+		stroke: isLightTheme ? "black" : "white",
+	};
 
 	const edges = transformTransitionsToEdges(
 		activeProcess?.roles?.find((r) => r.roleName === activeRole)?.transitions || []
