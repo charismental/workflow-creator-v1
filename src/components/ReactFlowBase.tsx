@@ -179,54 +179,59 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
 	return (
 		<>
-			<Dropdown
-				destroyPopupOnHide
-				trigger={["contextMenu"]}
-				menu={{ items }}
+			<div
+				className="reactflow-wrapper"
+				ref={reactFlowWrapper}
 			>
-				<ReactFlow
-					nodes={nodes}
-					edges={edges}
-					onNodesChange={onNodesChange}
-					onConnect={onConnect}
-					onInit={setReactFlowInstance}
-					onDrop={onDrop}
-					onDragOver={onDragOver}
-					fitView
-					nodeTypes={nodeTypes}
-					edgeTypes={edgeTypes}
-					defaultEdgeOptions={defaultEdgeOptions}
-					connectionLineComponent={CustomConnectionLine}
-					connectionLineStyle={connectionLineStyle}
-					onEdgeContextMenu={openEdgeContextMenu}
-					onNodeContextMenu={openNodeContextMenu}
-					onPaneContextMenu={openPaneContextMenu}
+				<Dropdown
+					destroyPopupOnHide
+					trigger={["contextMenu"]}
+					menu={{ items }}
 				>
-					{showMinimap && (
-						<MiniMap
-							color={activeRoleColor}
-							nodeStrokeWidth={3}
-							zoomable
-							pannable
-						/>
-					)}
-					{!roleIsToggled && (
-						<div
-							style={{
-								zIndex: 5000000,
-								backgroundColor: "darkGrey",
-								opacity: 0.5,
-								width: "100%",
-								height: "100%",
-								position: "relative",
-								cursor: "not-allowed",
-							}}
-						/>
-					)}
-					<Background variant={BackgroundVariant.Dots} />
-					{/* <Controls /> */}
-				</ReactFlow>
-			</Dropdown>
+					<ReactFlow
+						nodes={nodes}
+						edges={edges}
+						onNodesChange={onNodesChange}
+						onConnect={onConnect}
+						onInit={setReactFlowInstance}
+						onDrop={onDrop}
+						onDragOver={onDragOver}
+						fitView
+						nodeTypes={nodeTypes}
+						edgeTypes={edgeTypes}
+						defaultEdgeOptions={defaultEdgeOptions}
+						connectionLineComponent={CustomConnectionLine}
+						connectionLineStyle={connectionLineStyle}
+						onEdgeContextMenu={openEdgeContextMenu}
+						onNodeContextMenu={openNodeContextMenu}
+						// onPaneContextMenu={openPaneContextMenu}
+					>
+						{showMinimap && (
+							<MiniMap
+								color={activeRoleColor}
+								nodeStrokeWidth={3}
+								zoomable
+								pannable
+							/>
+						)}
+						{!roleIsToggled && (
+							<div
+								style={{
+									zIndex: 5000000,
+									backgroundColor: "darkGrey",
+									opacity: 0.5,
+									width: "100%",
+									height: "100%",
+									position: "relative",
+									cursor: "not-allowed",
+								}}
+							/>
+						)}
+						<Background variant={BackgroundVariant.Dots} />
+						{/* <Controls /> */}
+					</ReactFlow>
+				</Dropdown>
+			</div>
 		</>
 	);
 };
