@@ -4,7 +4,7 @@ import { Node } from "reactflow";
 const { Title } = Typography;
 
 interface EdgeModalProps {
-	allCurrentNodesInCanvas: Node<any>[] | undefined;
+	allCurrentNodesInCanvas: Node<any>[];
 	nodeModalOpen: boolean;
 	setNodeModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -19,8 +19,8 @@ export default ({ allCurrentNodesInCanvas, nodeModalOpen, setNodeModalOpen }: Ed
 			onCancel={() => setNodeModalOpen(false)}
 		>
 			<Title level={3}>All Current Nodes (states)</Title>
-			<div style={{ overflowY: "scroll" }}>
-				{allCurrentNodesInCanvas ? (
+			<div style={{ overflowY: "auto", maxHeight: 'calc(100vh - 300px)' }}>
+				{allCurrentNodesInCanvas.length ? (
 					allCurrentNodesInCanvas.map((node, index) => (
 						<div key={index}>
 							<Space align={"center"}>

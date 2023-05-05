@@ -81,9 +81,6 @@ const WorkflowCreator = () => {
 		fetchAll();
 	}, []);
 
-	const allCurrentEdgesOnCanvas = reactFlowInstance?.getEdges();
-	const allCurrentNodes = reactFlowInstance?.getNodes();
-
 	const activeRoleColor = roleColor({
 		roleName: activeRole,
 		allRoles: activeProcess?.Roles || [],
@@ -173,8 +170,8 @@ const WorkflowCreator = () => {
 							/>
 						</Content>
 						<CustomControls
-							allCurrentEdgesInCanvas={allCurrentEdgesOnCanvas}
-							allCurrentNodesInCanvas={allCurrentNodes}
+							getCurrentEdges={reactFlowInstance?.getEdges}
+							getCurrentNodes={reactFlowInstance?.getNodes}
 						/>
 					</ReactFlowProvider>
 				</Layout>

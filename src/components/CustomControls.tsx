@@ -22,22 +22,24 @@ import EdgeModal from "./Modals/EdgeModal";
 import NodeModal from "./Modals/NodeModal";
 
 interface CustomControlsProps {
-	allCurrentEdgesInCanvas: Edge<any>[] | undefined;
-	allCurrentNodesInCanvas: Node<any>[] | undefined;
+	getCurrentEdges: (() => Edge[]) | undefined;
+	getCurrentNodes: (() => Node[]) | undefined;
 }
 
 const isInteractiveSelector = (s: ReactFlowState) =>
 	s.nodesDraggable && s.nodesConnectable && s.elementsSelectable;
 
 export default ({
-	allCurrentEdgesInCanvas,
-	allCurrentNodesInCanvas,
+	getCurrentEdges,
+	getCurrentNodes,
 	onInteractiveChange,
 }: CustomControlsProps & ControlProps) => {
 	const store = useStoreApi();
 	const isInteractive = useStore(isInteractiveSelector);
 	const { fitView, zoomIn, zoomOut } = useReactFlow();
 	const [edgeModalOpen, setEdgeModalOpen] = useState(false);
+	const [currentEdges, setCurrentEdges] = useState<Edge[]>([]);
+	const [currentNodes, setCurrentNodes] = useState<Node[]>([]);
 	const [nodeModalOpen, setNodeModalOpen] = useState(false);
 
 	const onToggleInteractivity = () => {
@@ -50,18 +52,28 @@ export default ({
 		onInteractiveChange?.(!isInteractive);
 	};
 
+	const getEdgesAndOpenModal = () => {
+		setCurrentEdges(getCurrentEdges ? getCurrentEdges() : []);
+		setEdgeModalOpen(true);
+	};
+
+	const getNodesAndOpenModal = () => {
+		setCurrentNodes(getCurrentNodes ? getCurrentNodes() : []);
+		setNodeModalOpen(true);
+	};
+
 	return (
 		<div style={{ marginBottom: "1rem", paddingLeft: "2rem" }}>
 			<Space>
 				<Button
 					type={"default"}
-					onClick={() => setEdgeModalOpen(true)}
+					onClick={getEdgesAndOpenModal}
 				>
 					Show Edges
 				</Button>
 				<Button
 					type={"default"}
-					onClick={() => setNodeModalOpen(true)}
+					onClick={getNodesAndOpenModal}
 				>
 					Show Nodes
 				</Button>
@@ -127,12 +139,12 @@ export default ({
 					/>
 				</Tooltip>
 				<EdgeModal
-					allCurrentEdgesInCanvas={allCurrentEdgesInCanvas}
+					allCurrentEdgesInCanvas={currentEdges}
 					edgeModalOpen={edgeModalOpen}
 					setEdgeModalOpen={setEdgeModalOpen}
 				/>
 				<NodeModal
-					allCurrentNodesInCanvas={allCurrentNodesInCanvas}
+					allCurrentNodesInCanvas={currentNodes}
 					nodeModalOpen={nodeModalOpen}
 					setNodeModalOpen={setNodeModalOpen}
 				/>

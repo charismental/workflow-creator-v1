@@ -5,7 +5,7 @@ import { Edge } from "reactflow";
 const { Title } = Typography;
 
 interface EdgeModalProps {
-	allCurrentEdgesInCanvas: Edge<any>[] | undefined;
+	allCurrentEdgesInCanvas: Edge<any>[];
 	edgeModalOpen: boolean;
 	setEdgeModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -20,7 +20,7 @@ export default ({ allCurrentEdgesInCanvas, edgeModalOpen, setEdgeModalOpen }: Ed
 			onCancel={() => setEdgeModalOpen(false)}
 		>
 			<Title level={3}>All Current Connections (edges)</Title>
-			{allCurrentEdgesInCanvas ? (
+			{allCurrentEdgesInCanvas.length ? (
 				allCurrentEdgesInCanvas.map((edge, index) => (
 					<div key={index}>
 						<Space align={"center"}>
