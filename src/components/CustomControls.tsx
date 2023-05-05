@@ -1,23 +1,24 @@
 import {
-	Edge,
-	Node,
-	useReactFlow,
-	ReactFlowState,
-	useStore,
-	useStoreApi,
-	ControlProps,
-} from "reactflow";
+	DeleteOutlined,
+	ExpandOutlined,
+	LockFilled,
+	MinusOutlined,
+	PlusOutlined,
+	ReloadOutlined,
+	SaveOutlined,
+	UnlockOutlined,
+} from "@ant-design/icons";
 import { Button, Space, Tooltip } from "antd";
 import { useState } from "react";
 import {
-	MinusOutlined,
-	PlusOutlined,
-	ExpandOutlined,
-	LockFilled,
-	UnlockOutlined,
-	SaveOutlined,
-	ReloadOutlined,
-} from "@ant-design/icons";
+	ControlProps,
+	Edge,
+	Node,
+	ReactFlowState,
+	useReactFlow,
+	useStore,
+	useStoreApi,
+} from "reactflow";
 import EdgeModal from "./Modals/EdgeModal";
 import NodeModal from "./Modals/NodeModal";
 
@@ -46,8 +47,32 @@ export default ({
 			nodesConnectable: !isInteractive,
 			elementsSelectable: !isInteractive,
 		});
-		console.log("not interactive");
 		onInteractiveChange?.(!isInteractive);
+	};
+
+	const ControlButtonWithTooltip = ({
+		title,
+		icon,
+		clickEvent,
+	}: {
+		title: string;
+		icon?: React.ReactNode;
+		clickEvent:
+			| (React.MouseEventHandler<HTMLAnchorElement> & React.MouseEventHandler<HTMLButtonElement>)
+			| undefined;
+	}) => {
+		return (
+			<Tooltip
+				placement="top"
+				title={title}
+			>
+				<Button
+					icon={icon}
+					type={"default"}
+					onClick={clickEvent}
+				/>
+			</Tooltip>
+		);
 	};
 
 	return (
@@ -65,67 +90,41 @@ export default ({
 				>
 					Show Nodes
 				</Button>
-				<Tooltip
-					placement="top"
+				<ControlButtonWithTooltip
 					title={"Zoom In"}
-				>
-					<Button
-						icon={<PlusOutlined />}
-						type={"default"}
-						onClick={() => zoomIn()}
-					/>
-				</Tooltip>
-				<Tooltip
-					placement="top"
+					icon={<PlusOutlined />}
+					clickEvent={() => zoomIn()}
+				/>
+				<ControlButtonWithTooltip
 					title={"Zoom Out"}
-				>
-					<Button
-						icon={<MinusOutlined />}
-						type={"default"}
-						onClick={() => zoomOut()}
-					/>
-				</Tooltip>
-
-				<Tooltip
-					placement="top"
+					icon={<MinusOutlined />}
+					clickEvent={() => zoomOut()}
+				/>
+				<ControlButtonWithTooltip
 					title={"Fit To Canvas"}
-				>
-					<Button
-						icon={<ExpandOutlined />}
-						type={"default"}
-						onClick={() => fitView()}
-					/>
-				</Tooltip>
-				<Tooltip
-					placement="top"
+					icon={<ExpandOutlined />}
+					clickEvent={() => fitView()}
+				/>
+				<ControlButtonWithTooltip
 					title={"Lock Interactivity"}
-				>
-					<Button
-						type={"default"}
-						icon={isInteractive ? <UnlockOutlined /> : <LockFilled />}
-						onClick={onToggleInteractivity}
-					/>
-				</Tooltip>
-				<Tooltip
-					placement="top"
+					icon={isInteractive ? <UnlockOutlined /> : <LockFilled />}
+					clickEvent={onToggleInteractivity}
+				/>
+				<ControlButtonWithTooltip
 					title={"Save Progress"}
-				>
-					<Button
-						icon={<SaveOutlined />}
-						type={"default"}
-						onClick={() => console.log("you saved a thing!")}
-					/>
-				</Tooltip>
-				<Tooltip
-					placement="top"
+					icon={<SaveOutlined />}
+					clickEvent={() => console.log("you saved a thing!")}
+				/>
+				<ControlButtonWithTooltip
 					title={"Revert To Last Save Point"}
-				>
-					<Button
-						icon={<ReloadOutlined />}
-						type={"default"}
-						onClick={() => console.log("you reverted a thing!")}
-					/>
-				</Tooltip>
+					icon={<ReloadOutlined />}
+					clickEvent={() => console.log("you reverted a thing!")}
+				/>
+				<ControlButtonWithTooltip
+					title={"Delete Progress"}
+					icon={<DeleteOutlined />}
+					clickEvent={() => console.log("you deleted a thing!")}
+				/>
 				<EdgeModal
 					allCurrentEdgesInCanvas={allCurrentEdgesInCanvas}
 					edgeModalOpen={edgeModalOpen}

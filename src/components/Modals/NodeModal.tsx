@@ -1,4 +1,4 @@
-import { Modal, Space, Typography } from "antd";
+import { Divider, Modal, Space, Typography } from "antd";
 import { Node } from "reactflow";
 
 const { Title } = Typography;
@@ -18,7 +18,8 @@ export default ({ allCurrentNodesInCanvas, nodeModalOpen, setNodeModalOpen }: Ed
 			footer={null}
 			onCancel={() => setNodeModalOpen(false)}
 		>
-			<Title level={3}>All Current Nodes (states)</Title>
+			<Title level={3} >All Current Nodes (states)</Title>
+			<Divider />
 			<div style={{ overflowY: "scroll" }}>
 				{allCurrentNodesInCanvas ? (
 					allCurrentNodesInCanvas.map((node, index) => (
