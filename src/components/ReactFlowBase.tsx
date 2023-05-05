@@ -129,7 +129,6 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
 	const openPaneContextMenu = (e: React.MouseEvent<Element, MouseEvent>) => {
 		e.preventDefault();
-		console.log(activeProcess?.processName);
 		return setItems([
 			getItem(
 				<Descriptions
@@ -188,6 +187,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 				<div
 					className="reactflow-wrapper"
 					ref={reactFlowWrapper}
+					style={!roleIsToggled ? { pointerEvents: "none" } : {}}
 				>
 					<ReactFlow
 						nodes={nodes}
