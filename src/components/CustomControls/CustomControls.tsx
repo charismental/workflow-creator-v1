@@ -1,4 +1,4 @@
-import {
+import Icon, {
 	DeleteOutlined,
 	ExpandOutlined,
 	LockFilled,
@@ -9,7 +9,7 @@ import {
 	UnlockOutlined,
 } from "@ant-design/icons";
 import { Button, Space } from "antd";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
 	ControlProps,
 	Edge,
@@ -19,9 +19,11 @@ import {
 	useStore,
 	useStoreApi,
 } from "reactflow";
+import useMainStore from "store";
 import EdgeModal from "../Modals/EdgeModal";
 import NodeModal from "../Modals/NodeModal";
 import CustomControlButtonWithTooltip from "./CustomControlButtonWithTooltip";
+import MapSvg from "./MapSvg";
 
 interface CustomControlsProps {
 	allCurrentEdgesInCanvas: Edge<any>[] | undefined;
@@ -41,6 +43,7 @@ export default ({
 	const { fitView, zoomIn, zoomOut } = useReactFlow();
 	const [edgeModalOpen, setEdgeModalOpen] = useState(false);
 	const [nodeModalOpen, setNodeModalOpen] = useState(false);
+	const setShowMinimap = useMainStore(useCallback((state) => state.setShowMinimap, []));
 
 	const onToggleInteractivity = () => {
 		store.setState({
@@ -50,7 +53,6 @@ export default ({
 		});
 		onInteractiveChange?.(!isInteractive);
 	};
-
 
 	return (
 		<div style={{ marginBottom: "1rem", paddingLeft: "2rem" }}>
@@ -101,6 +103,17 @@ export default ({
 					title={"Delete Progress"}
 					icon={<DeleteOutlined />}
 					clickEvent={() => console.log("you deleted a thing!")}
+				/>
+				<CustomControlButtonWithTooltip
+					title={"Toggle Minimap"}
+					icon={
+						<Icon
+							component={MapSvg}
+							width={10}
+							height={20}
+						/>
+					}
+					clickEvent={setShowMinimap}
 				/>
 				<EdgeModal
 					allCurrentEdgesInCanvas={allCurrentEdgesInCanvas}
