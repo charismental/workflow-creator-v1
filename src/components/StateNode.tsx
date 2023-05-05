@@ -33,13 +33,37 @@ const StateNode: FunctionComponent<NodeProps> = ({
     shallow
   );
 
+  const onConnect = useMainStore(
+    (state) => state.onConnect,
+    shallow
+  );
+
+  const removeTransition = useMainStore(
+    (state) => state.removeTransition,
+    shallow
+  );
+
+  const selfConnected = useMainStore(
+      (state) => !!(state.activeProcess?.Roles?.find(({ RoleName }) => RoleName === state.activeRole)?.Transitions?.find(({ FromStateName, ToStateName }) => [FromStateName, ToStateName].every(el => el === id))),
+      shallow
+    );
+
   const onResize = (_: any, payload: any) => {
     const { height: h, width: w, x, y } = payload;
     updateStateProperties({ stateName: data.label, properties: { x, y, h, w } });
   }
 
   const [isMouseOver, setIsMouseOver] = useState(false);
-  const { toggleSelfConnected, selfConnected = false } = data;
+
+  const toggleSelfConnection = () => {
+    const connectionPayload = { source: id, target: id };
+
+    if (!selfConnected) {
+      onConnect({ ...connectionPayload, sourceHandle: null, targetHandle: null });
+    } else {
+      removeTransition(connectionPayload);
+    }
+  };
 
   const connectionNodeId = useReactFlowStore(connectionNodeIdSelector);
   const isTarget = connectionNodeId && connectionNodeId !== id;
@@ -77,7 +101,7 @@ const StateNode: FunctionComponent<NodeProps> = ({
           <Checkbox
             style={checkboxStyle}
             checked={selfConnected}
-            onChange={() => toggleSelfConnected(id)}
+            onChange={toggleSelfConnection}
           />
           <div className="state-delete-button" onClick={() => removeState(data.label)} />
         </>

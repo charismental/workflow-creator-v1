@@ -39,8 +39,6 @@ const selector = (state: MainState & MainActions) => ({
 });
 
 interface ReactFlowBaseProps {
-	allSelfConnectingEdges: any;
-	setAllSelfConnectingEdges: any;
 	activeRoleColor?: string;
 	activeRole: any;
 	roleIsToggled: boolean;
@@ -64,8 +62,6 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 	} = useMainStore(selector, shallow);
 
 	const {
-		allSelfConnectingEdges,
-		setAllSelfConnectingEdges,
 		activeRole,
 		activeRoleColor,
 		roleIsToggled,
@@ -109,26 +105,6 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		]);
 	}, []);
 
-	const toggleSelfConnected = useCallback(
-		(stateId: string) => {
-			let activeRoleSelfConnected = allSelfConnectingEdges?.[activeRole] || [];
-
-			if (activeRoleSelfConnected.some(({ target }: any) => target === stateId)) {
-				activeRoleSelfConnected = activeRoleSelfConnected.filter(
-					({ target }: any) => target !== stateId
-				);
-			} else {
-				activeRoleSelfConnected.push({ source: stateId, target: stateId });
-			}
-
-			setAllSelfConnectingEdges({
-				...allSelfConnectingEdges,
-				[activeRole]: activeRoleSelfConnected,
-			});
-		},
-		[activeRole, allSelfConnectingEdges, setAllSelfConnectingEdges]
-	);
-
 	const onDragOver = useCallback((event: any) => {
 		event.preventDefault();
 		event.dataTransfer.dropEffect = "move";
@@ -170,16 +146,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 				ref={reactFlowWrapper}
 			>
 				<ReactFlow
-					nodes={nodes.map((node: any) => ({
-						...node,
-						data: {
-							...node.data,
-							toggleSelfConnected,
-							selfConnected: allSelfConnectingEdges?.[activeRole]?.some(
-								({ target }: any) => target === node.id
-							),
-						},
-					}))}
+					nodes={nodes}
 					edges={edges}
 					onNodesChange={onNodesChange}
 					onConnect={onConnect}

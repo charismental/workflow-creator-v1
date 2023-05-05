@@ -24,7 +24,6 @@ const initialRole = "system";
 export interface MainState {
 	globalLoading: boolean;
 	activeRole: string;
-	allSelfConnectingEdges: { [roleName: string]: WorkflowConnection[] };
 	_hasHydrated: boolean;
 	processes: WorkflowProcess[];
 	edges: Edge[];
@@ -40,9 +39,6 @@ export interface MainActions {
 	addProcess: (processName: string) => void;
 	updateProcess: (payload: { processIndex: number; process: WorkflowProcess }) => void;
 	deleteProcess: (processName: string) => void;
-	setAllSelfConnectingEdges: (allSelfConnectingEdges: {
-		[roleName: string]: WorkflowConnection[];
-	}) => void;
 	toggleRoleForProcess: (role: string, color?: string) => void;
 	filteredStates: (existingStates: WorkflowState[]) => string[];
 	addNewState: (name: string) => void;
@@ -273,9 +269,6 @@ const useMainStore = create<MainState & MainActions>()(
 				),
 			activeRole: initialRole,
 			setActiveRole: (role) => set(() => ({ activeRole: role }), false, "setActiveRole"),
-			allSelfConnectingEdges: {},
-			setAllSelfConnectingEdges: (allSelfConnectingEdges) =>
-				set(() => ({ allSelfConnectingEdges }), false, "setAllSelfConnectingEdges"),
 			processes: [],
 			updateProcess: ({
 				processIndex,

@@ -46,8 +46,6 @@ const storeSelector = (state: MainActions & MainState) => ({
 	setActiveRole: state.setActiveRole,
 	roles: state.roles,
 	setColorForActiveRole: state.setColorForActiveRole,
-	allSelfConnectingEdges: state.allSelfConnectingEdges,
-	setAllSelfConnectingEdges: state.setAllSelfConnectingEdges,
 	currentStates: state.states,
 	addNewState: state.addNewState,
 	addNewRole: state.addNewRole,
@@ -67,8 +65,6 @@ const WorkflowCreator = () => {
 		setActiveRole,
 		roles,
 		setColorForActiveRole,
-		allSelfConnectingEdges,
-		setAllSelfConnectingEdges,
 		currentStates,
 		addNewState,
 		addNewRole,
@@ -172,8 +168,6 @@ const WorkflowCreator = () => {
 						<Content className="dndflow">
 							<ReactFlowBase
 								roleIsToggled={roleIsToggled()}
-								allSelfConnectingEdges={allSelfConnectingEdges}
-								setAllSelfConnectingEdges={setAllSelfConnectingEdges}
 								activeRoleColor={activeRoleColor}
 								activeRole={activeRole}
 							/>
