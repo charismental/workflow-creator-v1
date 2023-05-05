@@ -214,8 +214,6 @@ const WorkflowCreator = () => {
 									hasColorInput
 									useStyle={{
 										width: "100%",
-										maxHeight: "20em",
-										overflow: "scroll",
 										color: isLightTheme ? "black" : "white",
 									}}
 									multiselectHandler={(el) => toggleRoleForProcess(el.label)}
