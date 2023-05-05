@@ -3,20 +3,20 @@ import { defaultColors } from "data";
 import { create } from "zustand";
 // import { persist } from 'zustand/middleware';
 import {
+	Connection,
+	Edge,
+	NodeChange,
 	OnConnect,
 	OnNodesChange,
-	Edge,
-	applyNodeChanges,
-	NodeChange,
-	Connection,
 	ReactFlowInstance,
+	applyNodeChanges,
 } from "reactflow";
 import { devtools } from "zustand/middleware";
 import { WorkflowConnection, WorkflowProcess, WorkflowRole, WorkflowState } from "./types";
 
 import mockFetchAll from "data/mockFetchAll";
-import { nodeByState, roleColor, stateByNode, transformNewConnectionToTransition } from "utils";
 import isEqual from "lodash.isequal";
+import { nodeByState, roleColor, stateByNode, transformNewConnectionToTransition } from "utils";
 
 // const initialRole = "Intake-Specialist";
 const initialRole = "system";
@@ -31,6 +31,7 @@ export interface MainState {
 	roles: WorkflowRole[];
 	activeProcess: WorkflowProcess | null;
 	reactFlowInstance: ReactFlowInstance | undefined;
+	showMinimap: boolean;
 }
 
 export interface MainActions {
@@ -56,6 +57,7 @@ export interface MainActions {
 	setActiveProcess: (processName: string) => void;
 	setColorForActiveRole: (newColor: string) => void;
 	setReactFlowInstance: (instance: ReactFlowInstance) => void;
+	setShowMinimap: () => void;
 }
 
 const useMainStore = create<MainState & MainActions>()(
@@ -400,6 +402,10 @@ const useMainStore = create<MainState & MainActions>()(
 				),
 			reactFlowInstance: undefined,
 			setReactFlowInstance: (instance: ReactFlowInstance) => set({ reactFlowInstance: instance }),
+			showMinimap: false,
+			setShowMinimap: () => {
+				set({ showMinimap: !get().showMinimap });
+			},
 		}),
 		{
 			name: "Main-Store",
