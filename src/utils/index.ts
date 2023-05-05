@@ -150,7 +150,7 @@ export function edgeIdByNodes({ source, target }: { source: string; target: stri
   return `reactflow__edge-${source}-${target}`;
 }
 
-export function nodeByState({ state, index, allNodesLength, color }: { state: WorkflowState, index: number, allNodesLength?: number, color?: string }): Node {
+export function nodeByState({ state, index, color }: { state: WorkflowState, index: number, allNodesLength?: number, color?: string }): Node {
   const { stateName, Properties = {} } = state;
   const defaultW = 200;
   const defaultH = 30;
@@ -199,7 +199,7 @@ export function stateByNode({ node, allStates }: { node: Node | any; allStates: 
 export function roleColor({ roleName, allRoles, index }: { roleName: string; allRoles: WorkflowRole[]; index?: any }): string {
   const availableDefaultColors = defaultColors;
 
-  const roleIndex = typeof index === 'number' ? index : allRoles.findIndex(({ roleName }) => roleName === roleName);
+  const roleIndex = typeof index === 'number' ? index : allRoles.findIndex((r) => r.roleName === roleName);
 
   if (roleIndex !== -1) {
     return allRoles[roleIndex]?.Properties?.color || availableDefaultColors[roleIndex % availableDefaultColors.length]
