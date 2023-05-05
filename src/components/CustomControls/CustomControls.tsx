@@ -8,7 +8,7 @@ import {
 	SaveOutlined,
 	UnlockOutlined,
 } from "@ant-design/icons";
-import { Button, Space, Tooltip } from "antd";
+import { Button, Space } from "antd";
 import { useState } from "react";
 import {
 	ControlProps,
@@ -19,8 +19,9 @@ import {
 	useStore,
 	useStoreApi,
 } from "reactflow";
-import EdgeModal from "./Modals/EdgeModal";
-import NodeModal from "./Modals/NodeModal";
+import EdgeModal from "../Modals/EdgeModal";
+import NodeModal from "../Modals/NodeModal";
+import CustomControlButtonWithTooltip from "./CustomControlButtonWithTooltip";
 
 interface CustomControlsProps {
 	allCurrentEdgesInCanvas: Edge<any>[] | undefined;
@@ -50,30 +51,6 @@ export default ({
 		onInteractiveChange?.(!isInteractive);
 	};
 
-	const ControlButtonWithTooltip = ({
-		title,
-		icon,
-		clickEvent,
-	}: {
-		title: string;
-		icon?: React.ReactNode;
-		clickEvent:
-			| (React.MouseEventHandler<HTMLAnchorElement> & React.MouseEventHandler<HTMLButtonElement>)
-			| undefined;
-	}) => {
-		return (
-			<Tooltip
-				placement="top"
-				title={title}
-			>
-				<Button
-					icon={icon}
-					type={"default"}
-					onClick={clickEvent}
-				/>
-			</Tooltip>
-		);
-	};
 
 	return (
 		<div style={{ marginBottom: "1rem", paddingLeft: "2rem" }}>
@@ -90,37 +67,37 @@ export default ({
 				>
 					Show Nodes
 				</Button>
-				<ControlButtonWithTooltip
+				<CustomControlButtonWithTooltip
 					title={"Zoom In"}
 					icon={<PlusOutlined />}
 					clickEvent={() => zoomIn()}
 				/>
-				<ControlButtonWithTooltip
+				<CustomControlButtonWithTooltip
 					title={"Zoom Out"}
 					icon={<MinusOutlined />}
 					clickEvent={() => zoomOut()}
 				/>
-				<ControlButtonWithTooltip
+				<CustomControlButtonWithTooltip
 					title={"Fit To Canvas"}
 					icon={<ExpandOutlined />}
 					clickEvent={() => fitView()}
 				/>
-				<ControlButtonWithTooltip
+				<CustomControlButtonWithTooltip
 					title={"Lock Interactivity"}
 					icon={isInteractive ? <UnlockOutlined /> : <LockFilled />}
 					clickEvent={onToggleInteractivity}
 				/>
-				<ControlButtonWithTooltip
+				<CustomControlButtonWithTooltip
 					title={"Save Progress"}
 					icon={<SaveOutlined />}
 					clickEvent={() => console.log("you saved a thing!")}
 				/>
-				<ControlButtonWithTooltip
+				<CustomControlButtonWithTooltip
 					title={"Revert To Last Save Point"}
 					icon={<ReloadOutlined />}
 					clickEvent={() => console.log("you reverted a thing!")}
 				/>
-				<ControlButtonWithTooltip
+				<CustomControlButtonWithTooltip
 					title={"Delete Progress"}
 					icon={<DeleteOutlined />}
 					clickEvent={() => console.log("you deleted a thing!")}
