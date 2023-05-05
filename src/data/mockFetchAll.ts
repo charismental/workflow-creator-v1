@@ -910,6 +910,18 @@ const roles = [
 		roleId: 19,
 		roleName: "QA/QC-Lead",
 	},
+	{
+		roleId: 20,
+		roleName: "Review-Lead",
+	 },
+	 {
+		roleId: 21,
+		roleName: "Outreach-Specialist",
+	 },
+	 {
+		roleId: 22,
+		roleName: "Outreach-Lead",
+	 }
 ];
 
 const states = [

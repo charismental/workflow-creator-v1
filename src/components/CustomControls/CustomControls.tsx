@@ -1,25 +1,29 @@
-import {
-	Edge,
-	Node,
-	useReactFlow,
-	ReactFlowState,
-	useStore,
-	useStoreApi,
-	ControlProps,
-} from "reactflow";
-import { Button, Space, Tooltip } from "antd";
-import { useState } from "react";
-import {
-	MinusOutlined,
-	PlusOutlined,
+import Icon, {
+	DeleteOutlined,
 	ExpandOutlined,
 	LockFilled,
-	UnlockOutlined,
-	SaveOutlined,
+	MinusOutlined,
+	PlusOutlined,
 	ReloadOutlined,
+	SaveOutlined,
+	UnlockOutlined,
 } from "@ant-design/icons";
-import EdgeModal from "./Modals/EdgeModal";
-import NodeModal from "./Modals/NodeModal";
+import { Button, Space } from "antd";
+import { useCallback, useState } from "react";
+import {
+	ControlProps,
+	Edge,
+	Node,
+	ReactFlowState,
+	useReactFlow,
+	useStore,
+	useStoreApi,
+} from "reactflow";
+import useMainStore from "store";
+import EdgeModal from "../Modals/EdgeModal";
+import NodeModal from "../Modals/NodeModal";
+import CustomControlButtonWithTooltip from "./CustomControlButtonWithTooltip";
+import MapSvg from "./MapSvg";
 
 interface CustomControlsProps {
 	getCurrentEdges: (() => Edge[]) | undefined;
@@ -41,6 +45,7 @@ export default ({
 	const [currentEdges, setCurrentEdges] = useState<Edge[]>([]);
 	const [currentNodes, setCurrentNodes] = useState<Node[]>([]);
 	const [nodeModalOpen, setNodeModalOpen] = useState(false);
+	const setShowMinimap = useMainStore(useCallback((state) => state.setShowMinimap, []));
 
 	const onToggleInteractivity = () => {
 		store.setState({
@@ -48,7 +53,6 @@ export default ({
 			nodesConnectable: !isInteractive,
 			elementsSelectable: !isInteractive,
 		});
-		console.log("not interactive");
 		onInteractiveChange?.(!isInteractive);
 	};
 
@@ -77,67 +81,52 @@ export default ({
 				>
 					Show Nodes
 				</Button>
-				<Tooltip
-					placement="top"
+				<CustomControlButtonWithTooltip
 					title={"Zoom In"}
-				>
-					<Button
-						icon={<PlusOutlined />}
-						type={"default"}
-						onClick={() => zoomIn()}
-					/>
-				</Tooltip>
-				<Tooltip
-					placement="top"
+					icon={<PlusOutlined />}
+					clickEvent={() => zoomIn()}
+				/>
+				<CustomControlButtonWithTooltip
 					title={"Zoom Out"}
-				>
-					<Button
-						icon={<MinusOutlined />}
-						type={"default"}
-						onClick={() => zoomOut()}
-					/>
-				</Tooltip>
-
-				<Tooltip
-					placement="top"
+					icon={<MinusOutlined />}
+					clickEvent={() => zoomOut()}
+				/>
+				<CustomControlButtonWithTooltip
 					title={"Fit To Canvas"}
-				>
-					<Button
-						icon={<ExpandOutlined />}
-						type={"default"}
-						onClick={() => fitView()}
-					/>
-				</Tooltip>
-				<Tooltip
-					placement="top"
+					icon={<ExpandOutlined />}
+					clickEvent={() => fitView()}
+				/>
+				<CustomControlButtonWithTooltip
 					title={"Lock Interactivity"}
-				>
-					<Button
-						type={"default"}
-						icon={isInteractive ? <UnlockOutlined /> : <LockFilled />}
-						onClick={onToggleInteractivity}
-					/>
-				</Tooltip>
-				<Tooltip
-					placement="top"
+					icon={isInteractive ? <UnlockOutlined /> : <LockFilled />}
+					clickEvent={onToggleInteractivity}
+				/>
+				<CustomControlButtonWithTooltip
 					title={"Save Progress"}
-				>
-					<Button
-						icon={<SaveOutlined />}
-						type={"default"}
-						onClick={() => console.log("you saved a thing!")}
-					/>
-				</Tooltip>
-				<Tooltip
-					placement="top"
+					icon={<SaveOutlined />}
+					clickEvent={() => console.log("you saved a thing!")}
+				/>
+				<CustomControlButtonWithTooltip
 					title={"Revert To Last Save Point"}
-				>
-					<Button
-						icon={<ReloadOutlined />}
-						type={"default"}
-						onClick={() => console.log("you reverted a thing!")}
-					/>
-				</Tooltip>
+					icon={<ReloadOutlined />}
+					clickEvent={() => console.log("you reverted a thing!")}
+				/>
+				<CustomControlButtonWithTooltip
+					title={"Delete Progress"}
+					icon={<DeleteOutlined />}
+					clickEvent={() => console.log("you deleted a thing!")}
+				/>
+				<CustomControlButtonWithTooltip
+					title={"Toggle Minimap"}
+					icon={
+						<Icon
+							component={MapSvg}
+							width={10}
+							height={20}
+						/>
+					}
+					clickEvent={setShowMinimap}
+				/>
 				<EdgeModal
 					allCurrentEdgesInCanvas={currentEdges}
 					edgeModalOpen={edgeModalOpen}

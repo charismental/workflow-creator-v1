@@ -1,23 +1,16 @@
-import { FC, useCallback, useEffect, useRef, useState } from "react";
-import ReactFlow, {
-	Background,
-	BackgroundVariant,
-	// Controls,
-	ReactFlowInstance,
-	NodeTypes,
-	Edge,
-} from "reactflow";
+import type { MenuProps } from "antd";
 import defaultEdgeOptions from "data/defaultEdgeOptions";
-import { shallow } from "zustand/shallow";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
+import ReactFlow, { Background, BackgroundVariant, Edge, MiniMap, NodeTypes } from "reactflow";
 import useMainStore, { MainActions, MainState } from "store";
+import { shallow } from "zustand/shallow";
 import CustomConnectionLine from "../components/CustomConnectionLine";
 import FloatingEdge from "../components/FloatingEdge";
-import type { MenuProps } from "antd";
 import StateNode from "../components/StateNode";
 
-import "../css/style.css";
 import "reactflow/dist/style.css";
 import { nodeByState, transformTransitionsToEdges } from "utils";
+import "../css/style.css";
 
 const nodeTypes: NodeTypes = {
 	custom: StateNode,
@@ -32,6 +25,7 @@ const selector = (state: MainState & MainActions) => ({
 	reactFlowInstance: state.reactFlowInstance,
 	setReactFlowInstance: state.setReactFlowInstance,
 	isLightTheme: state.isLightTheme,
+	showMinimap: state.showMinimap,
 });
 
 interface ReactFlowBaseProps {
@@ -48,6 +42,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 	// const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
 
 	const {
+		showMinimap,
 		setStatesForActiveProcess,
 		onNodesChange,
 		onConnect,
@@ -160,6 +155,14 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 					onEdgeContextMenu={openEdgeContextMenu}
 					onNodeContextMenu={openNodeContextMenu}
 				>
+					{showMinimap && (
+						<MiniMap
+							color={activeRoleColor}
+							nodeStrokeWidth={3}
+							zoomable
+							pannable
+						/>
+					)}
 					{!roleIsToggled && (
 						<div
 							style={{

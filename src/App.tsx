@@ -1,20 +1,20 @@
 import { Layout, Space, Spin, Typography, ConfigProvider, theme, Switch } from "antd";
 import { CSSProperties, useCallback, useEffect } from "react";
 import { ReactFlowProvider } from "reactflow";
-import useMainStore from "store";
-import { shallow } from "zustand/shallow";
 import ActiveRoleSettings from "components/ActiveRoleSettings";
+import CustomControls from "components/CustomControls/CustomControls";
 import ReactFlowBase from "components/ReactFlowBase";
 import SelectBox from "components/SelectBox";
 import StateCollapseBox from "components/StateCollapseBox";
-import Sidebar from "./components/Sidebar";
 import "reactflow/dist/style.css";
-import "./css/style.css";
 import type { MainActions, MainState } from "store";
+import useMainStore from "store";
 import { roleColor } from "utils";
-import CustomControls from "components/CustomControls";
 import { MoonSvg, SunSvg } from "assets/icons";
 import Icon from "@ant-design/icons";
+import { shallow } from "zustand/shallow";
+import Sidebar from "./components/Sidebar";
+import "./css/style.css";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
