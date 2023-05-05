@@ -2,7 +2,7 @@ import { FC, useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
 	Background,
 	BackgroundVariant,
-	Controls,
+	// Controls,
 	ReactFlowInstance,
 	NodeTypes,
 	Edge,
@@ -34,6 +34,8 @@ const selector = (state: MainState & MainActions) => ({
 	setStatesForActiveProcess: state.setStatesForActiveProcess,
 	onConnect: state.onConnect,
 	activeProcessStates: state.activeProcess?.States || [],
+	reactFlowInstance: state.reactFlowInstance,
+	setReactFlowInstance: state.setReactFlowInstance,
 });
 
 interface ReactFlowBaseProps {
@@ -49,12 +51,7 @@ const edgeTypes: any = {
 
 const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 	const reactFlowWrapper = useRef<HTMLDivElement>(null);
-	const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
-
-	// reactFlowInstance should only change on init. I think...
-	useEffect(() => {
-		if (reactFlowInstance) reactFlowInstance.fitView();
-	}, [reactFlowInstance]);
+	// const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
 
 	const {
 		setStatesForActiveProcess,
@@ -62,6 +59,8 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		onConnect,
 		activeProcess,
 		activeProcessStates,
+		reactFlowInstance,
+		setReactFlowInstance,
 	} = useMainStore(selector, shallow);
 
 	const {
@@ -72,6 +71,11 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		roleIsToggled,
 	} = props;
 	const [items, setItems] = useState<MenuProps["items"]>();
+
+	// reactFlowInstance should only change on init. I think...
+	useEffect(() => {
+		if (reactFlowInstance) reactFlowInstance.fitView();
+	}, [reactFlowInstance]);
 
 	const edges = transformTransitionsToEdges(
 		activeProcess?.Roles?.find((r) => r.RoleName === activeRole)?.Transitions || []
@@ -205,7 +209,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 						/>
 					)}
 					<Background variant={BackgroundVariant.Dots} />
-					<Controls />
+					{/* <Controls /> */}
 				</ReactFlow>
 			</div>
 		</>

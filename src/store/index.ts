@@ -9,6 +9,7 @@ import {
 	applyNodeChanges,
 	NodeChange,
 	Connection,
+	ReactFlowInstance,
 } from "reactflow";
 import { devtools } from "zustand/middleware";
 import { WorkflowConnection, WorkflowProcess, WorkflowRole, WorkflowState } from "./types";
@@ -30,6 +31,7 @@ export interface MainState {
 	states: WorkflowState[];
 	roles: WorkflowRole[];
 	activeProcess: WorkflowProcess | null;
+	reactFlowInstance: ReactFlowInstance | undefined;
 }
 
 export interface MainActions {
@@ -57,6 +59,7 @@ export interface MainActions {
 	}) => void;
 	setActiveProcess: (processName: string) => void;
 	setColorForActiveRole: (newColor: string) => void;
+	setReactFlowInstance: (instance: ReactFlowInstance) => void;
 }
 
 const useMainStore = create<MainState & MainActions>()(
@@ -402,6 +405,8 @@ const useMainStore = create<MainState & MainActions>()(
 					false,
 					"addNewRole"
 				),
+			reactFlowInstance: undefined,
+			setReactFlowInstance: (instance: ReactFlowInstance) => set({ reactFlowInstance: instance }),
 		}),
 		{
 			name: "Main-Store",

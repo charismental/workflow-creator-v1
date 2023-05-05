@@ -193,3 +193,8 @@ div.targetHandle {
     stroke-dashoffset: 20;
   }
 }
+
+.modal_item {
+  font-size: "16px";
+	line-height: 1.2;
+}

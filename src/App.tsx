@@ -12,6 +12,7 @@ import "reactflow/dist/style.css";
 import "./css/style.css";
 import type { MainActions, MainState } from "store";
 import { roleColor } from "utils";
+import CustomControls from "components/CustomControls";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -52,11 +53,10 @@ const storeSelector = (state: MainActions & MainState) => ({
 	addNewRole: state.addNewRole,
 	fetchAll: state.fetchAll,
 	loading: state.globalLoading,
+	reactFlowInstance: state.reactFlowInstance,
 });
 
 const WorkflowCreator = () => {
-	// const hasHydrated = useMainStore((state) => state._hasHydrated);
-
 	const {
 		processes,
 		addProcess,
@@ -74,6 +74,7 @@ const WorkflowCreator = () => {
 		addNewRole,
 		fetchAll,
 		loading,
+		reactFlowInstance,
 	} = useMainStore(storeSelector, shallow);
 
 	const filteredStates = useMainStore(
@@ -83,6 +84,9 @@ const WorkflowCreator = () => {
 	useEffect(() => {
 		fetchAll();
 	}, []);
+
+	const allCurrentEdgesOnCanvas = reactFlowInstance?.getEdges();
+	const allCurrentNodes = reactFlowInstance?.getNodes();
 
 	const activeRoleColor = roleColor({
 		roleName: activeRole,
@@ -137,34 +141,34 @@ const WorkflowCreator = () => {
 			direction="vertical"
 			style={spaceContainer}
 		>
-			<ReactFlowProvider>
-				<Layout style={layoutContainer}>
-					<Layout>
-						<Header style={headerStyle}>
-							<SelectBox
-								useStyle={{ flexGrow: 1, maxWidth: "360px" }}
-								selectOnChange={setActiveProcess}
-								addNew={addNewProcessAndSelect}
-								type="process"
-								selectValue={activeProcess?.ProcessName}
-								items={availableProcesses}
-								placeholder="Select Process"
-								hasColorInput={false}
-							/>
-							<Title
-								level={2}
-								style={activeRoleTitleStyle}
-							>
-								{activeRole}
-							</Title>
-							<ActiveRoleSettings
-								roleIsToggled={roleIsToggled()}
-								updateColor={setColorForActiveRole}
-								color={activeRoleColor}
-								toggleRole={() => toggleRoleForProcess(activeRole, activeRoleColor)}
-								useStyle={{ flexGrow: 1 }}
-							/>
-						</Header>
+			<Layout style={layoutContainer}>
+				<Layout>
+					<Header style={headerStyle}>
+						<SelectBox
+							useStyle={{ flexGrow: 1, maxWidth: "360px" }}
+							selectOnChange={setActiveProcess}
+							addNew={addNewProcessAndSelect}
+							type="process"
+							selectValue={activeProcess?.ProcessName}
+							items={availableProcesses}
+							placeholder="Select Process"
+							hasColorInput={false}
+						/>
+						<Title
+							level={2}
+							style={activeRoleTitleStyle}
+						>
+							{activeRole}
+						</Title>
+						<ActiveRoleSettings
+							roleIsToggled={roleIsToggled()}
+							updateColor={setColorForActiveRole}
+							color={activeRoleColor}
+							toggleRole={() => toggleRoleForProcess(activeRole, activeRoleColor)}
+							useStyle={{ flexGrow: 1 }}
+						/>
+					</Header>
+					<ReactFlowProvider>
 						<Content className="dndflow">
 							<ReactFlowBase
 								roleIsToggled={roleIsToggled()}
@@ -174,32 +178,36 @@ const WorkflowCreator = () => {
 								activeRole={activeRole}
 							/>
 						</Content>
-					</Layout>
-					<Sidebar
-						children={
-							<>
-								<StateCollapseBox
-									items={availableStates}
-									addNew={addNewState}
-									roleColor={activeRoleColor}
-									disabled={!activeProcess?.Roles?.some((r) => r.RoleName === activeRole)}
-								/>
-								<SelectBox
-									addNew={addNewRoleAndToggle}
-									placeholder="Select Role"
-									selectValue={activeRole}
-									items={roleList}
-									type={"role"}
-									hasColorInput
-									useStyle={{ width: "100%" }}
-									multiselectHandler={(el) => toggleRoleForProcess(el.label)}
-									selectOnChange={setActiveRole}
-								/>
-							</>
-						}
-					/>
+						<CustomControls
+							allCurrentEdgesInCanvas={allCurrentEdgesOnCanvas}
+							allCurrentNodesInCanvas={allCurrentNodes}
+						/>
+					</ReactFlowProvider>
 				</Layout>
-			</ReactFlowProvider>
+				<Sidebar
+					children={
+						<>
+							<StateCollapseBox
+								items={availableStates}
+								addNew={addNewState}
+								roleColor={activeRoleColor}
+								disabled={!activeProcess?.Roles?.some((r) => r.RoleName === activeRole)}
+							/>
+							<SelectBox
+								addNew={addNewRoleAndToggle}
+								placeholder="Select Role"
+								selectValue={activeRole}
+								items={roleList}
+								type={"role"}
+								hasColorInput
+								useStyle={{ width: "100%" }}
+								multiselectHandler={(el) => toggleRoleForProcess(el.label)}
+								selectOnChange={setActiveRole}
+							/>
+						</>
+					}
+				/>
+			</Layout>
 		</Space>
 	);
 };
