@@ -1,25 +1,23 @@
+import { DragOutlined } from "@ant-design/icons";
+import { Descriptions, Dropdown, Typography } from "antd";
+import defaultEdgeOptions from "data/defaultEdgeOptions";
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
 	Background,
 	BackgroundVariant,
 	Controls,
-	ReactFlowInstance,
-	NodeTypes,
 	Edge,
+	NodeTypes,
+	ReactFlowInstance,
 } from "reactflow";
-import { DragOutlined } from "@ant-design/icons";
-import defaultEdgeOptions from "data/defaultEdgeOptions";
-import { shallow } from "zustand/shallow";
+import "reactflow/dist/style.css";
 import useMainStore, { MainActions, MainState } from "store";
+import { getItem, nodeByState, transformTransitionsToEdges } from "utils";
+import { shallow } from "zustand/shallow";
 import CustomConnectionLine from "../components/CustomConnectionLine";
 import FloatingEdge from "../components/FloatingEdge";
-import type { MenuProps } from "antd";
 import StateNode from "../components/StateNode";
-import { Dropdown, Typography, Descriptions } from "antd";
-import { getItem } from "utils";
 import "../css/style.css";
-import "reactflow/dist/style.css";
-import { nodeByState, transformTransitionsToEdges } from "utils";
 
 const { Text, Title } = Typography;
 
@@ -75,7 +73,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		activeRoleColor,
 		roleIsToggled,
 	} = props;
-	const [items, setItems] = useState<MenuProps["items"]>();
+	const [items, setItems] = useState<any>();
 	const edges = transformTransitionsToEdges(
 		activeProcess?.Roles?.find((r) => r.RoleName === activeRole)?.Transitions || []
 	);
@@ -86,49 +84,58 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 			nodeByState({ state, index, allNodesLength: arr.length, color: activeRoleColor })
 		);
 
-	const openEdgeContextMenu = useCallback((e: React.MouseEvent, el: Edge) => {
+	const openEdgeContextMenu = (e: React.MouseEvent, el: Edge) => {
 		e.preventDefault();
 		return setItems([
 			getItem(<Text style={{ fontSize: "18px" }}>Source: {el.source}</Text>, 1, null),
 			getItem(<Text style={{ fontSize: "18px" }}>Target: {el.target}</Text>, 2, null),
 		]);
-	}, []);
+	};
 
-	const openNodeContextMenu = useCallback((e: React.MouseEvent, node: Node | any) => {
+	const openNodeContextMenu = (e: React.MouseEvent, node: Node | any) => {
 		e.preventDefault();
 		e.preventDefault();
 		setItems([
-			getItem(<Title level={3}>{node.id}</Title>, 3, null, [
-				getItem("Position", 1, <DragOutlined />, [
-					getItem(<Text>X: {node.position.x}</Text>, "x", null),
-					getItem(<Text>Y: {node.position.y}</Text>, "y", null),
-				]),
-				getItem("Dimensions", 2, <DragOutlined rotate={45} />, [
-					getItem(`width: ${node.width} `, "w", null),
-					getItem(`height: ${node.height}`, "h", null),
-				]),
-			]),
-		]);
-	}, []);
-
-	const openPaneContextMenu = useCallback(
-		() => (e: React.MouseEvent<Element, MouseEvent>) => {
-			e.preventDefault();
-			return setItems([
+			getItem(<Text style={{ fontSize: "18px", textDecoration: 'underline' }}>{node.id}</Text>, 3, null, [
 				getItem(
-					<Descriptions
-						style={{ fontSize: "18px", width: "min-content" }}
-						title={`Process Name: ${activeProcess?.ProcessName || "Unknown Process Name"}`}
-					>
-						<Descriptions.Item label={"Active Role:"}>{activeRole}</Descriptions.Item>
-					</Descriptions>,
-					1,
-					null
+					<Text style={{ fontSize: "18px" }}>Position</Text>,
+					"pos",
+					<DragOutlined />,
+					[
+						getItem(<Text style={{ fontSize: "18px" }}>X: {node.position.x}</Text>, "x"),
+						getItem(<Text style={{ fontSize: "18px" }}>Y: {node.position.y}</Text>, "y"),
+					],
+					"group"
 				),
-			]);
-		},
-		[]
-	);
+				getItem(
+					<Text style={{ fontSize: "18px" }}>Dimensions</Text>,
+					"dim",
+					<DragOutlined rotate={45} />,
+					[
+						getItem(<Text style={{ fontSize: "18px" }}>X: {node.width}</Text>, "w"),
+						getItem(<Text style={{ fontSize: "18px" }}>X: {node.heigth}</Text>, "h"),
+					],
+					"group"
+				),
+			], 'group'),
+		]);
+	};
+
+	const openPaneContextMenu = (e: React.MouseEvent<Element, MouseEvent>) => {
+		e.preventDefault();
+		return setItems([
+			getItem(
+				<Descriptions
+					style={{ fontSize: "18px", width: "min-content" }}
+					title={`Process Name: ${activeProcess?.ProcessName || "Unknown Process Name"}`}
+				>
+					<Descriptions.Item label={"Active Role:"}>{activeRole}</Descriptions.Item>
+				</Descriptions>,
+				1,
+				null
+			),
+		]);
+	};
 
 	const toggleSelfConnected = useCallback(
 		(stateId: string) => {

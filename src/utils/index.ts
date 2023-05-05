@@ -1,7 +1,7 @@
+import type { MenuProps } from "antd/es/menu";
 import { defaultColors } from "data";
-import { Edge, MarkerType, Position, Node, Connection } from "reactflow";
+import { Connection, Edge, MarkerType, Node, Position } from "reactflow";
 import { WorkflowConnection, WorkflowRole, WorkflowState } from "store/types";
-import type { MenuProps, MenuTheme } from "antd/es/menu";
 
 interface IntersectionNodeType {
 	width: any;
