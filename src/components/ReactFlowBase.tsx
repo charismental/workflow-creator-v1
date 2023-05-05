@@ -1,16 +1,23 @@
-import type { MenuProps } from "antd";
-import defaultEdgeOptions from "data/defaultEdgeOptions";
 import { FC, useCallback, useEffect, useRef, useState } from "react";
-import ReactFlow, { Background, BackgroundVariant, Edge, MiniMap, NodeTypes } from "reactflow";
-import useMainStore, { MainActions, MainState } from "store";
+import ReactFlow, {
+	Background,
+	BackgroundVariant,
+	// Controls,
+	ReactFlowInstance,
+	NodeTypes,
+	Edge,
+} from "reactflow";
+import defaultEdgeOptions from "data/defaultEdgeOptions";
 import { shallow } from "zustand/shallow";
+import useMainStore, { MainActions, MainState } from "store";
 import CustomConnectionLine from "../components/CustomConnectionLine";
 import FloatingEdge from "../components/FloatingEdge";
+import type { MenuProps } from "antd";
 import StateNode from "../components/StateNode";
 
+import "../css/style.css";
 import "reactflow/dist/style.css";
 import { nodeByState, transformTransitionsToEdges } from "utils";
-import "../css/style.css";
 
 const connectionLineStyle = {
 	strokeWidth: 1.5,
@@ -29,7 +36,6 @@ const selector = (state: MainState & MainActions) => ({
 	activeProcessStates: state.activeProcess?.states || [],
 	reactFlowInstance: state.reactFlowInstance,
 	setReactFlowInstance: state.setReactFlowInstance,
-	showMinimap: state.showMinimap,
 });
 
 interface ReactFlowBaseProps {
@@ -46,7 +52,6 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 	// const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
 
 	const {
-		showMinimap,
 		setStatesForActiveProcess,
 		onNodesChange,
 		onConnect,
@@ -56,7 +61,11 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		setReactFlowInstance,
 	} = useMainStore(selector, shallow);
 
-	const { activeRole, activeRoleColor, roleIsToggled } = props;
+	const {
+		activeRole,
+		activeRoleColor,
+		roleIsToggled,
+	} = props;
 	const [items, setItems] = useState<MenuProps["items"]>();
 
 	// reactFlowInstance should only change on init. I think...
@@ -153,14 +162,6 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 					onEdgeContextMenu={openEdgeContextMenu}
 					onNodeContextMenu={openNodeContextMenu}
 				>
-					{showMinimap && (
-						<MiniMap
-							color={activeRoleColor}
-							nodeStrokeWidth={3}
-							zoomable
-							pannable
-						/>
-					)}
 					{!roleIsToggled && (
 						<div
 							style={{

@@ -1,4 +1,4 @@
-import { Divider, Modal, Space, Typography } from "antd";
+import { Modal, Space, Typography } from "antd";
 import { Node } from "reactflow";
 
 const { Title } = Typography;
@@ -19,7 +19,7 @@ export default ({ allCurrentNodesInCanvas, nodeModalOpen, setNodeModalOpen }: Ed
 			onCancel={() => setNodeModalOpen(false)}
 		>
 			<Title level={3}>All Current Nodes (states)</Title>
-			<div style={{ overflowY: "auto", maxHeight: "calc(100vh - 300px)" }}>
+			<div style={{ overflowY: "auto", maxHeight: 'calc(100vh - 300px)' }}>
 				{allCurrentNodesInCanvas.length ? (
 					allCurrentNodesInCanvas.map((node, index) => (
 						<div key={index}>
