@@ -86,9 +86,7 @@ const WorkflowCreator = () => {
 		allRoles: activeProcess?.Roles || [],
 	});
 
-	const roleIsToggled = () => {
-		return !!activeProcess?.Roles?.some((r) => r.RoleName === activeRole);
-	};
+	const roleIsToggled = !!activeProcess?.Roles?.some((r) => r.RoleName === activeRole);
 
 	const availableStates = filteredStates(activeProcess?.States || []);
 
@@ -154,17 +152,17 @@ const WorkflowCreator = () => {
 							{activeRole}
 						</Title>
 						<ActiveRoleSettings
-							roleIsToggled={roleIsToggled()}
+							roleIsToggled={roleIsToggled}
 							updateColor={setColorForActiveRole}
 							color={activeRoleColor}
-							toggleRole={() => toggleRoleForProcess(activeRole, activeRoleColor)}
+							toggleRole={() => toggleRoleForProcess(activeRole)}
 							useStyle={{ flexGrow: 1 }}
 						/>
 					</Header>
 					<ReactFlowProvider>
 						<Content className="dndflow">
 							<ReactFlowBase
-								roleIsToggled={roleIsToggled()}
+								roleIsToggled={roleIsToggled}
 								activeRoleColor={activeRoleColor}
 								activeRole={activeRole}
 							/>
