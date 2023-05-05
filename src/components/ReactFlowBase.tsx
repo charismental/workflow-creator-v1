@@ -129,6 +129,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
 	const openPaneContextMenu = (e: React.MouseEvent<Element, MouseEvent>) => {
 		e.preventDefault();
+		console.log(activeProcess?.processName);
 		return setItems([
 			getItem(
 				<Descriptions
@@ -179,14 +180,14 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
 	return (
 		<>
-			<div
-				className="reactflow-wrapper"
-				ref={reactFlowWrapper}
+			<Dropdown
+				destroyPopupOnHide
+				trigger={["contextMenu"]}
+				menu={{ items }}
 			>
-				<Dropdown
-					destroyPopupOnHide
-					trigger={["contextMenu"]}
-					menu={{ items }}
+				<div
+					className="reactflow-wrapper"
+					ref={reactFlowWrapper}
 				>
 					<ReactFlow
 						nodes={nodes}
@@ -204,7 +205,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 						connectionLineStyle={connectionLineStyle}
 						onEdgeContextMenu={openEdgeContextMenu}
 						onNodeContextMenu={openNodeContextMenu}
-						// onPaneContextMenu={openPaneContextMenu}
+						onPaneContextMenu={openPaneContextMenu}
 					>
 						{showMinimap && (
 							<MiniMap
@@ -230,8 +231,8 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 						<Background variant={BackgroundVariant.Dots} />
 						{/* <Controls /> */}
 					</ReactFlow>
-				</Dropdown>
-			</div>
+				</div>
+			</Dropdown>
 		</>
 	);
 };
