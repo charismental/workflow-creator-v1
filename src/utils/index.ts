@@ -115,7 +115,7 @@ export function createNodesAndEdges() {
 
 export function transformTransitionsToEdges(transitions: WorkflowConnection[]): Edge[] {
   const mapper = (transition: WorkflowConnection): Edge | any => {
-    const { FromStateName: source, ToStateName: target } = transition;
+    const { fromStateName: source, toStateName: target } = transition;
 
     return {
       style: {
@@ -141,9 +141,9 @@ export function transformTransitionsToEdges(transitions: WorkflowConnection[]): 
 export function transformNewConnectionToTransition(connection: Connection, existingTransitions: WorkflowConnection[]): WorkflowConnection | null {
   const { source, target } = connection;
 
-  const foundTransition = existingTransitions.find(({ FromStateName, ToStateName }) => source === FromStateName && target === ToStateName)
+  const foundTransition = existingTransitions.find(({ fromStateName, toStateName }) => source === fromStateName && target === toStateName)
 
-  return foundTransition || (source && target ? { FromStateName: source, ToStateName: target } : null);
+  return foundTransition || (source && target ? { fromStateName: source, toStateName: target } : null);
 }
 
 export function edgeIdByNodes({ source, target }: { source: string; target: string }): string {
@@ -151,7 +151,7 @@ export function edgeIdByNodes({ source, target }: { source: string; target: stri
 }
 
 export function nodeByState({ state, index, allNodesLength, color }: { state: WorkflowState, index: number, allNodesLength?: number, color?: string }): Node {
-  const { StateName, Properties = {} } = state;
+  const { stateName, Properties = {} } = state;
   const defaultW = 200;
   const defaultH = 30;
   const defaultXPadding = 50;
@@ -166,7 +166,7 @@ export function nodeByState({ state, index, allNodesLength, color }: { state: Wo
   const height = propH || defaultH;
 
   return {
-    id: StateName,
+    id: stateName,
     dragHandle: '.drag-handle',
     type: 'custom',
     position: {
@@ -174,7 +174,7 @@ export function nodeByState({ state, index, allNodesLength, color }: { state: Wo
       y
     },
     data: {
-      label: StateName,
+      label: stateName,
       ...(color && { color }),
       w: width,
       h: height,
@@ -189,17 +189,17 @@ export function nodeByState({ state, index, allNodesLength, color }: { state: Wo
 };
 
 export function stateByNode({ node, allStates }: { node: Node | any; allStates: WorkflowState[] }): WorkflowState {
-  const { id: StateName, positionAbsolute = { x: 1, y: 1 }, width: w = 200, height: h = 30 } = node;
-  const foundState = allStates.find(s => s?.StateName === StateName) || {};
+  const { id: stateName, positionAbsolute = { x: 1, y: 1 }, width: w = 200, height: h = 30 } = node;
+  const foundState = allStates.find(s => s?.stateName === stateName) || {};
   const Properties = { ...positionAbsolute, h, w }
 
-  return { ...foundState, StateName, Properties };
+  return { ...foundState, stateName, Properties };
 };
 
 export function roleColor({ roleName, allRoles, index }: { roleName: string; allRoles: WorkflowRole[]; index?: any }): string {
   const availableDefaultColors = defaultColors;
 
-  const roleIndex = typeof index === 'number' ? index : allRoles.findIndex(({ RoleName }) => RoleName === roleName);
+  const roleIndex = typeof index === 'number' ? index : allRoles.findIndex(({ roleName }) => roleName === roleName);
 
   if (roleIndex !== -1) {
     return allRoles[roleIndex]?.Properties?.color || availableDefaultColors[roleIndex % availableDefaultColors.length]

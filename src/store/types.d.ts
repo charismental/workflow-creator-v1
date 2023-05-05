@@ -1,16 +1,16 @@
 export interface WorkflowConnection {
-	StateTransitionId?: number;
-	FromStateId?: number;
-	ToStateId?: number;
-	ProcessId?: number;
-	FromStateName: string;
-	ToStateName: string;
+	stateTransitionId?: number;
+	fromStateId?: number;
+	toStateId?: number;
+	processId?: number;
+	fromStateName: string;
+	toStateName: string;
 }
 
 export interface WorkflowState {
-	StateId?: number;
-	StateName: string;
-	DisplayOrder?: number;
+	stateId?: number;
+	stateName: string;
+	displayOrder?: number;
 	Properties?: {
 		x?: number;
 		y?: number;
@@ -20,16 +20,16 @@ export interface WorkflowState {
 }
 
 export interface WorkflowRole {
-	RoleId?: number;
-	ProcessId?: number;
-	RoleName: string;
+	roleId?: number;
+	processId?: number;
+	roleName: string;
 	Properties?: { color?: string };
-	Transitions?: WorkflowConnection[];
+	transitions?: WorkflowConnection[];
 }
 
 export interface WorkflowProcess {
 	ProcessID?: number;
-	ProcessName: string;
-	States?: Array<WorkflowState>;
-	Roles?: Array<WorkflowRole>;
+	processName: string;
+	states?: Array<WorkflowState>;
+	roles?: Array<WorkflowRole>;
 }

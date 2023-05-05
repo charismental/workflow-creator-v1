@@ -33,7 +33,7 @@ const selector = (state: MainState & MainActions) => ({
 	onNodesChange: state.onNodesChange,
 	setStatesForActiveProcess: state.setStatesForActiveProcess,
 	onConnect: state.onConnect,
-	activeProcessStates: state.activeProcess?.States || [],
+	activeProcessStates: state.activeProcess?.states || [],
 	reactFlowInstance: state.reactFlowInstance,
 	setReactFlowInstance: state.setReactFlowInstance,
 });
@@ -74,11 +74,11 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 	}, [reactFlowInstance]);
 
 	const edges = transformTransitionsToEdges(
-		activeProcess?.Roles?.find((r) => r.RoleName === activeRole)?.Transitions || []
+		activeProcess?.roles?.find((r) => r.roleName === activeRole)?.transitions || []
 	);
 
-	const nodes = [...(activeProcess?.States || [])]
-		.sort((a, b) => a?.DisplayOrder || 1 - (b?.DisplayOrder || 0))
+	const nodes = [...(activeProcess?.states || [])]
+		.sort((a, b) => a?.displayOrder || 1 - (b?.displayOrder || 0))
 		.map((state, index, arr) =>
 			nodeByState({ state, index, allNodesLength: arr.length, color: activeRoleColor })
 		);
@@ -127,9 +127,9 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 			});
 
 			const newState = {
-				StateName: type,
-				DisplayOrder:
-					Math.max(...activeProcessStates.map(({ DisplayOrder }) => DisplayOrder || 0)) + 10,
+				stateName: type,
+				displayOrder:
+					Math.max(...activeProcessStates.map(({ displayOrder }) => displayOrder || 0)) + 10,
 				Properties: { ...position },
 			};
 

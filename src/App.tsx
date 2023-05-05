@@ -83,19 +83,19 @@ const WorkflowCreator = () => {
 
 	const activeRoleColor = roleColor({
 		roleName: activeRole,
-		allRoles: activeProcess?.Roles || [],
+		allRoles: activeProcess?.roles || [],
 	});
 
-	const roleIsToggled = !!activeProcess?.Roles?.some((r) => r.RoleName === activeRole);
+	const roleIsToggled = !!activeProcess?.roles?.some((r) => r.roleName === activeRole);
 
-	const availableStates = filteredStates(activeProcess?.States || []);
+	const availableStates = filteredStates(activeProcess?.states || []);
 
-	const availableProcesses = processes.map((p) => p.ProcessName);
+	const availableProcesses = processes.map((p) => p.processName);
 
-	const roleList = roles.map(({ RoleName }) => {
+	const roleList = roles.map(({ roleName }) => {
 		return {
-			label: RoleName,
-			value: activeProcess?.Roles?.some((r) => r.RoleName === RoleName) || false,
+			label: roleName,
+			value: activeProcess?.roles?.some((r) => r.roleName === roleName) || false,
 		};
 	});
 
@@ -140,7 +140,7 @@ const WorkflowCreator = () => {
 							selectOnChange={setActiveProcess}
 							addNew={addNewProcessAndSelect}
 							type="process"
-							selectValue={activeProcess?.ProcessName}
+							selectValue={activeProcess?.processName}
 							items={availableProcesses}
 							placeholder="Select Process"
 							hasColorInput={false}
@@ -180,7 +180,7 @@ const WorkflowCreator = () => {
 								items={availableStates}
 								addNew={addNewState}
 								roleColor={activeRoleColor}
-								disabled={!activeProcess?.Roles?.some((r) => r.RoleName === activeRole)}
+								disabled={!activeProcess?.roles?.some((r) => r.roleName === activeRole)}
 							/>
 							<SelectBox
 								addNew={addNewRoleAndToggle}

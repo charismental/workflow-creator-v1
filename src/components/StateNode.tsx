@@ -44,7 +44,7 @@ const StateNode: FunctionComponent<NodeProps> = ({
   );
 
   const selfConnected = useMainStore(
-      (state) => !!(state.activeProcess?.Roles?.find(({ RoleName }) => RoleName === state.activeRole)?.Transitions?.find(({ FromStateName, ToStateName }) => [FromStateName, ToStateName].every(el => el === id))),
+      (state) => !!(state.activeProcess?.roles?.find(({ roleName }) => roleName === state.activeRole)?.transitions?.find(({ fromStateName, toStateName }) => [fromStateName, toStateName].every(el => el === id))),
       shallow
     );
 
