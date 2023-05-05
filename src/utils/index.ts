@@ -199,7 +199,7 @@ export function stateByNode({ node, allStates }: { node: Node | any; allStates: 
 export function roleColor({ roleName, allRoles, index }: { roleName: string; allRoles: WorkflowRole[]; index?: any }): string {
   const availableDefaultColors = defaultColors;
 
-  const roleIndex = index || allRoles.findIndex(({ RoleName }) => RoleName === roleName);
+  const roleIndex = typeof index === 'number' ? index : allRoles.findIndex(({ RoleName }) => RoleName === roleName);
 
   if (roleIndex !== -1) {
     return allRoles[roleIndex]?.Properties?.color || availableDefaultColors[roleIndex % availableDefaultColors.length]
