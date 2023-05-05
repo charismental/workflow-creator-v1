@@ -71,8 +71,14 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
 	// reactFlowInstance should only change on init. I think...
 	useEffect(() => {
-		if (reactFlowInstance) reactFlowInstance.fitView();
+		if (reactFlowInstance?.viewportInitialized) {
+			setTimeout(() => {
+				reactFlowInstance.fitView();
+			}, 1000);
+		}
 	}, [reactFlowInstance]);
+
+	console.log(reactFlowInstance?.viewportInitialized);
 
 	const edges = transformTransitionsToEdges(
 		activeProcess?.roles?.find((r) => r.roleName === activeRole)?.transitions || []
@@ -177,6 +183,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		[reactFlowInstance, setStatesForActiveProcess, activeRole, nodes]
 	);
 
+	console.log(activeRoleColor);
 	return (
 		<>
 			<Dropdown
@@ -210,7 +217,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 						{showMinimap && (
 							<MiniMap
 								color={activeRoleColor}
-								nodeStrokeWidth={3}
+								nodeStrokeWidth={6}
 								zoomable
 								pannable
 							/>
