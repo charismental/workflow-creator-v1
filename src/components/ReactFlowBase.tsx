@@ -7,6 +7,7 @@ import ReactFlow, {
 	NodeTypes,
 	Edge,
 } from "reactflow";
+import { DragOutlined } from "@ant-design/icons";
 import defaultEdgeOptions from "data/defaultEdgeOptions";
 import { shallow } from "zustand/shallow";
 import useMainStore, { MainActions, MainState } from "store";
@@ -14,10 +15,13 @@ import CustomConnectionLine from "../components/CustomConnectionLine";
 import FloatingEdge from "../components/FloatingEdge";
 import type { MenuProps } from "antd";
 import StateNode from "../components/StateNode";
-
+import { Dropdown, Typography, Descriptions } from "antd";
+import { getItem } from "utils";
 import "../css/style.css";
 import "reactflow/dist/style.css";
 import { nodeByState, transformTransitionsToEdges } from "utils";
+
+const { Text, Title } = Typography;
 
 const connectionLineStyle = {
 	strokeWidth: 1.5,
@@ -72,7 +76,6 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		roleIsToggled,
 	} = props;
 	const [items, setItems] = useState<MenuProps["items"]>();
-
 	const edges = transformTransitionsToEdges(
 		activeProcess?.Roles?.find((r) => r.RoleName === activeRole)?.Transitions || []
 	);
@@ -85,25 +88,47 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
 	const openEdgeContextMenu = useCallback((e: React.MouseEvent, el: Edge) => {
 		e.preventDefault();
-		setItems([
-			{ label: `Source: ${el.source}`, key: 1 },
-			{ label: `Target: ${el.target}`, key: 2 },
+		return setItems([
+			getItem(<Text style={{ fontSize: "18px" }}>Source: {el.source}</Text>, 1, null),
+			getItem(<Text style={{ fontSize: "18px" }}>Target: {el.target}</Text>, 2, null),
 		]);
 	}, []);
 
-	const openNodeContextMenu = useCallback((e: React.MouseEvent, node: any) => {
+	const openNodeContextMenu = useCallback((e: React.MouseEvent, node: Node | any) => {
+		e.preventDefault();
 		e.preventDefault();
 		setItems([
-			{
-				label: `Position: {x: ${node.position.x}, y: ${node.position.y}}`,
-				key: 1,
-			},
-			{
-				label: `Dimensions: {width: ${node.style.width}, height: ${node.style.height}}`,
-				key: 2,
-			},
+			getItem(<Title level={3}>{node.id}</Title>, 3, null, [
+				getItem("Position", 1, <DragOutlined />, [
+					getItem(<Text>X: {node.position.x}</Text>, "x", null),
+					getItem(<Text>Y: {node.position.y}</Text>, "y", null),
+				]),
+				getItem("Dimensions", 2, <DragOutlined rotate={45} />, [
+					getItem(`width: ${node.width} `, "w", null),
+					getItem(`height: ${node.height}`, "h", null),
+				]),
+			]),
 		]);
 	}, []);
+
+	const openPaneContextMenu = useCallback(
+		() => (e: React.MouseEvent<Element, MouseEvent>) => {
+			e.preventDefault();
+			return setItems([
+				getItem(
+					<Descriptions
+						style={{ fontSize: "18px", width: "min-content" }}
+						title={`Process Name: ${activeProcess?.ProcessName || "Unknown Process Name"}`}
+					>
+						<Descriptions.Item label={"Active Role:"}>{activeRole}</Descriptions.Item>
+					</Descriptions>,
+					1,
+					null
+				),
+			]);
+		},
+		[]
+	);
 
 	const toggleSelfConnected = useCallback(
 		(stateId: string) => {
@@ -161,53 +186,60 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
 	return (
 		<>
-			<div
-				className="reactflow-wrapper"
-				ref={reactFlowWrapper}
+			<Dropdown
+				destroyPopupOnHide
+				trigger={["contextMenu"]}
+				menu={{ items }}
 			>
-				<ReactFlow
-					nodes={nodes.map((node: any) => ({
-						...node,
-						data: {
-							...node.data,
-							toggleSelfConnected,
-							selfConnected: allSelfConnectingEdges?.[activeRole]?.some(
-								({ target }: any) => target === node.id
-							),
-						},
-					}))}
-					edges={edges}
-					onNodesChange={onNodesChange}
-					onConnect={onConnect}
-					onInit={setReactFlowInstance}
-					onDrop={onDrop}
-					onDragOver={onDragOver}
-					fitView
-					nodeTypes={nodeTypes}
-					edgeTypes={edgeTypes}
-					defaultEdgeOptions={defaultEdgeOptions}
-					connectionLineComponent={CustomConnectionLine}
-					connectionLineStyle={connectionLineStyle}
-					onEdgeContextMenu={openEdgeContextMenu}
-					onNodeContextMenu={openNodeContextMenu}
+				<div
+					className="reactflow-wrapper"
+					ref={reactFlowWrapper}
 				>
-					{!roleIsToggled && (
-						<div
-							style={{
-								zIndex: 5000000,
-								backgroundColor: "darkGrey",
-								opacity: 0.5,
-								width: "100%",
-								height: "100%",
-								position: "relative",
-								cursor: "not-allowed",
-							}}
-						/>
-					)}
-					<Background variant={BackgroundVariant.Dots} />
-					<Controls />
-				</ReactFlow>
-			</div>
+					<ReactFlow
+						nodes={nodes.map((node: any) => ({
+							...node,
+							data: {
+								...node.data,
+								toggleSelfConnected,
+								selfConnected: allSelfConnectingEdges?.[activeRole]?.some(
+									({ target }: any) => target === node.id
+								),
+							},
+						}))}
+						edges={edges}
+						onNodesChange={onNodesChange}
+						onConnect={onConnect}
+						onInit={setReactFlowInstance}
+						onDrop={onDrop}
+						onDragOver={onDragOver}
+						fitView
+						nodeTypes={nodeTypes}
+						edgeTypes={edgeTypes}
+						defaultEdgeOptions={defaultEdgeOptions}
+						connectionLineComponent={CustomConnectionLine}
+						connectionLineStyle={connectionLineStyle}
+						onEdgeContextMenu={openEdgeContextMenu}
+						onNodeContextMenu={openNodeContextMenu}
+						onPaneContextMenu={openPaneContextMenu}
+					>
+						{!roleIsToggled && (
+							<div
+								style={{
+									zIndex: 5000000,
+									backgroundColor: "darkGrey",
+									opacity: 0.5,
+									width: "100%",
+									height: "100%",
+									position: "relative",
+									cursor: "not-allowed",
+								}}
+							/>
+						)}
+						<Background variant={BackgroundVariant.Dots} />
+						<Controls />
+					</ReactFlow>
+				</div>
+			</Dropdown>
 		</>
 	);
 };
