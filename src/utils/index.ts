@@ -116,7 +116,7 @@ export function createNodesAndEdges() {
 
 export function transformTransitionsToEdges(transitions: WorkflowConnection[]): Edge[] {
 	const mapper = (transition: WorkflowConnection): Edge | any => {
-		const { FromStateName: source, ToStateName: target } = transition;
+		const { fromStateName: source, toStateName: target } = transition;
 
 		return {
 			style: {
@@ -139,22 +139,6 @@ export function transformTransitionsToEdges(transitions: WorkflowConnection[]): 
 	return transitions.map(mapper);
 }
 
-// export function transformEdgesToTransitions(edges: Edge[], existingTransitions: WorkflowConnection[]): WorkflowConnection[] {
-//   const mapper = (edge: Edge): WorkflowConnection => {
-//     const { source, target } = edge;
-
-//     const foundTransition = existingTransitions.find(({ FromStateName, ToStateName }) => source === FromStateName && target === ToStateName)
-
-//     return {
-//       ...foundTransition,
-//       FromStateName: source,
-//       ToStateName: target,
-//     }
-//   };
-
-//   return edges.map(mapper);
-// }
-
 export function transformNewConnectionToTransition(
 	connection: Connection,
 	existingTransitions: WorkflowConnection[]
@@ -162,11 +146,11 @@ export function transformNewConnectionToTransition(
 	const { source, target } = connection;
 
 	const foundTransition = existingTransitions.find(
-		({ FromStateName, ToStateName }) => source === FromStateName && target === ToStateName
+		({ fromStateName, toStateName }) => source === fromStateName && target === toStateName
 	);
 
 	return (
-		foundTransition || (source && target ? { FromStateName: source, ToStateName: target } : null)
+		foundTransition || (source && target ? { fromStateName: source, toStateName: target } : null)
 	);
 }
 
@@ -177,7 +161,6 @@ export function edgeIdByNodes({ source, target }: { source: string; target: stri
 export function nodeByState({
 	state,
 	index,
-	allNodesLength,
 	color,
 }: {
 	state: WorkflowState;
@@ -185,7 +168,7 @@ export function nodeByState({
 	allNodesLength?: number;
 	color?: string;
 }): Node {
-	const { StateName, Properties = {} } = state;
+	const { stateName, Properties = {} } = state;
 	const defaultW = 200;
 	const defaultH = 30;
 	const defaultXPadding = 50;
@@ -194,13 +177,14 @@ export function nodeByState({
 
 	const { x: propX, y: propY, w: propW, h: propH } = Properties;
 
-	const x = propX || (index % divisor) * (defaultW + defaultXPadding);
-	const y = propY || Math.floor(index / divisor) * (defaultH + defaultYPadding);
+	const x = typeof propX === "number" ? propX : (index % divisor) * (defaultW + defaultXPadding);
+	const y =
+		typeof propY === "number" ? propY : Math.floor(index / divisor) * (defaultH + defaultYPadding);
 	const width = propW || defaultW;
 	const height = propH || defaultH;
 
 	return {
-		id: StateName,
+		id: stateName,
 		dragHandle: ".drag-handle",
 		type: "custom",
 		position: {
@@ -208,7 +192,7 @@ export function nodeByState({
 			y,
 		},
 		data: {
-			label: StateName,
+			label: stateName,
 			...(color && { color }),
 			w: width,
 			h: height,
@@ -229,11 +213,11 @@ export function stateByNode({
 	node: Node | any;
 	allStates: WorkflowState[];
 }): WorkflowState {
-	const { id: StateName, positionAbsolute = { x: 1, y: 1 }, width: w = 200, height: h = 30 } = node;
-	const foundState = allStates.find((s) => s?.StateName === StateName) || {};
+	const { id: stateName, positionAbsolute = { x: 1, y: 1 }, width: w = 200, height: h = 30 } = node;
+	const foundState = allStates.find((s) => s?.stateName === stateName) || {};
 	const Properties = { ...positionAbsolute, h, w };
 
-	return { ...foundState, StateName, Properties };
+	return { ...foundState, stateName, Properties };
 }
 
 export function roleColor({
@@ -247,7 +231,8 @@ export function roleColor({
 }): string {
 	const availableDefaultColors = defaultColors;
 
-	const roleIndex = index || allRoles.findIndex(({ RoleName }) => RoleName === roleName);
+	const roleIndex =
+		typeof index === "number" ? index : allRoles.findIndex((r) => r.roleName === roleName);
 
 	if (roleIndex !== -1) {
 		return (
