@@ -1,4 +1,4 @@
-import { Layout, Space, Spin, Typography, ConfigProvider, theme } from "antd";
+import { Layout, Space, Spin, Typography, ConfigProvider, theme, Switch } from "antd";
 import { CSSProperties, useCallback, useEffect } from "react";
 import { ReactFlowProvider } from "reactflow";
 import useMainStore from "store";
@@ -27,6 +27,14 @@ const activeRoleTitleStyle: CSSProperties = {
 	flexGrow: 2,
 	textAlign: "center",
 	paddingBottom: "18px",
+};
+
+const switchStyle: CSSProperties = {
+	color: theme ? "" : "white",
+	position: "absolute",
+	fontSize: "10px",
+	bottom: "20px",
+	right: "20px",
 };
 
 const layoutContainer: CSSProperties = { width: "100%", height: "100vh" };
@@ -191,7 +199,7 @@ const WorkflowCreator = () => {
 						children={
 							<>
 								<StateCollapseBox
-									theme={isLightTheme}
+									isLightTheme={isLightTheme}
 									items={availableStates}
 									addNew={addNewState}
 									roleColor={activeRoleColor}
@@ -213,28 +221,27 @@ const WorkflowCreator = () => {
 									multiselectHandler={(el) => toggleRoleForProcess(el.label)}
 									selectOnChange={setActiveRole}
 								/>
-								<Icon
-									style={{
-										fontSize: "20pt",
-										color: colorTheme ? "black" : "white",
-										color: lightMode ? "black" : "white",
-									}}
-									component={SunSvg}
-								/>
-								<Switch
-									size="small"
-									onChange={() => setColorTheme()}
-									onChange={() => setlightMode()}
-									style={{ margin: "10px" }}
-								/>
-								<Icon
-									style={{
-										fontSize: "20pt",
-										color: colorTheme ? "black" : "white",
-										color: lightMode ? "black" : "white",
-									}}
-									component={MoonSvg}
-								/>
+								<div style={switchStyle}>
+									<Icon
+										style={{
+											fontSize: "20pt",
+											color: isLightTheme ? "black" : "white",
+										}}
+										component={SunSvg}
+									/>
+									<Switch
+										size="small"
+										onChange={() => toggleLightTheme()}
+										style={{ margin: "10px" }}
+									/>
+									<Icon
+										style={{
+											fontSize: "20pt",
+											color: isLightTheme ? "black" : "white",
+										}}
+										component={MoonSvg}
+									/>
+								</div>
 							</>
 						}
 					/>

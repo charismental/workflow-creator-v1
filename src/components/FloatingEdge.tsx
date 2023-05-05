@@ -77,7 +77,14 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 						className="edgebutton"
 						onClick={onEdgeClick}
 						icon={
-							isLightTheme ? <CloseCircleOutlined className="dumb-icon" /> : <CloseCircleFilled />
+							isLightTheme ? (
+								<CloseCircleOutlined className="dumb-icon" />
+							) : (
+								<CloseCircleFilled
+									className="dumb-icon"
+									style={{ color: "black" }}
+								/>
+							)
 						}
 					/>
 				</div>

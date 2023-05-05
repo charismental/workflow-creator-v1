@@ -81,7 +81,7 @@ const StateCollapseBox: React.FC<StateCollapsebox> = ({
 					<Panel
 						header={"Add/Select State"}
 						key="1"
-						style={isLightTheme ? { backgroundColor: "lightgray" } : {}}
+						style={!isLightTheme ? { backgroundColor: "darkGray" } : {}}
 					>
 						<Input
 							style={{ width: "100%", position: "sticky", top: 0 }}

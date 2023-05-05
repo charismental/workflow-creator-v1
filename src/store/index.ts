@@ -402,7 +402,7 @@ const useMainStore = create<MainState & MainActions>()(
 				),
 			reactFlowInstance: undefined,
 			setReactFlowInstance: (instance: ReactFlowInstance) => set({ reactFlowInstance: instance }),
-			isLightTheme: false,
+			isLightTheme: true,
 			toggleLightTheme: () => set({ isLightTheme: !get().isLightTheme }, false, "toggleLightTheme"),
 		}),
 		{
