@@ -1,16 +1,26 @@
-import type { MenuProps } from "antd";
+import { DragOutlined } from "@ant-design/icons";
+import { Descriptions, Dropdown, Typography, MenuProps } from "antd";
 import defaultEdgeOptions from "data/defaultEdgeOptions";
 import { FC, useCallback, useEffect, useRef, useState } from "react";
-import ReactFlow, { Background, BackgroundVariant, Edge, MiniMap, NodeTypes } from "reactflow";
+import ReactFlow, {
+	Background,
+	BackgroundVariant,
+	Controls,
+	Edge,
+	MiniMap,
+	NodeTypes,
+	ReactFlowInstance,
+} from "reactflow";
+import "reactflow/dist/style.css";
 import useMainStore, { MainActions, MainState } from "store";
+import { getItem, nodeByState, transformTransitionsToEdges } from "utils";
 import { shallow } from "zustand/shallow";
 import CustomConnectionLine from "../components/CustomConnectionLine";
 import FloatingEdge from "../components/FloatingEdge";
 import StateNode from "../components/StateNode";
-
-import "reactflow/dist/style.css";
-import { nodeByState, transformTransitionsToEdges } from "utils";
 import "../css/style.css";
+
+const { Text, Title } = Typography;
 
 const connectionLineStyle = {
 	strokeWidth: 1.5,
@@ -74,27 +84,64 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 			nodeByState({ state, index, allNodesLength: arr.length, color: activeRoleColor })
 		);
 
-	const openEdgeContextMenu = useCallback((e: React.MouseEvent, el: Edge) => {
+	const openEdgeContextMenu = (e: React.MouseEvent, el: Edge) => {
 		e.preventDefault();
-		setItems([
-			{ label: `Source: ${el.source}`, key: 1 },
-			{ label: `Target: ${el.target}`, key: 2 },
+		return setItems([
+			getItem(<Text style={{ fontSize: "18px" }}>Source: {el.source}</Text>, 1, null),
+			getItem(<Text style={{ fontSize: "18px" }}>Target: {el.target}</Text>, 2, null),
 		]);
-	}, []);
+	};
 
-	const openNodeContextMenu = useCallback((e: React.MouseEvent, node: any) => {
+	const openNodeContextMenu = (e: React.MouseEvent, node: Node | any) => {
+		e.preventDefault();
 		e.preventDefault();
 		setItems([
-			{
-				label: `Position: {x: ${node.position.x}, y: ${node.position.y}}`,
-				key: 1,
-			},
-			{
-				label: `Dimensions: {width: ${node.style.width}, height: ${node.style.height}}`,
-				key: 2,
-			},
+			getItem(
+				<Text style={{ fontSize: "18px", textDecoration: "underline" }}>{node.id}</Text>,
+				3,
+				null,
+				[
+					getItem(
+						<Text style={{ fontSize: "18px" }}>Position</Text>,
+						"pos",
+						<DragOutlined />,
+						[
+							getItem(<Text style={{ fontSize: "18px" }}>X: {node.position.x}</Text>, "x"),
+							getItem(<Text style={{ fontSize: "18px" }}>Y: {node.position.y}</Text>, "y"),
+						],
+						"group"
+					),
+					getItem(
+						<Text style={{ fontSize: "18px" }}>Dimensions</Text>,
+						"dim",
+						<DragOutlined rotate={45} />,
+						[
+							getItem(<Text style={{ fontSize: "18px" }}>X: {node.width}</Text>, "w"),
+							getItem(<Text style={{ fontSize: "18px" }}>X: {node.heigth}</Text>, "h"),
+						],
+						"group"
+					),
+				],
+				"group"
+			),
 		]);
-	}, []);
+	};
+
+	const openPaneContextMenu = (e: React.MouseEvent<Element, MouseEvent>) => {
+		e.preventDefault();
+		return setItems([
+			getItem(
+				<Descriptions
+					style={{ fontSize: "18px", width: "min-content" }}
+					title={`Process Name: ${activeProcess?.processName || "Unknown Process Name"}`}
+				>
+					<Descriptions.Item label={"Active Role:"}>{activeRole}</Descriptions.Item>
+				</Descriptions>,
+				1,
+				null
+			),
+		]);
+	};
 
 	const onDragOver = useCallback((event: any) => {
 		event.preventDefault();
@@ -132,9 +179,10 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
 	return (
 		<>
-			<div
-				className="reactflow-wrapper"
-				ref={reactFlowWrapper}
+			<Dropdown
+				destroyPopupOnHide
+				trigger={["contextMenu"]}
+				menu={{ items }}
 			>
 				<ReactFlow
 					nodes={nodes}
@@ -152,6 +200,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 					connectionLineStyle={connectionLineStyle}
 					onEdgeContextMenu={openEdgeContextMenu}
 					onNodeContextMenu={openNodeContextMenu}
+					onPaneContextMenu={openPaneContextMenu}
 				>
 					{showMinimap && (
 						<MiniMap
@@ -177,7 +226,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 					<Background variant={BackgroundVariant.Dots} />
 					{/* <Controls /> */}
 				</ReactFlow>
-			</div>
+			</Dropdown>
 		</>
 	);
 };
