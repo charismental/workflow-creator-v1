@@ -200,6 +200,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 					connectionLineStyle={connectionLineStyle}
 					onEdgeContextMenu={openEdgeContextMenu}
 					onNodeContextMenu={openNodeContextMenu}
+					onPaneContextMenu={openPaneContextMenu}
 				>
 					{showMinimap && (
 						<MiniMap
