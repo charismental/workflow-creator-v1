@@ -155,7 +155,9 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 				>
 					{showMinimap && (
 						<MiniMap
-							color={activeRoleColor}
+							nodeColor={activeRoleColor}
+							maskStrokeColor="darkGray"
+							maskStrokeWidth={20}
 							nodeStrokeWidth={3}
 							zoomable
 							pannable
