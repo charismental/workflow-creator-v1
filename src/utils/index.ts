@@ -138,22 +138,6 @@ export function transformTransitionsToEdges(transitions: WorkflowConnection[]): 
   return transitions.map(mapper);
 }
 
-// export function transformEdgesToTransitions(edges: Edge[], existingTransitions: WorkflowConnection[]): WorkflowConnection[] {
-//   const mapper = (edge: Edge): WorkflowConnection => {
-//     const { source, target } = edge;
-
-//     const foundTransition = existingTransitions.find(({ FromStateName, ToStateName }) => source === FromStateName && target === ToStateName)
-
-//     return {
-//       ...foundTransition,
-//       FromStateName: source,
-//       ToStateName: target,
-//     }
-//   };
-
-//   return edges.map(mapper);
-// }
-
 export function transformNewConnectionToTransition(connection: Connection, existingTransitions: WorkflowConnection[]): WorkflowConnection | null {
   const { source, target } = connection;
 
@@ -176,8 +160,8 @@ export function nodeByState({ state, index, allNodesLength, color }: { state: Wo
 
   const { x: propX, y: propY, w: propW, h: propH } = Properties;
 
-  const x = propX || index % divisor * (defaultW + defaultXPadding);
-  const y = propY || Math.floor(index / divisor) * (defaultH + defaultYPadding);
+  const x = typeof propX === 'number' ? propX : index % divisor * (defaultW + defaultXPadding);
+  const y = typeof propY === 'number' ? propY : Math.floor(index / divisor) * (defaultH + defaultYPadding);
   const width = propW || defaultW;
   const height = propH || defaultH;
 

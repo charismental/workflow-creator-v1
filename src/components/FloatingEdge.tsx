@@ -2,7 +2,7 @@ import { CloseCircleOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import { FunctionComponent, useCallback, useState } from "react";
 import { EdgeProps, getStraightPath, useStore as useReactFlowStore } from "reactflow";
-import { getEdgeParams, nodeByState } from "../utils";
+import { getEdgeParams } from "../utils";
 import useMainStore from "store";
 import { shallow } from "zustand/shallow";
 
@@ -10,13 +10,6 @@ const foreignObjectSize = 40;
 
 const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd, style }) => {
 	const removeTransition = useMainStore((state) => state.removeTransition, shallow);
-
-	const states = useMainStore((state) => state.activeProcess?.States || []);
-
-	const nodes = states.map((state, index) =>
-		nodeByState({ state, index, allNodesLength: states.length })
-	);
-
 	const [isHover, setIsHover] = useState<boolean | null>(null);
 
 	// useEffect(() => {
