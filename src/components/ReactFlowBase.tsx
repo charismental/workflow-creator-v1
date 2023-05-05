@@ -2,15 +2,7 @@ import { DragOutlined } from "@ant-design/icons";
 import { Descriptions, Dropdown, Typography, MenuProps } from "antd";
 import defaultEdgeOptions from "data/defaultEdgeOptions";
 import { FC, useCallback, useEffect, useRef, useState } from "react";
-import ReactFlow, {
-	Background,
-	BackgroundVariant,
-	Controls,
-	Edge,
-	MiniMap,
-	NodeTypes,
-	ReactFlowInstance,
-} from "reactflow";
+import ReactFlow, { Background, BackgroundVariant, Edge, MiniMap, NodeTypes } from "reactflow";
 import "reactflow/dist/style.css";
 import useMainStore, { MainActions, MainState } from "store";
 import { getItem, nodeByState, transformTransitionsToEdges } from "utils";
@@ -20,7 +12,7 @@ import FloatingEdge from "../components/FloatingEdge";
 import StateNode from "../components/StateNode";
 import "../css/style.css";
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 const connectionLineStyle = {
 	strokeWidth: 1.5,
@@ -78,8 +70,6 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		}
 	}, [reactFlowInstance]);
 
-	console.log(reactFlowInstance?.viewportInitialized);
-
 	const edges = transformTransitionsToEdges(
 		activeProcess?.roles?.find((r) => r.roleName === activeRole)?.transitions || []
 	);
@@ -122,8 +112,8 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 						"dim",
 						<DragOutlined rotate={45} />,
 						[
-							getItem(<Text style={{ fontSize: "18px" }}>X: {node.width}</Text>, "w"),
-							getItem(<Text style={{ fontSize: "18px" }}>X: {node.heigth}</Text>, "h"),
+							getItem(<Text style={{ fontSize: "18px" }}>W: {node.width}</Text>, "w"),
+							getItem(<Text style={{ fontSize: "18px" }}>H: {node.height}</Text>, "h"),
 						],
 						"group"
 					),
@@ -183,7 +173,6 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		[reactFlowInstance, setStatesForActiveProcess, activeRole, nodes]
 	);
 
-	console.log(activeRoleColor);
 	return (
 		<>
 			<Dropdown
@@ -216,9 +205,12 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 					>
 						{showMinimap && (
 							<MiniMap
-								color={activeRoleColor}
+								nodeColor={activeRoleColor}
+								nodeStrokeColor={"black"}
 								nodeStrokeWidth={6}
 								zoomable
+								maskStrokeColor="darkGray"
+								maskStrokeWidth={20}
 								pannable
 							/>
 						)}
