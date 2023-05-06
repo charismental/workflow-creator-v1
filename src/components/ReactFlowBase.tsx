@@ -135,6 +135,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 			<div
 				className="reactflow-wrapper"
 				ref={reactFlowWrapper}
+				id="download"
 			>
 				<ReactFlow
 					nodes={nodes}

@@ -8,8 +8,9 @@ import Icon, {
 	SaveOutlined,
 	UnlockOutlined,
 } from "@ant-design/icons";
-import { Button, Space } from "antd";
+import { Button, Space, Tooltip } from "antd";
 import { useCallback, useState } from "react";
+import DownloadButton from "tools/DownloadImage";
 import {
 	ControlProps,
 	Edge,
@@ -127,6 +128,12 @@ export default ({
 					}
 					clickEvent={setShowMinimap}
 				/>
+				<Tooltip
+					title={"Download Workflow as Image"}
+					placement={"top"}
+				>
+					<DownloadButton />
+				</Tooltip>
 				<EdgeModal
 					allCurrentEdgesInCanvas={currentEdges}
 					edgeModalOpen={edgeModalOpen}
