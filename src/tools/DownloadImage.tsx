@@ -2,7 +2,7 @@ import React from "react";
 import { toPng } from "html-to-image";
 import { Button } from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
-import useMainStore from "store";
+import useMainStore from "../store";
 
 function downloadImage(dataUrl: any) {
 	const a = document.createElement("a");
