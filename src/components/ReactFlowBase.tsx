@@ -1,16 +1,17 @@
+import "reactflow/dist/style.css";
+import "../css/style.css";
 import { DragOutlined } from "@ant-design/icons";
 import { Descriptions, Dropdown, Typography, MenuProps } from "antd";
 import defaultEdgeOptions from "data/defaultEdgeOptions";
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, { Background, BackgroundVariant, Edge, MiniMap, NodeTypes } from "reactflow";
-import "reactflow/dist/style.css";
 import useMainStore, { MainActions, MainState } from "store";
-import { getItem, nodeByState, transformTransitionsToEdges } from "utils";
 import { shallow } from "zustand/shallow";
 import CustomConnectionLine from "../components/CustomConnectionLine";
 import FloatingEdge from "../components/FloatingEdge";
 import StateNode from "../components/StateNode";
-import "../css/style.css";
+import { computedEdges, getItem, computedNodes } from "utils";
+import LabelNode from "./LabelNode";
 
 const { Text } = Typography;
 
@@ -21,6 +22,7 @@ const connectionLineStyle = {
 
 const nodeTypes: NodeTypes = {
 	custom: StateNode,
+	label: LabelNode,
 };
 
 const selector = (state: MainState & MainActions) => ({
@@ -32,6 +34,7 @@ const selector = (state: MainState & MainActions) => ({
 	reactFlowInstance: state.reactFlowInstance,
 	setReactFlowInstance: state.setReactFlowInstance,
 	showMinimap: state.showMinimap,
+	showAllRoles: state.showAllRoles,
 });
 
 interface ReactFlowBaseProps {
@@ -56,6 +59,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		activeProcessStates,
 		reactFlowInstance,
 		setReactFlowInstance,
+		showAllRoles,
 	} = useMainStore(selector, shallow);
 
 	const { activeRole, activeRoleColor, roleIsToggled } = props;
@@ -67,18 +71,12 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 			setTimeout(() => {
 				reactFlowInstance.fitView();
 			}, 1000);
-		}
-	}, [reactFlowInstance]);
+		};
+	}, [reactFlowInstance, showAllRoles]);
 
-	const edges = transformTransitionsToEdges(
-		activeProcess?.roles?.find((r) => r.roleName === activeRole)?.transitions || []
-	);
+	const edges = computedEdges({ roles: activeProcess?.roles || [], activeRole, showAllRoles })
 
-	const nodes = [...(activeProcess?.states || [])]
-		.sort((a, b) => a?.displayOrder || 1 - (b?.displayOrder || 0))
-		.map((state, index, arr) =>
-			nodeByState({ state, index, allNodesLength: arr.length, color: activeRoleColor })
-		);
+	const nodes = computedNodes({ process: activeProcess, showAllRoles, activeRole })
 
 	const openEdgeContextMenu = (e: React.MouseEvent, el: Edge) => {
 		e.preventDefault();
@@ -164,7 +162,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 				stateName: type,
 				displayOrder:
 					Math.max(...activeProcessStates.map(({ displayOrder }) => displayOrder || 0)) + 10,
-				Properties: { ...position },
+				properties: { ...position },
 			};
 
 			const updatedStates = activeProcessStates.concat(newState);
@@ -183,6 +181,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 				<div
 					className="reactflow-wrapper"
 					ref={reactFlowWrapper}
+					id="download"
 					style={!roleIsToggled ? { pointerEvents: "none" } : {}}
 				>
 					<ReactFlow

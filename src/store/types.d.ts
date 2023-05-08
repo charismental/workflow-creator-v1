@@ -11,7 +11,7 @@ export interface WorkflowState {
 	stateId?: number;
 	stateName: string;
 	displayOrder?: number;
-	Properties?: {
+	properties?: {
 		x?: number;
 		y?: number;
 		h?: number;
@@ -23,7 +23,7 @@ export interface WorkflowRole {
 	roleId?: number;
 	processId?: number;
 	roleName: string;
-	Properties?: { color?: string };
+	properties?: { color?: string };
 	transitions?: WorkflowConnection[];
 }
 

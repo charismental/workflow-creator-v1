@@ -7,9 +7,11 @@ import Icon, {
 	ReloadOutlined,
 	SaveOutlined,
 	UnlockOutlined,
+	ExpandAltOutlined,
 } from "@ant-design/icons";
-import { Button, Space } from "antd";
+import { Button, Space, Tooltip } from "antd";
 import { useCallback, useState } from "react";
+import DownloadButton from "tools/DownloadImage";
 import {
 	ControlProps,
 	Edge,
@@ -24,6 +26,7 @@ import EdgeModal from "../Modals/EdgeModal";
 import NodeModal from "../Modals/NodeModal";
 import CustomControlButtonWithTooltip from "./CustomControlButtonWithTooltip";
 import MapSvg from "./MapSvg";
+import { shallow } from "zustand/shallow";
 
 interface CustomControlsProps {
 	getCurrentEdges: (() => Edge[]) | undefined;
@@ -46,14 +49,17 @@ export default ({
 	const [currentNodes, setCurrentNodes] = useState<Node[]>([]);
 	const [nodeModalOpen, setNodeModalOpen] = useState(false);
 	const setShowMinimap = useMainStore(useCallback((state) => state.setShowMinimap, []));
+	const [showAllRoles, toggleShowAllRoles] = useMainStore((state) => [state.showAllRoles, state.toggleShowAllRoles], shallow);
 
-	const onToggleInteractivity = () => {
+
+	const onToggleInteractivity = (status = !isInteractive) => {
 		store.setState({
-			nodesDraggable: !isInteractive,
-			nodesConnectable: !isInteractive,
-			elementsSelectable: !isInteractive,
+			nodesDraggable: status,
+			nodesConnectable: status,
+			elementsSelectable: status,
 		});
-		onInteractiveChange?.(!isInteractive);
+
+		onInteractiveChange?.(status);
 	};
 
 	const getEdgesAndOpenModal = () => {
@@ -64,6 +70,11 @@ export default ({
 	const getNodesAndOpenModal = () => {
 		setCurrentNodes(getCurrentNodes ? getCurrentNodes() : []);
 		setNodeModalOpen(true);
+	};
+
+	const setShowAllRoles = () => {
+		onToggleInteractivity(showAllRoles);
+		toggleShowAllRoles();
 	};
 
 	return (
@@ -99,7 +110,7 @@ export default ({
 				<CustomControlButtonWithTooltip
 					title={"Lock Interactivity"}
 					icon={isInteractive ? <UnlockOutlined /> : <LockFilled />}
-					clickEvent={onToggleInteractivity}
+					clickEvent={() => onToggleInteractivity()}
 				/>
 				<CustomControlButtonWithTooltip
 					title={"Save Progress"}
@@ -126,6 +137,17 @@ export default ({
 						/>
 					}
 					clickEvent={setShowMinimap}
+				/>
+				<Tooltip
+					title={"Download Workflow as Image"}
+					placement={"top"}
+				>
+					<DownloadButton />
+				</Tooltip>
+				<CustomControlButtonWithTooltip
+					title={"Show All"}
+					icon={<ExpandAltOutlined />}
+					clickEvent={setShowAllRoles}
 				/>
 				<EdgeModal
 					allCurrentEdgesInCanvas={currentEdges}
