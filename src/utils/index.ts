@@ -158,7 +158,7 @@ export function edgeIdByNodes({ source, target }: { source: string; target: stri
 	return `reactflow__edge-${source}-${target}`;
 }
 
-export function nodeByState({ state, index, color, yOffset = 0, idPrefix = '' }: { state: WorkflowState, index: number, allNodesLength?: number, color?: string; yOffset?: number; idPrefix?: string }): Node {
+export function nodeByState({ state, index, color, yOffset = 0, idPrefix = '', selfConnected = false }: { state: WorkflowState, index: number, allNodesLength?: number, color?: string; yOffset?: number; idPrefix?: string; selfConnected?: boolean }): Node {
   const { stateName, properties = {} } = state;
   const defaultW = 200;
   const defaultH = 30;
@@ -185,6 +185,7 @@ export function nodeByState({ state, index, color, yOffset = 0, idPrefix = '' }:
     data: {
       label: stateName,
       ...(color && { color }),
+      ...(selfConnected && { selfConnected }),
       w: width,
       h: height,
     },
@@ -258,7 +259,7 @@ export const getItem = (
 	type?: "group"
 ) => ({ key, icon, children, label, type });
 
-export function computedNodes({ process, showAllRoles, activeRole }: { process: WorkflowProcess | null; showAllRoles: Boolean; activeRole: string }): Node[] {
+export function computedNodes({ process, showAllRoles, activeRole }: { process: WorkflowProcess | null; showAllRoles: boolean; activeRole: string }): Node[] {
   const { states = [], roles = [], processName = 'Process Name' } = process || {};
   const mappedStates = states.map(({ properties }) => properties || {});
 
@@ -291,9 +292,11 @@ export function computedNodes({ process, showAllRoles, activeRole }: { process: 
 
       [...states]
         .sort((a, b) => a?.displayOrder || 1 - (b?.displayOrder || 0))
-        .forEach((state, index, arr) =>
-          nodes.push(nodeByState({ state, index, allNodesLength: arr.length, idPrefix: String(i), yOffset: yOffset * i, color: roleColor({ roleName: roleName, allRoles: roles }) }))
-        )
+        .forEach((state, index, arr) => {
+          const selfConnected = stateIsSelfConnected({ role: roleName, stateId: state.stateName, process })
+
+          nodes.push(nodeByState({ state, index, allNodesLength: arr.length, selfConnected, idPrefix: String(i), yOffset: yOffset * i, color: roleColor({ roleName: roleName, allRoles: roles }) }))
+        })
     })
   }
 
@@ -316,4 +319,10 @@ export function computedEdges({ roles, activeRole, showAllRoles }: { showAllRole
 
     return allEdges;
   }
+}
+
+export function stateIsSelfConnected({ stateId, role, process }: { stateId: string; role?: string; process: WorkflowProcess | null }): boolean {
+  const { roles = [] } = process ||  {};
+  
+  return !!roles.find(({ roleName }) => roleName === role)?.transitions?.find(({ fromStateName, toStateName }) => [fromStateName, toStateName].every(el => el === stateId));
 }

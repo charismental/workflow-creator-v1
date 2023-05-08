@@ -46,7 +46,7 @@ const StateNode: FunctionComponent<NodeProps> = ({
   const selfConnected = useMainStore(
       (state) => !!(state.activeProcess?.roles?.find(({ roleName }) => roleName === state.activeRole)?.transitions?.find(({ fromStateName, toStateName }) => [fromStateName, toStateName].every(el => el === id))),
       shallow
-    );
+    ) || data?.selfConnected;
 
   const onResize = (_: any, payload: any) => {
     const { height: h, width: w, x, y } = payload;
