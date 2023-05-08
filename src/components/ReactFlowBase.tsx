@@ -11,6 +11,7 @@ import StateNode from "../components/StateNode";
 import "reactflow/dist/style.css";
 import { computedEdges, computedNodes, nodeByState, transformTransitionsToEdges } from "utils";
 import "../css/style.css";
+import LabelNode from "./LabelNode";
 
 const connectionLineStyle = {
 	strokeWidth: 1.5,
@@ -19,6 +20,7 @@ const connectionLineStyle = {
 
 const nodeTypes: NodeTypes = {
 	custom: StateNode,
+	label: LabelNode,
 };
 
 const selector = (state: MainState & MainActions) => ({

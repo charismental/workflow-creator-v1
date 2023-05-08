@@ -188,6 +188,28 @@ export function nodeByState({ state, index, color, yOffset = 0, idPrefix = '' }:
   }
 };
 
+export function labelNode({ name, x, y, w }: { name: string, x: number; y: number, w?: number }): Node {
+  return {
+    id: `${name}_label`,
+    draggable: false,
+    type: 'label',
+    position: {
+      x,
+      y,
+    },
+    data: {
+      label: name,
+      ...(w && { w, centered: true }),
+    },
+    positionAbsolute: {
+      x,
+      y,
+    },
+    width: 300,
+    height: 30,
+  }
+};
+
 export function stateByNode({ node, allStates }: { node: Node | any; allStates: WorkflowState[] }): WorkflowState {
   const { id: stateName, positionAbsolute = { x: 1, y: 1 }, width: w = 200, height: h = 30 } = node;
   const foundState = allStates.find(s => s?.stateName === stateName) || {};
@@ -209,14 +231,21 @@ export function roleColor({ roleName, allRoles, index }: { roleName: string; all
 };
 
 export function computedNodes({ process, showAllRoles, activeRole }: { process: WorkflowProcess | null; showAllRoles: Boolean; activeRole: string }): Node[] {
-  const { states = [], roles = [] } = process || {};
+  const { states = [], roles = [], processName = 'Process Name' } = process || {};
   const mappedStates = states.map(({ properties }) => properties || {});
 
-  const startingY = Math.min(...mappedStates.map(({ y = 0 }) => y))
+  const startingY = Math.min(...mappedStates.map(({ y = 0 }) => y));
+  const startingX = Math.min(...mappedStates.map(({ x = 0 }) => x));
 
   const totalSetHeight = Math.max(...mappedStates.map(({ h = 30, y = 0 }) => {
     return h + y - startingY;
   }));
+
+  const totalSetWidth = Math.max(...mappedStates.map(({ w = 30, x = 0 }) => {
+    return w + x - startingX;
+  }));
+
+  const yOffset = totalSetHeight + 40;
 
   const nodes: Node[] = [];
 
@@ -227,11 +256,15 @@ export function computedNodes({ process, showAllRoles, activeRole }: { process: 
         nodes.push(nodeByState({ state, index, allNodesLength: arr.length, color: roleColor({ roleName: activeRole, allRoles: roles }) }))
       )
   } else {
+    nodes.push(labelNode({ name: processName, x: startingX, y: -80, w: totalSetWidth }));
+
     roles.forEach(({ roleName }, i) => {
+      nodes.push(labelNode({ name: roleName, x: -360, y: yOffset * i + (totalSetHeight / 2 - 20) }));
+
       [...states]
         .sort((a, b) => a?.displayOrder || 1 - (b?.displayOrder || 0))
         .forEach((state, index, arr) =>
-          nodes.push(nodeByState({ state, index, allNodesLength: arr.length, idPrefix: String(i), yOffset: (totalSetHeight + 40) * i, color: roleColor({ roleName: roleName, allRoles: roles }) }))
+          nodes.push(nodeByState({ state, index, allNodesLength: arr.length, idPrefix: String(i), yOffset: yOffset * i, color: roleColor({ roleName: roleName, allRoles: roles }) }))
         )
     })
   }

@@ -155,6 +155,11 @@ div.targetHandle {
   min-height: 40px;
 }
 
+.LabelNodeBody {
+  font-size: 28px;
+  font-weight: bold;
+}
+
 .state-delete-button {
   position: absolute;
   width: 15px;
