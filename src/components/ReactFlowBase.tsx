@@ -9,7 +9,7 @@ import FloatingEdge from "../components/FloatingEdge";
 import StateNode from "../components/StateNode";
 
 import "reactflow/dist/style.css";
-import { nodeByState, transformTransitionsToEdges } from "utils";
+import { computedEdges, computedNodes, nodeByState, transformTransitionsToEdges } from "utils";
 import "../css/style.css";
 
 const connectionLineStyle = {
@@ -30,6 +30,7 @@ const selector = (state: MainState & MainActions) => ({
 	reactFlowInstance: state.reactFlowInstance,
 	setReactFlowInstance: state.setReactFlowInstance,
 	showMinimap: state.showMinimap,
+	showAllRoles: state.showAllRoles,
 });
 
 interface ReactFlowBaseProps {
@@ -54,6 +55,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		activeProcessStates,
 		reactFlowInstance,
 		setReactFlowInstance,
+		showAllRoles,
 	} = useMainStore(selector, shallow);
 
 	const { activeRole, activeRoleColor, roleIsToggled } = props;
@@ -62,17 +64,11 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 	// reactFlowInstance should only change on init. I think...
 	useEffect(() => {
 		if (reactFlowInstance) reactFlowInstance.fitView();
-	}, [reactFlowInstance]);
+	}, [reactFlowInstance, showAllRoles]);
 
-	const edges = transformTransitionsToEdges(
-		activeProcess?.roles?.find((r) => r.roleName === activeRole)?.transitions || []
-	);
+	const edges = computedEdges({ roles: activeProcess?.roles || [], activeRole, showAllRoles })
 
-	const nodes = [...(activeProcess?.states || [])]
-		.sort((a, b) => a?.displayOrder || 1 - (b?.displayOrder || 0))
-		.map((state, index, arr) =>
-			nodeByState({ state, index, allNodesLength: arr.length, color: activeRoleColor })
-		);
+	const nodes = computedNodes({ process: activeProcess, showAllRoles, activeRole })
 
 	const openEdgeContextMenu = useCallback((e: React.MouseEvent, el: Edge) => {
 		e.preventDefault();
@@ -121,7 +117,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 				stateName: type,
 				displayOrder:
 					Math.max(...activeProcessStates.map(({ displayOrder }) => displayOrder || 0)) + 10,
-				Properties: { ...position },
+				properties: { ...position },
 			};
 
 			const updatedStates = activeProcessStates.concat(newState);

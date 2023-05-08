@@ -32,6 +32,7 @@ export interface MainState {
 	activeProcess: WorkflowProcess | null;
 	reactFlowInstance: ReactFlowInstance | undefined;
 	showMinimap: boolean;
+	showAllRoles: boolean;
 }
 
 export interface MainActions {
@@ -58,6 +59,7 @@ export interface MainActions {
 	setColorForActiveRole: (newColor: string) => void;
 	setReactFlowInstance: (instance: ReactFlowInstance) => void;
 	setShowMinimap: () => void;
+	toggleShowAllRoles: () => void;
 }
 
 const useMainStore = create<MainState & MainActions>()(
@@ -87,9 +89,9 @@ const useMainStore = create<MainState & MainActions>()(
 					const activeRoleIndex = (activeProcess?.roles || []).findIndex(
 						({ roleName }) => roleName === activeRole
 					);
-					const { Properties = {} } = activeProcess.roles?.[activeRoleIndex] || {};
+					const { properties = {} } = activeProcess.roles?.[activeRoleIndex] || {};
 
-					const nodeColor = Properties?.color || defaultColors?.[activeRoleIndex];
+					const nodeColor = properties?.color || defaultColors?.[activeRoleIndex];
 
 					const { states: allStates = [] } = activeProcess || {};
 
@@ -141,7 +143,7 @@ const useMainStore = create<MainState & MainActions>()(
 								? s
 								: {
 										...states[foundStateIndex],
-										Properties: { ...states[foundStateIndex].Properties, ...properties },
+										properties: { ...states[foundStateIndex].properties, ...properties },
 								  }
 						)
 					);
@@ -187,6 +189,11 @@ const useMainStore = create<MainState & MainActions>()(
 					);
 				}
 			},
+			showAllRoles: false,
+			toggleShowAllRoles: () => set(({ showAllRoles}) => ({ showAllRoles: !showAllRoles })),
+				// activeRole !== 'important'
+				// nodes = ALL nodes
+				// activeProcess.roles.length * activeProcess.states
 			removeTransition: ({ source, target }: { source: string; target: string }) => {
 				const { activeRole, activeProcess } = get();
 
@@ -324,7 +331,7 @@ const useMainStore = create<MainState & MainActions>()(
 					} else {
 						const newRole = {
 							roleName: role,
-							Properties: {
+							properties: {
 								color: color || roleColor({ roleName: role, allRoles: roles, index: roles.length }),
 							},
 							transitions: [],
@@ -355,7 +362,7 @@ const useMainStore = create<MainState & MainActions>()(
 						const updatedRoles = roles.map((r, i) =>
 							i !== activeRoleIndex
 								? r
-								: { ...foundRole, Properties: { ...foundRole.Properties, color } }
+								: { ...foundRole, properties: { ...foundRole.properties, color } }
 						);
 
 						set(
