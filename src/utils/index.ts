@@ -1,6 +1,6 @@
 import { defaultColors } from 'data';
 import { Edge, MarkerType, Position, Node, Connection } from 'reactflow';
-import { WorkflowConnection, WorkflowRole, WorkflowState } from 'store/types';
+import { WorkflowConnection, WorkflowProcess, WorkflowRole, WorkflowState } from 'store/types';
 
 interface IntersectionNodeType {
   width: any;
@@ -113,7 +113,7 @@ export function createNodesAndEdges() {
   return { nodes, edges };
 }
 
-export function transformTransitionsToEdges(transitions: WorkflowConnection[]): Edge[] {
+export function transformTransitionsToEdges(transitions: WorkflowConnection[], idPrefix: string = ''): Edge[] {
   const mapper = (transition: WorkflowConnection): Edge | any => {
     const { fromStateName: source, toStateName: target } = transition;
 
@@ -129,9 +129,9 @@ export function transformTransitionsToEdges(transitions: WorkflowConnection[]): 
       },
       sourceHandle: null,
       targetHandle: null,
-      source,
-      target,
-      id: edgeIdByNodes({ source, target }),
+      source: `${idPrefix}${source}`,
+      target: `${idPrefix}${target}`,
+      id: edgeIdByNodes({ source: `${idPrefix}${source}`, target: `${idPrefix}${target}` }),
     }
   };
 
@@ -150,15 +150,15 @@ export function edgeIdByNodes({ source, target }: { source: string; target: stri
   return `reactflow__edge-${source}-${target}`;
 }
 
-export function nodeByState({ state, index, color }: { state: WorkflowState, index: number, allNodesLength?: number, color?: string }): Node {
-  const { stateName, Properties = {} } = state;
+export function nodeByState({ state, index, color, yOffset = 0, idPrefix = '' }: { state: WorkflowState, index: number, allNodesLength?: number, color?: string; yOffset?: number; idPrefix?: string }): Node {
+  const { stateName, properties = {} } = state;
   const defaultW = 200;
   const defaultH = 30;
   const defaultXPadding = 50;
   const defaultYPadding = 40;
   const divisor = 5; // todo: dynamic value based on allNodesLength if provided
 
-  const { x: propX, y: propY, w: propW, h: propH } = Properties;
+  const { x: propX, y: propY, w: propW, h: propH } = properties;
 
   const x = typeof propX === 'number' ? propX : index % divisor * (defaultW + defaultXPadding);
   const y = typeof propY === 'number' ? propY : Math.floor(index / divisor) * (defaultH + defaultYPadding);
@@ -166,12 +166,12 @@ export function nodeByState({ state, index, color }: { state: WorkflowState, ind
   const height = propH || defaultH;
 
   return {
-    id: stateName,
+    id: idPrefix + stateName,
     dragHandle: '.drag-handle',
     type: 'custom',
     position: {
       x,
-      y
+      y: y + yOffset,
     },
     data: {
       label: stateName,
@@ -181,7 +181,7 @@ export function nodeByState({ state, index, color }: { state: WorkflowState, ind
     },
     positionAbsolute: {
       x,
-      y
+      y: y + yOffset,
     },
     width,
     height,
@@ -191,9 +191,9 @@ export function nodeByState({ state, index, color }: { state: WorkflowState, ind
 export function stateByNode({ node, allStates }: { node: Node | any; allStates: WorkflowState[] }): WorkflowState {
   const { id: stateName, positionAbsolute = { x: 1, y: 1 }, width: w = 200, height: h = 30 } = node;
   const foundState = allStates.find(s => s?.stateName === stateName) || {};
-  const Properties = { ...positionAbsolute, h, w }
+  const properties = { ...positionAbsolute, h, w }
 
-  return { ...foundState, stateName, Properties };
+  return { ...foundState, stateName, properties };
 };
 
 export function roleColor({ roleName, allRoles, index }: { roleName: string; allRoles: WorkflowRole[]; index?: any }): string {
@@ -202,8 +202,57 @@ export function roleColor({ roleName, allRoles, index }: { roleName: string; all
   const roleIndex = typeof index === 'number' ? index : allRoles.findIndex((r) => r.roleName === roleName);
 
   if (roleIndex !== -1) {
-    return allRoles[roleIndex]?.Properties?.color || availableDefaultColors[roleIndex % availableDefaultColors.length]
+    return allRoles[roleIndex]?.properties?.color || availableDefaultColors[roleIndex % availableDefaultColors.length]
   }
 
   return '#d4d4d4';
 };
+
+export function computedNodes({ process, showAllRoles, activeRole }: { process: WorkflowProcess | null; showAllRoles: Boolean; activeRole: string }): Node[] {
+  const { states = [], roles = [] } = process || {};
+  const mappedStates = states.map(({ properties }) => properties || {});
+
+  const startingY = Math.min(...mappedStates.map(({ y = 0 }) => y))
+
+  const totalSetHeight = Math.max(...mappedStates.map(({ h = 30, y = 0 }) => {
+    return h + y - startingY;
+  }));
+
+  const nodes: Node[] = [];
+
+  if (!showAllRoles) {
+    [...states]
+      .sort((a, b) => a?.displayOrder || 1 - (b?.displayOrder || 0))
+      .forEach((state, index, arr) =>
+        nodes.push(nodeByState({ state, index, allNodesLength: arr.length, color: roleColor({ roleName: activeRole, allRoles: roles }) }))
+      )
+  } else {
+    roles.forEach(({ roleName }, i) => {
+      [...states]
+        .sort((a, b) => a?.displayOrder || 1 - (b?.displayOrder || 0))
+        .forEach((state, index, arr) =>
+          nodes.push(nodeByState({ state, index, allNodesLength: arr.length, idPrefix: String(i), yOffset: (totalSetHeight + 40) * i, color: roleColor({ roleName: roleName, allRoles: roles }) }))
+        )
+    })
+  }
+
+  return nodes;
+}
+
+export function computedEdges({ roles, activeRole, showAllRoles }: { showAllRoles: boolean; roles: WorkflowRole[]; activeRole: string }): Edge[] {
+  const edges: WorkflowConnection[] = [];
+
+  if (!showAllRoles) {
+    const transitions = roles?.find((r) => r.roleName === activeRole)?.transitions || [];
+
+    return transformTransitionsToEdges(transitions);
+  } else {
+    const allEdges: Edge[] = [];
+    
+    roles.forEach(({ transitions = [] }, i) => {
+      allEdges.push(...transformTransitionsToEdges(transitions, String(i)))
+    })
+
+    return allEdges;
+  }
+}
