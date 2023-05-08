@@ -68,9 +68,9 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 	// reactFlowInstance should only change on init. I think...
 	useEffect(() => {
 		if (reactFlowInstance?.viewportInitialized) {
-			setTimeout(() => {
-				reactFlowInstance.fitView();
-			}, 1000);
+			// setTimeout(() => {
+			reactFlowInstance.fitView();
+			// }, 1000);
 		};
 	}, [reactFlowInstance, showAllRoles]);
 

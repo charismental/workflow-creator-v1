@@ -81,8 +81,6 @@ const WorkflowCreator = () => {
 		fetchAll();
 	}, []);
 
-	console.log(reactFlowInstance?.getViewport());
-
 	const activeRoleColor = roleColor({
 		roleName: activeRole,
 		allRoles: activeProcess?.roles || [],
