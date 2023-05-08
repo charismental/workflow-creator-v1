@@ -195,6 +195,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 						fitView
 						nodeTypes={nodeTypes}
 						edgeTypes={edgeTypes}
+						proOptions={{ hideAttribution: true }}
 						defaultEdgeOptions={defaultEdgeOptions}
 						connectionLineComponent={CustomConnectionLine}
 						connectionLineStyle={connectionLineStyle}
