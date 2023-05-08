@@ -10,6 +10,8 @@ const foreignObjectSize = 40;
 
 const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd, style }) => {
 	const removeTransition = useMainStore((state) => state.removeTransition, shallow);
+	const showAllRoles = useMainStore((state) => state.showAllRoles, shallow);
+
 	const [isHover, setIsHover] = useState<boolean | null>(null);
 
 	// useEffect(() => {
@@ -51,7 +53,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 				markerEnd={markerEnd}
 				stroke={isHover ? "#0ff" : "black"}
 			/>
-			<foreignObject
+			{!showAllRoles && <foreignObject
 				onMouseOver={() => setIsHover(true)}
 				onMouseLeave={() => setIsHover(false)}
 				width={foreignObjectSize}
@@ -68,7 +70,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 						icon={<CloseCircleOutlined className="dumb-icon" />}
 					/>
 				</div>
-			</foreignObject>
+			</foreignObject>}
 		</>
 	);
 };
