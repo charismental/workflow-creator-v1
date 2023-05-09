@@ -279,7 +279,7 @@ export function computedNodes({ process, showAllRoles, activeRole, showAllConnec
   const nodes: Node[] = [];
 
   if (showAllRoles) {
-    nodes.push(labelNode({ name: processName, x: startingX, y: -80, w: totalSetWidth }));
+    nodes.push(labelNode({ name: processName, x: startingX, y: startingY - 80, w: totalSetWidth }));
 
     roles.forEach(({ roleName }, i) => {
       nodes.push(labelNode({ name: roleName, x: -360, y: yOffset * i + (totalSetHeight / 2 - 20) }));
