@@ -35,6 +35,7 @@ const selector = (state: MainState & MainActions) => ({
 	setReactFlowInstance: state.setReactFlowInstance,
 	showMinimap: state.showMinimap,
 	showAllRoles: state.showAllRoles,
+	showAllConnectedStates: state.showAllConnectedStates,
 });
 
 interface ReactFlowBaseProps {
@@ -48,7 +49,6 @@ const edgeTypes: any = {
 
 const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 	const reactFlowWrapper = useRef<HTMLDivElement>(null);
-	// const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
 
 	const {
 		showMinimap,
@@ -60,23 +60,25 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		reactFlowInstance,
 		setReactFlowInstance,
 		showAllRoles,
+		showAllConnectedStates,
 	} = useMainStore(selector, shallow);
 
 	const { activeRole, activeRoleColor, roleIsToggled } = props;
 	const [items, setItems] = useState<MenuProps["items"]>();
 
-	// reactFlowInstance should only change on init. I think...
+	const fitView = (timeout = 0) => setTimeout(() => reactFlowInstance && reactFlowInstance.fitView(), timeout);
+
 	useEffect(() => {
-		if (reactFlowInstance?.viewportInitialized) {
-			// setTimeout(() => {
-			reactFlowInstance.fitView();
-			// }, 1000);
-		};
-	}, [reactFlowInstance, showAllRoles]);
+		fitView();
+	}, [showAllRoles, showAllConnectedStates]);
 
-	const edges = computedEdges({ roles: activeProcess?.roles || [], activeRole, showAllRoles })
+	useEffect(() => {
+		fitView(50);
+	}, [reactFlowInstance]);
 
-	const nodes = computedNodes({ process: activeProcess, showAllRoles, activeRole })
+	const edges = computedEdges({ roles: activeProcess?.roles || [], activeRole, showAllRoles, showAllConnections: showAllConnectedStates })
+
+	const nodes = computedNodes({ process: activeProcess, showAllRoles, activeRole, showAllConnections: showAllConnectedStates })
 
 	const openEdgeContextMenu = (e: React.MouseEvent, el: Edge) => {
 		e.preventDefault();

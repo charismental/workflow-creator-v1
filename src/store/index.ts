@@ -33,6 +33,7 @@ export interface MainState {
 	reactFlowInstance: ReactFlowInstance | undefined;
 	showMinimap: boolean;
 	showAllRoles: boolean;
+	showAllConnectedStates: boolean;
 }
 
 export interface MainActions {
@@ -60,6 +61,7 @@ export interface MainActions {
 	setReactFlowInstance: (instance: ReactFlowInstance) => void;
 	setShowMinimap: () => void;
 	toggleShowAllRoles: () => void;
+	setShowAllConnectedStates: () => void;
 }
 
 const useMainStore = create<MainState & MainActions>()(
@@ -190,10 +192,9 @@ const useMainStore = create<MainState & MainActions>()(
 				}
 			},
 			showAllRoles: false,
-			toggleShowAllRoles: () => set(({ showAllRoles}) => ({ showAllRoles: !showAllRoles })),
-				// activeRole !== 'important'
-				// nodes = ALL nodes
-				// activeProcess.roles.length * activeProcess.states
+			toggleShowAllRoles: () => set(({ showAllRoles }) => ({ showAllRoles: !showAllRoles, showAllConnectedStates: false })),
+			showAllConnectedStates: false,
+			setShowAllConnectedStates: () => set(({ showAllConnectedStates }) => ({ showAllConnectedStates: !showAllConnectedStates, showAllRoles: false })),
 			removeTransition: ({ source, target }: { source: string; target: string }) => {
 				const { activeRole, activeProcess } = get();
 

@@ -7,7 +7,8 @@ import Icon, {
 	ReloadOutlined,
 	SaveOutlined,
 	UnlockOutlined,
-	ExpandAltOutlined,
+	TableOutlined,
+	ApartmentOutlined,
 } from "@ant-design/icons";
 import { Button, Space, Tooltip } from "antd";
 import { useCallback, useState } from "react";
@@ -49,6 +50,7 @@ export default ({
 	const [currentNodes, setCurrentNodes] = useState<Node[]>([]);
 	const [nodeModalOpen, setNodeModalOpen] = useState(false);
 	const setShowMinimap = useMainStore(useCallback((state) => state.setShowMinimap, []));
+	const setShowAllConnectedStates = useMainStore((state) => state.setShowAllConnectedStates, shallow);
 	const [showAllRoles, toggleShowAllRoles] = useMainStore((state) => [state.showAllRoles, state.toggleShowAllRoles], shallow);
 
 
@@ -75,6 +77,11 @@ export default ({
 	const setShowAllRoles = () => {
 		onToggleInteractivity(showAllRoles);
 		toggleShowAllRoles();
+	};
+
+	const setShowAllConnections = () => {
+		onToggleInteractivity(true);
+		setShowAllConnectedStates();
 	};
 
 	return (
@@ -145,9 +152,14 @@ export default ({
 					<DownloadButton />
 				</Tooltip>
 				<CustomControlButtonWithTooltip
-					title={"Show All"}
-					icon={<ExpandAltOutlined />}
+					title={"Show All Roles and Connections"}
+					icon={<TableOutlined />}
 					clickEvent={setShowAllRoles}
+				/>
+				<CustomControlButtonWithTooltip
+					title={"Show All Connected States"}
+					icon={<ApartmentOutlined />}
+					clickEvent={setShowAllConnections}
 				/>
 				<EdgeModal
 					allCurrentEdgesInCanvas={currentEdges}

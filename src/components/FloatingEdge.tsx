@@ -11,6 +11,7 @@ const foreignObjectSize = 40;
 const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd, style }) => {
 	const removeTransition = useMainStore((state) => state.removeTransition, shallow);
 	const showAllRoles = useMainStore((state) => state.showAllRoles, shallow);
+	const showAllConnections = useMainStore((state) => state.showAllConnectedStates, shallow);
 
 	const [isHover, setIsHover] = useState<boolean | null>(null);
 
@@ -53,7 +54,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 				markerEnd={markerEnd}
 				stroke={isHover ? "#0ff" : "black"}
 			/>
-			{!showAllRoles && <foreignObject
+			{!showAllRoles && !showAllConnections && <foreignObject
 				onMouseOver={() => setIsHover(true)}
 				onMouseLeave={() => setIsHover(false)}
 				width={foreignObjectSize}
