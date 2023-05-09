@@ -43,6 +43,8 @@ const StateNode: FunctionComponent<NodeProps> = ({
     shallow
   );
 
+  // todo, use only data.selfConnected
+  // update util to always add selfConnected for stateToNode
   const selfConnected = useMainStore(
       (state) => !!(state.activeProcess?.roles?.find(({ roleName }) => roleName === state.activeRole)?.transitions?.find(({ fromStateName, toStateName }) => [fromStateName, toStateName].every(el => el === id))),
       shallow

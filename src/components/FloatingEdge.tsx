@@ -48,7 +48,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 		return null;
 	}
 
-	const { sx, sy, tx, ty } = getEdgeParams(sourceNode, targetNode);
+	const { sx, sy, tx, ty, sourcePos, targetPos } = getEdgeParams(sourceNode, targetNode);
 
 	const currentEdgeType = () => {
 		const baseParams = {
@@ -56,6 +56,8 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 			sourceY: sy,
 			targetX: tx,
 			targetY: ty,
+			sourcePosition: sourcePos,
+			targetPosition: targetPos,
 		};
 		switch (edgeType) {
 			case "step":
