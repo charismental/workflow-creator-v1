@@ -66,7 +66,8 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 	const { activeRole, activeRoleColor, roleIsToggled } = props;
 	const [items, setItems] = useState<MenuProps["items"]>();
 
-	const fitView = (timeout = 0) => setTimeout(() => reactFlowInstance && reactFlowInstance.fitView(), timeout);
+	const fitView = (timeout = 0) =>
+		setTimeout(() => reactFlowInstance && reactFlowInstance.fitView(), timeout);
 
 	useEffect(() => {
 		fitView();
@@ -76,9 +77,19 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		fitView(50);
 	}, [reactFlowInstance]);
 
-	const edges = computedEdges({ roles: activeProcess?.roles || [], activeRole, showAllRoles, showAllConnections: showAllConnectedStates })
+	const edges = computedEdges({
+		roles: activeProcess?.roles || [],
+		activeRole,
+		showAllRoles,
+		showAllConnections: showAllConnectedStates,
+	});
 
-	const nodes = computedNodes({ process: activeProcess, showAllRoles, activeRole, showAllConnections: showAllConnectedStates })
+	const nodes = computedNodes({
+		process: activeProcess,
+		showAllRoles,
+		activeRole,
+		showAllConnections: showAllConnectedStates,
+	});
 
 	const openEdgeContextMenu = (e: React.MouseEvent, el: Edge) => {
 		e.preventDefault();
@@ -89,7 +100,6 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 	};
 
 	const openNodeContextMenu = (e: React.MouseEvent, node: Node | any) => {
-		e.preventDefault();
 		e.preventDefault();
 		setItems([
 			getItem(

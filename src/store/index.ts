@@ -34,6 +34,7 @@ export interface MainState {
 	showMinimap: boolean;
 	showAllRoles: boolean;
 	showAllConnectedStates: boolean;
+	edgeType: string;
 }
 
 export interface MainActions {
@@ -62,6 +63,7 @@ export interface MainActions {
 	setShowMinimap: () => void;
 	toggleShowAllRoles: () => void;
 	setShowAllConnectedStates: () => void;
+	setEdgeType: (type: string) => void;
 }
 
 const useMainStore = create<MainState & MainActions>()(
@@ -151,6 +153,8 @@ const useMainStore = create<MainState & MainActions>()(
 					);
 				}
 			},
+			edgeType: "straight",
+			setEdgeType: (type) => set({ edgeType: type }, false, "setEdgeType"),
 			setStatesForActiveProcess: (states: WorkflowState[]) => {
 				const { activeProcess } = get();
 
@@ -192,9 +196,14 @@ const useMainStore = create<MainState & MainActions>()(
 				}
 			},
 			showAllRoles: false,
-			toggleShowAllRoles: () => set(({ showAllRoles }) => ({ showAllRoles: !showAllRoles, showAllConnectedStates: false })),
+			toggleShowAllRoles: () =>
+				set(({ showAllRoles }) => ({ showAllRoles: !showAllRoles, showAllConnectedStates: false })),
 			showAllConnectedStates: false,
-			setShowAllConnectedStates: () => set(({ showAllConnectedStates }) => ({ showAllConnectedStates: !showAllConnectedStates, showAllRoles: false })),
+			setShowAllConnectedStates: () =>
+				set(({ showAllConnectedStates }) => ({
+					showAllConnectedStates: !showAllConnectedStates,
+					showAllRoles: false,
+				})),
 			removeTransition: ({ source, target }: { source: string; target: string }) => {
 				const { activeRole, activeProcess } = get();
 

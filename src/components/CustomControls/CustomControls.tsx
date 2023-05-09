@@ -9,8 +9,9 @@ import Icon, {
 	UnlockOutlined,
 	TableOutlined,
 	ApartmentOutlined,
+	SwapOutlined,
 } from "@ant-design/icons";
-import { Button, Space, Tooltip } from "antd";
+import { Button, Dropdown, MenuProps, Radio, Space, Tooltip } from "antd";
 import { useCallback, useState } from "react";
 import DownloadButton from "tools/DownloadImage";
 import {
@@ -28,6 +29,7 @@ import NodeModal from "../Modals/NodeModal";
 import CustomControlButtonWithTooltip from "./CustomControlButtonWithTooltip";
 import MapSvg from "./MapSvg";
 import { shallow } from "zustand/shallow";
+import { getItem } from "utils";
 
 interface CustomControlsProps {
 	getCurrentEdges: (() => Edge[]) | undefined;
@@ -50,9 +52,17 @@ export default ({
 	const [currentNodes, setCurrentNodes] = useState<Node[]>([]);
 	const [nodeModalOpen, setNodeModalOpen] = useState(false);
 	const setShowMinimap = useMainStore(useCallback((state) => state.setShowMinimap, []));
-	const setShowAllConnectedStates = useMainStore((state) => state.setShowAllConnectedStates, shallow);
-	const [showAllRoles, toggleShowAllRoles] = useMainStore((state) => [state.showAllRoles, state.toggleShowAllRoles], shallow);
-
+	const [showAllRoles, toggleShowAllRoles, setShowAllConnectedStates, setEdgeType, edgeType] =
+		useMainStore(
+			(state) => [
+				state.showAllRoles,
+				state.toggleShowAllRoles,
+				state.setShowAllConnectedStates,
+				state.setEdgeType,
+				state.edgeType,
+			],
+			shallow
+		);
 
 	const onToggleInteractivity = (status = !isInteractive) => {
 		store.setState({
@@ -83,6 +93,26 @@ export default ({
 		onToggleInteractivity(true);
 		setShowAllConnectedStates();
 	};
+
+	const radioValues = [
+		{ label: "Straight", value: "straight" },
+		{ label: "Step", value: "step" },
+		{ label: "Bezier", value: "bezier" },
+	];
+	const items: MenuProps["items"] = [
+		{
+			key: "1",
+			label: (
+				<Radio.Group
+					value={edgeType}
+					optionType="button"
+					buttonStyle="solid"
+					options={radioValues}
+					onChange={(e) => setEdgeType(e.target.value)}
+				/>
+			),
+		},
+	];
 
 	return (
 		<div style={{ marginBottom: "1rem", paddingLeft: "2rem" }}>
@@ -161,6 +191,22 @@ export default ({
 					icon={<ApartmentOutlined />}
 					clickEvent={setShowAllConnections}
 				/>
+				<Dropdown
+					autoFocus
+					placement="top"
+					trigger={["click"]}
+					menu={{ items }}
+				>
+					<Tooltip
+						placement="right"
+						title={"Toggle Edge Type"}
+					>
+						<Button
+							onClick={(e) => e.preventDefault()}
+							icon={<SwapOutlined />}
+						/>
+					</Tooltip>
+				</Dropdown>
 				<EdgeModal
 					allCurrentEdgesInCanvas={currentEdges}
 					edgeModalOpen={edgeModalOpen}

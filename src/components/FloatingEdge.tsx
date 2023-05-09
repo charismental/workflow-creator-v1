@@ -1,7 +1,13 @@
 import { CloseCircleOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import { FunctionComponent, useCallback, useState } from "react";
-import { EdgeProps, getStraightPath, useStore as useReactFlowStore } from "reactflow";
+import {
+	EdgeProps,
+	getStraightPath,
+	getBezierPath,
+	getSmoothStepPath,
+	useStore as useReactFlowStore,
+} from "reactflow";
 import { getEdgeParams } from "../utils";
 import useMainStore from "store";
 import { shallow } from "zustand/shallow";
@@ -9,9 +15,15 @@ import { shallow } from "zustand/shallow";
 const foreignObjectSize = 40;
 
 const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd, style }) => {
-	const removeTransition = useMainStore((state) => state.removeTransition, shallow);
-	const showAllRoles = useMainStore((state) => state.showAllRoles, shallow);
-	const showAllConnections = useMainStore((state) => state.showAllConnectedStates, shallow);
+	const [removeTransition, showAllRoles, showAllConnections, edgeType] = useMainStore(
+		(state) => [
+			state.removeTransition,
+			state.showAllRoles,
+			state.showAllConnectedStates,
+			state.edgeType,
+		],
+		shallow
+	);
 
 	const [isHover, setIsHover] = useState<boolean | null>(null);
 
@@ -38,12 +50,24 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 
 	const { sx, sy, tx, ty } = getEdgeParams(sourceNode, targetNode);
 
-	const [edgePath, labelX, labelY] = getStraightPath({
-		sourceX: sx,
-		sourceY: sy,
-		targetX: tx,
-		targetY: ty,
-	});
+	const currentEdgeType = useCallback(() => {
+		const baseParams = {
+			sourceX: sx,
+			sourceY: sy,
+			targetX: tx,
+			targetY: ty,
+		};
+		switch (edgeType) {
+			case "step":
+				return getSmoothStepPath(baseParams);
+			case "bezier":
+				return getBezierPath(baseParams);
+			default:
+				return getStraightPath(baseParams);
+		}
+	}, [edgeType]);
+
+	const [edgePath, labelX, labelY] = currentEdgeType();
 
 	return (
 		<>
@@ -54,24 +78,26 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 				markerEnd={markerEnd}
 				stroke={isHover ? "#0ff" : "black"}
 			/>
-			{!showAllRoles && !showAllConnections && <foreignObject
-				onMouseOver={() => setIsHover(true)}
-				onMouseLeave={() => setIsHover(false)}
-				width={foreignObjectSize}
-				height={foreignObjectSize}
-				x={labelX - foreignObjectSize / 2}
-				y={labelY - foreignObjectSize / 2}
-				className="edgebutton-foreignobject"
-				requiredExtensions="http://www.w3.org/1999/xhtml"
-			>
-				<div>
-					<Button
-						className="edgebutton"
-						onClick={onEdgeClick}
-						icon={<CloseCircleOutlined className="dumb-icon" />}
-					/>
-				</div>
-			</foreignObject>}
+			{!showAllRoles && !showAllConnections && (
+				<foreignObject
+					onMouseOver={() => setIsHover(true)}
+					onMouseLeave={() => setIsHover(false)}
+					width={foreignObjectSize}
+					height={foreignObjectSize}
+					x={labelX - foreignObjectSize / 2}
+					y={labelY - foreignObjectSize / 2}
+					className="edgebutton-foreignobject"
+					requiredExtensions="http://www.w3.org/1999/xhtml"
+				>
+					<div>
+						<Button
+							className="edgebutton"
+							onClick={onEdgeClick}
+							icon={<CloseCircleOutlined className="dumb-icon" />}
+						/>
+					</div>
+				</foreignObject>
+			)}
 		</>
 	);
 };
