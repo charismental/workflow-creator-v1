@@ -50,7 +50,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 
 	const { sx, sy, tx, ty } = getEdgeParams(sourceNode, targetNode);
 
-	const currentEdgeType = useCallback(() => {
+	const currentEdgeType = () => {
 		const baseParams = {
 			sourceX: sx,
 			sourceY: sy,
@@ -65,7 +65,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 			default:
 				return getStraightPath(baseParams);
 		}
-	}, [edgeType]);
+	}
 
 	const [edgePath, labelX, labelY] = currentEdgeType();
 
