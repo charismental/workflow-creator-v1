@@ -205,6 +205,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 						onDrop={onDrop}
 						onDragOver={onDragOver}
 						fitView
+						snapToGrid
 						nodeTypes={nodeTypes}
 						edgeTypes={edgeTypes}
 						proOptions={{ hideAttribution: true }}
