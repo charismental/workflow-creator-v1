@@ -33,6 +33,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 
 	const onEdgeClick = (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
 		event.stopPropagation();
+		console.log(source, target)
 		removeTransition({ source, target });
 		setIsHover(false);
 	};
@@ -80,7 +81,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 				markerEnd={markerEnd}
 				stroke={isHover ? "#0ff" : "black"}
 			/>
-			{!showAllRoles && !showAllConnections && (
+			{!showAllConnections && (
 				<foreignObject
 					onMouseOver={() => setIsHover(true)}
 					onMouseLeave={() => setIsHover(false)}

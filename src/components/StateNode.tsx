@@ -43,6 +43,11 @@ const StateNode: FunctionComponent<NodeProps> = ({
     shallow
   );
 
+  const showAllRoles = useMainStore(
+    (state) => state.showAllRoles,
+    shallow
+  );
+
   // todo, use only data.selfConnected
   // update util to always add selfConnected for stateToNode
   const selfConnected = useMainStore(
@@ -68,7 +73,7 @@ const StateNode: FunctionComponent<NodeProps> = ({
   };
 
   const connectionNodeId = useReactFlowStore(connectionNodeIdSelector);
-  const isTarget = connectionNodeId && connectionNodeId !== id;
+  const isTarget = connectionNodeId && connectionNodeId !== id && (!showAllRoles || connectionNodeId.charAt(0) === id.charAt(0));
 
   const targetHandleStyle = { zIndex: isTarget ? 3 : 1 };
 
@@ -90,7 +95,7 @@ const StateNode: FunctionComponent<NodeProps> = ({
         ...(data?.h && { height: data.h }),
       }}
     >
-      {selfConnected && <RollbackOutlined rotate={270} style={{ color: 'black', fontSize: '32px', position: 'absolute', top: '-28px', right: '12px' }} />}
+      {selfConnected && <RollbackOutlined rotate={270} style={{ color: 'black', fontSize: '24px', position: 'absolute', top: '-21px', right: '12px' }} />}
       <NodeResizer
         onResize={onResize}
         isVisible={isMouseOver}

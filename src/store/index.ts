@@ -87,12 +87,22 @@ const useMainStore = create<MainState & MainActions>()(
 			edges: [],
 			states: [],
 			roles: [],
-			onNodesChange: (changes: NodeChange[]) => {
-				const { activeProcess, activeRole } = get();
+			onNodesChange: (changes: NodeChange[] | any[]) => {
+				const { activeProcess, activeRole, showAllRoles } = get();
+
+				const removeIndexPrefix = (prefixedString: string): string => {
+					const prefix = !showAllRoles ? '' : prefixedString.match(/\d+/g)?.[0] || ''
+
+					return prefixedString.slice(prefix.length);
+				}
+
+				const mappedChanges = changes.map(change => ({ ...change, id: removeIndexPrefix(change.id) }));
+
 				if (activeProcess) {
 					const activeRoleIndex = (activeProcess?.roles || []).findIndex(
 						({ roleName }) => roleName === activeRole
 					);
+
 					const { properties = {} } = activeProcess.roles?.[activeRoleIndex] || {};
 
 					const nodeColor = properties?.color || defaultColors?.[activeRoleIndex];
@@ -108,7 +118,7 @@ const useMainStore = create<MainState & MainActions>()(
 						})
 					);
 
-					const updatedNodes = applyNodeChanges(changes, nodes);
+					const updatedNodes = applyNodeChanges(mappedChanges, nodes);
 
 					set(
 						{
@@ -146,9 +156,9 @@ const useMainStore = create<MainState & MainActions>()(
 							i !== foundStateIndex
 								? s
 								: {
-										...states[foundStateIndex],
-										properties: { ...states[foundStateIndex].properties, ...properties },
-								  }
+									...states[foundStateIndex],
+									properties: { ...states[foundStateIndex].properties, ...properties },
+								}
 						)
 					);
 				}
@@ -169,16 +179,33 @@ const useMainStore = create<MainState & MainActions>()(
 				}
 			},
 			onConnect: (connection: Connection) => {
-				const { activeRole, activeProcess } = get();
+				const { activeRole, activeProcess, showAllRoles } = get();
+				const { source, target } = connection;
 
 				const { roles = [] } = activeProcess || {};
+				let roleIndexStr = '';
 
-				const foundRoleIndex = roles.findIndex(({ roleName }) => roleName === activeRole);
+				const removeIndexPrefixFromName = (prefix: string, name: string): string => {
+					const index = name.indexOf(prefix);
+
+					if (index !== -1) return name.slice(0, index) + name.slice(index + prefix.length);
+					return name;
+				}
+
+				const foundRoleIndex = roles.findIndex(({ roleName }, i) => {
+					if (showAllRoles) {
+						roleIndexStr = (source || '').match(/\d+/g)?.[0] || '';
+
+						return Number(roleIndexStr) === i;
+					}
+
+					return roleName === activeRole
+				});
 
 				if (foundRoleIndex !== -1 && activeProcess) {
 					const { transitions = [] } = roles[foundRoleIndex];
-
-					const newTransition = transformNewConnectionToTransition(connection, transitions);
+					const updatedConnection = { ...connection, ...(showAllRoles && { source: removeIndexPrefixFromName(roleIndexStr, source || ''), target: removeIndexPrefixFromName(roleIndexStr, target || '') }) }
+					const newTransition = transformNewConnectionToTransition(updatedConnection, transitions);
 
 					const updatedTransitions = [...transitions, ...(newTransition ? [newTransition] : [])];
 
@@ -205,18 +232,37 @@ const useMainStore = create<MainState & MainActions>()(
 					showAllRoles: false,
 				})),
 			removeTransition: ({ source, target }: { source: string; target: string }) => {
-				const { activeRole, activeProcess } = get();
+				const { activeRole, activeProcess, showAllRoles } = get();
 
 				const { roles = [] } = activeProcess || {};
+				let roleIndexStr = '';
 
-				const foundRoleIndex = roles.findIndex(({ roleName }) => roleName === activeRole);
+				const removeIndexPrefixFromName = (prefix: string, name: string): string => {
+					const index = name.indexOf(prefix);
+
+					if (index !== -1) return name.slice(0, index) + name.slice(index + prefix.length);
+					return name;
+				}
+
+				const foundRoleIndex = roles.findIndex(({ roleName }, i) => {
+					if (showAllRoles) {
+						roleIndexStr = source.match(/\d+/g)?.[0] || '';
+
+						return Number(roleIndexStr) === i;
+					}
+
+					return roleName === activeRole
+				});
 
 				if (foundRoleIndex !== -1 && activeProcess) {
 					const { transitions = [] } = roles[foundRoleIndex];
 
 					const updatedTransitions = transitions.filter(
-						({ fromStateName, toStateName }) => fromStateName !== source || toStateName !== target
-					);
+						({ fromStateName, toStateName }) => {
+							const updatedSource = showAllRoles ? removeIndexPrefixFromName(roleIndexStr, source) : source;
+							const updatedTarget = showAllRoles ? removeIndexPrefixFromName(roleIndexStr, target) : target;
+							return fromStateName !== updatedSource || toStateName !== updatedTarget
+						});
 
 					const updatedRoles = roles.map((r, i) =>
 						i === foundRoleIndex ? { ...r, transitions: updatedTransitions } : r

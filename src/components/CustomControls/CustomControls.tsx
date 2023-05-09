@@ -85,7 +85,6 @@ export default ({
 	};
 
 	const setShowAllRoles = () => {
-		onToggleInteractivity(showAllRoles);
 		toggleShowAllRoles();
 	};
 
