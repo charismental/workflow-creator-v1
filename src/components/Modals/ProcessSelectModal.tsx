@@ -1,30 +1,29 @@
 import { Button, Divider, ModalFuncProps, Space, Typography } from "antd";
 import { CSSProperties } from "react";
+import { MainActions } from "store";
 import ModalInstance from "./ModalInstance";
 
 const { Title } = Typography;
 
 interface ProcessSelectModalProps {
 	modalOpen: boolean;
-	setModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	unsavedChanges: boolean;
 	newerVersion: boolean;
     getNewerVersion: () => void;
-    saveChangesAndContinue: () => void;
+    saveChangesAndContinue: MainActions['setActiveProcess']
 }
 
 const button_container: CSSProperties = {
 	display: "flex",
 	flexDirection: "row",
-	justifyContent: "end",
-	alignContent: "end",
+	gap: '10px',
+	justifyContent: "center",
+	alignContent: "center",
 	marginTop: "1rem",
-	padding: "4px 8px"
 };
 
 export default ({
 	modalOpen,
-	setModalOpen,
 	unsavedChanges,
 	newerVersion,
     getNewerVersion,
@@ -42,14 +41,13 @@ export default ({
 		),
 		footer: (
 			<Space
-				align={"end"}
+				align={"center"}
 				size={"large"}
 			>
 				<Divider />
 				<div style={button_container}>
-					<Button onClick={setModalOpen}>Cancel</Button>
 					{newerVersion && <Button onClick={getNewerVersion}>Get Newer Version</Button>}
-					{unsavedChanges && <Button onClick={saveChangesAndContinue}>Save Changes</Button>}
+					{unsavedChanges && <Button onClick={() => saveChangesAndContinue}>Save Changes</Button>}
 				</div>
 			</Space>
 		),

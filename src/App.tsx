@@ -117,11 +117,10 @@ const WorkflowCreator = () => {
 		setProcessSelectModal(true);
 		return ProcessSelectModal({
 			modalOpen: processSelectModal,
-			setModalOpen: () => setProcessSelectModal(false),
 			unsavedChanges: true,
 			newerVersion: true,
 			getNewerVersion: () => {},
-			saveChangesAndContinue:(() => activeProcess?.processName && setActiveProcess(activeProcess?.processName)),
+			saveChangesAndContinue: setActiveProcess(activeProcess?.processName),
 		});
 
 		
