@@ -1,10 +1,11 @@
 import { Layout, Space, Spin, Typography } from "antd";
 import ActiveRoleSettings from "components/ActiveRoleSettings";
 import CustomControls from "components/CustomControls/CustomControls";
+import ProcessSelectModal from "components/Modals/ProcessSelectModal";
 import ReactFlowBase from "components/ReactFlowBase";
 import SelectBox from "components/SelectBox";
 import StateCollapseBox from "components/StateCollapseBox";
-import { CSSProperties, useCallback, useEffect } from "react";
+import { CSSProperties, useCallback, useEffect, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
 import "reactflow/dist/style.css";
 import type { MainActions, MainState } from "store";
@@ -77,6 +78,8 @@ const WorkflowCreator = () => {
 		useCallback((state) => state.filteredStates, [currentStates])
 	);
 
+	const [processSelectModal, setProcessSelectModal] = useState(false);
+
 	useEffect(() => {
 		fetchAll();
 	}, []);
@@ -110,6 +113,20 @@ const WorkflowCreator = () => {
 		setActiveRole(name);
 	};
 
+	const openProcessSelectModal = () => {
+		setProcessSelectModal(true);
+		return ProcessSelectModal({
+			modalOpen: processSelectModal,
+			setModalOpen: () => setProcessSelectModal(false),
+			unsavedChanges: true,
+			newerVersion: true,
+			getNewerVersion: () => {},
+			saveChangesAndContinue:(() => activeProcess?.processName && setActiveProcess(activeProcess?.processName)),
+		});
+
+		
+	};
+
 	if (loading) {
 		return (
 			<Spin
@@ -137,7 +154,7 @@ const WorkflowCreator = () => {
 					<Header style={headerStyle}>
 						<SelectBox
 							useStyle={{ flexGrow: 1, maxWidth: "360px" }}
-							selectOnChange={setActiveProcess}
+							selectOnChange={openProcessSelectModal}
 							addNew={addNewProcessAndSelect}
 							type="process"
 							selectValue={activeProcess?.processName}
