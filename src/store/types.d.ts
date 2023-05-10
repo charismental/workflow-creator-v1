@@ -5,6 +5,10 @@ export interface WorkflowConnection {
 	processId?: number;
 	fromStateName: string;
 	toStateName: string;
+	properties?: {
+		sourceHandle?: string | null;
+		targetHandle?: string | null;
+	};
 }
 
 export interface WorkflowState {

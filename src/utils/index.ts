@@ -87,7 +87,9 @@ export function getEdgeParams(source: any, target: any) {
 
 export function transformTransitionsToEdges(transitions: WorkflowConnection[], idPrefix: string = ''): Edge[] {
   const mapper = (transition: WorkflowConnection): Edge | any => {
-    const { fromStateName: source, toStateName: target } = transition;
+    const { fromStateName: source, toStateName: target, properties = {} } = transition;
+
+    const { sourceHandle = null, targetHandle = null } = properties;
 
     return {
       style: {
@@ -99,8 +101,8 @@ export function transformTransitionsToEdges(transitions: WorkflowConnection[], i
         type: "arrowclosed",
         color: "black"
       },
-      sourceHandle: null,
-      targetHandle: null,
+      sourceHandle,
+      targetHandle,
       source: `${idPrefix}${source}`,
       target: `${idPrefix}${target}`,
       id: edgeIdByNodes({ source: `${idPrefix}${source}`, target: `${idPrefix}${target}` }),
@@ -110,18 +112,19 @@ export function transformTransitionsToEdges(transitions: WorkflowConnection[], i
   return transitions.map(mapper);
 }
 
+// might get weird mama
 export function transformNewConnectionToTransition(
   connection: Connection,
   existingTransitions: WorkflowConnection[]
 ): WorkflowConnection | null {
-  const { source, target } = connection;
+  const { source, target, sourceHandle, targetHandle } = connection;
 
   const foundTransition = existingTransitions.find(
     ({ fromStateName, toStateName }) => source === fromStateName && target === toStateName
   );
 
   return (
-    foundTransition || (source && target ? { fromStateName: source, toStateName: target } : null)
+    foundTransition || (source && target ? { fromStateName: source, toStateName: target, properties: { sourceHandle, targetHandle } } : null)
   );
 }
 
