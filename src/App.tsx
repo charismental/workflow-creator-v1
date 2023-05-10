@@ -120,7 +120,8 @@ const WorkflowCreator = () => {
 			unsavedChanges: true,
 			newerVersion: true,
 			getNewerVersion: () => {},
-			saveChangesAndContinue: setActiveProcess(activeProcess?.processName),
+			processName: activeProcess?.processName || '', // this cant be right...
+			saveChangesAndContinue: setActiveProcess, // neither can this. need to get this from selectbox
 		});
 
 		

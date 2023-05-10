@@ -10,6 +10,7 @@ interface ProcessSelectModalProps {
 	unsavedChanges: boolean;
 	newerVersion: boolean;
     getNewerVersion: () => void;
+	processName: string;
     saveChangesAndContinue: MainActions['setActiveProcess']
 }
 
@@ -27,6 +28,7 @@ export default ({
 	unsavedChanges,
 	newerVersion,
     getNewerVersion,
+	processName,
     saveChangesAndContinue
 }: ProcessSelectModalProps) => {
 	const modalOptions: ModalFuncProps = {
@@ -47,7 +49,7 @@ export default ({
 				<Divider />
 				<div style={button_container}>
 					{newerVersion && <Button onClick={getNewerVersion}>Get Newer Version</Button>}
-					{unsavedChanges && <Button onClick={() => saveChangesAndContinue}>Save Changes</Button>}
+					{unsavedChanges && <Button onClick={() => saveChangesAndContinue(processName)}>Save Changes</Button>}
 				</div>
 			</Space>
 		),
