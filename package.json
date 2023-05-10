@@ -3,6 +3,7 @@
     "@reactflow/node-resizer": "^2.1.0",
     "@tisoap/react-flow-smart-edge": "^3.0.0",
     "antd": "^5.4.0",
+    "axios": "^1.4.0",
     "dotenv": "^16.0.3",
     "html-to-image": "^1.11.11",
     "immer": "^9.0.21",

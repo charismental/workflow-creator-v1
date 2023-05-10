@@ -13,11 +13,10 @@ import {
 } from "reactflow";
 import { devtools } from "zustand/middleware";
 import { WorkflowConnection, WorkflowProcess, WorkflowRole, WorkflowState } from "./types";
-
+import GetAllProcesses from "api/GetAllProcesses";
 import mockFetchAll from "data/mockFetchAll";
 import isEqual from "lodash.isequal";
 import { nodeByState, roleColor, stateByNode, transformNewConnectionToTransition } from "utils";
-
 // const initialRole = "Intake-Specialist";
 const initialRole = "system";
 
@@ -75,8 +74,8 @@ const useMainStore = create<MainState & MainActions>()(
 				set({ globalLoading: true }, false, "globalLoading");
 				const waitTime = Math.random() * (2500 - 500) + 500;
 				await new Promise((r) => setTimeout(r, waitTime));
-
-				const { processes = [], roles = [], states = [] }: any = mockFetchAll;
+				// const { processes = [], roles = [], states = [] }: any = mockFetchAll;
+				const { processes = [], roles = [], states = [] }: any = GetAllProcesses();
 				set({ states, roles, processes, globalLoading: false }, false, "fetchAll");
 				const activeProcessName = processes[0]?.processName;
 				get().setActiveProcess(activeProcessName);
@@ -91,12 +90,15 @@ const useMainStore = create<MainState & MainActions>()(
 				const { activeProcess, activeRole, showAllRoles } = get();
 
 				const removeIndexPrefix = (prefixedString: string): string => {
-					const prefix = !showAllRoles ? '' : prefixedString.match(/\d+/g)?.[0] || ''
+					const prefix = !showAllRoles ? "" : prefixedString.match(/\d+/g)?.[0] || "";
 
 					return prefixedString.slice(prefix.length);
-				}
+				};
 
-				const mappedChanges = changes.map(change => ({ ...change, id: removeIndexPrefix(change.id) }));
+				const mappedChanges = changes.map((change) => ({
+					...change,
+					id: removeIndexPrefix(change.id),
+				}));
 
 				if (activeProcess) {
 					const activeRoleIndex = (activeProcess?.roles || []).findIndex(
@@ -156,9 +158,9 @@ const useMainStore = create<MainState & MainActions>()(
 							i !== foundStateIndex
 								? s
 								: {
-									...states[foundStateIndex],
-									properties: { ...states[foundStateIndex].properties, ...properties },
-								}
+										...states[foundStateIndex],
+										properties: { ...states[foundStateIndex].properties, ...properties },
+								  }
 						)
 					);
 				}
@@ -183,28 +185,34 @@ const useMainStore = create<MainState & MainActions>()(
 				const { source, target } = connection;
 
 				const { roles = [] } = activeProcess || {};
-				let roleIndexStr = '';
+				let roleIndexStr = "";
 
 				const removeIndexPrefixFromName = (prefix: string, name: string): string => {
 					const index = name.indexOf(prefix);
 
 					if (index !== -1) return name.slice(0, index) + name.slice(index + prefix.length);
 					return name;
-				}
+				};
 
 				const foundRoleIndex = roles.findIndex(({ roleName }, i) => {
 					if (showAllRoles) {
-						roleIndexStr = (source || '').match(/\d+/g)?.[0] || '';
+						roleIndexStr = (source || "").match(/\d+/g)?.[0] || "";
 
 						return Number(roleIndexStr) === i;
 					}
 
-					return roleName === activeRole
+					return roleName === activeRole;
 				});
 
 				if (foundRoleIndex !== -1 && activeProcess) {
 					const { transitions = [] } = roles[foundRoleIndex];
-					const updatedConnection = { ...connection, ...(showAllRoles && { source: removeIndexPrefixFromName(roleIndexStr, source || ''), target: removeIndexPrefixFromName(roleIndexStr, target || '') }) }
+					const updatedConnection = {
+						...connection,
+						...(showAllRoles && {
+							source: removeIndexPrefixFromName(roleIndexStr, source || ""),
+							target: removeIndexPrefixFromName(roleIndexStr, target || ""),
+						}),
+					};
 					const newTransition = transformNewConnectionToTransition(updatedConnection, transitions);
 
 					const updatedTransitions = [...transitions, ...(newTransition ? [newTransition] : [])];
@@ -235,34 +243,37 @@ const useMainStore = create<MainState & MainActions>()(
 				const { activeRole, activeProcess, showAllRoles } = get();
 
 				const { roles = [] } = activeProcess || {};
-				let roleIndexStr = '';
+				let roleIndexStr = "";
 
 				const removeIndexPrefixFromName = (prefix: string, name: string): string => {
 					const index = name.indexOf(prefix);
 
 					if (index !== -1) return name.slice(0, index) + name.slice(index + prefix.length);
 					return name;
-				}
+				};
 
 				const foundRoleIndex = roles.findIndex(({ roleName }, i) => {
 					if (showAllRoles) {
-						roleIndexStr = source.match(/\d+/g)?.[0] || '';
+						roleIndexStr = source.match(/\d+/g)?.[0] || "";
 
 						return Number(roleIndexStr) === i;
 					}
 
-					return roleName === activeRole
+					return roleName === activeRole;
 				});
 
 				if (foundRoleIndex !== -1 && activeProcess) {
 					const { transitions = [] } = roles[foundRoleIndex];
 
-					const updatedTransitions = transitions.filter(
-						({ fromStateName, toStateName }) => {
-							const updatedSource = showAllRoles ? removeIndexPrefixFromName(roleIndexStr, source) : source;
-							const updatedTarget = showAllRoles ? removeIndexPrefixFromName(roleIndexStr, target) : target;
-							return fromStateName !== updatedSource || toStateName !== updatedTarget
-						});
+					const updatedTransitions = transitions.filter(({ fromStateName, toStateName }) => {
+						const updatedSource = showAllRoles
+							? removeIndexPrefixFromName(roleIndexStr, source)
+							: source;
+						const updatedTarget = showAllRoles
+							? removeIndexPrefixFromName(roleIndexStr, target)
+							: target;
+						return fromStateName !== updatedSource || toStateName !== updatedTarget;
+					});
 
 					const updatedRoles = roles.map((r, i) =>
 						i === foundRoleIndex ? { ...r, transitions: updatedTransitions } : r
