@@ -1,10 +1,10 @@
-import { Layout, Space, Spin, Typography, message } from "antd";
+import { Layout, Space, Spin, Typography } from "antd";
 import ActiveRoleSettings from "components/ActiveRoleSettings";
 import CustomControls from "components/CustomControls/CustomControls";
 import ReactFlowBase from "components/ReactFlowBase";
 import SelectBox from "components/SelectBox";
 import StateCollapseBox from "components/StateCollapseBox";
-import { CSSProperties, useCallback, useEffect, useState } from "react";
+import { CSSProperties, useCallback, useEffect } from "react";
 import { ReactFlowProvider } from "reactflow";
 import "reactflow/dist/style.css";
 import type { MainActions, MainState } from "store";
@@ -13,8 +13,6 @@ import { roleColor } from "utils";
 import { shallow } from "zustand/shallow";
 import Sidebar from "./components/Sidebar";
 import "./css/style.css";
-import SetAsInactiveWarning from "components/Modals/ToggleRoleActiveState";
-import ToggleRoleActiveState from "components/Modals/ToggleRoleActiveState";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -57,7 +55,6 @@ const storeSelector = (state: MainActions & MainState) => ({
 });
 
 const WorkflowCreator = () => {
-	const [toggleInactiveModal, setToggleInactiveModal] = useState(false);
 	const {
 		processes,
 		addProcess,
@@ -83,8 +80,6 @@ const WorkflowCreator = () => {
 	useEffect(() => {
 		fetchAll();
 	}, []);
-
-	const [messageApi, contextHolder] = message.useMessage();
 
 	const activeRoleColor = roleColor({
 		roleName: activeRole,
@@ -115,26 +110,6 @@ const WorkflowCreator = () => {
 		setActiveRole(name);
 	};
 
-	const openToggleActiveModal = () => {
-		setToggleInactiveModal(true);
-		ToggleRoleActiveState({
-			modalOpen: toggleInactiveModal,
-			roleName: activeRole,
-			setModalOpen: setToggleInactiveModal,
-			toggleRoleForProcess: () => toggleRoleForProcess(activeRole),
-			successMessage: activeStatusRemovedMessage,
-		});
-	};
-
-	const activeStatusRemovedMessage = () => {
-		messageApi.open({
-			type: "success",
-			content: "Properties have been reset!",
-			duration: 5,
-			style: { fontSize: "20px" },
-		});
-	};
-
 	if (loading) {
 		return (
 			<Spin
@@ -157,7 +132,6 @@ const WorkflowCreator = () => {
 			direction="vertical"
 			style={spaceContainer}
 		>
-			{contextHolder}
 			<Layout style={layoutContainer}>
 				<Layout>
 					<Header style={headerStyle}>
@@ -177,14 +151,11 @@ const WorkflowCreator = () => {
 						>
 							{activeRole}
 						</Title>
-
 						<ActiveRoleSettings
 							roleIsToggled={roleIsToggled}
 							updateColor={setColorForActiveRole}
 							color={activeRoleColor}
-							toggleRole={() =>
-								roleIsToggled ? openToggleActiveModal() : toggleRoleForProcess(activeRole)
-							}
+							toggleRole={() => toggleRoleForProcess(activeRole)}
 							useStyle={{ flexGrow: 1 }}
 						/>
 					</Header>
