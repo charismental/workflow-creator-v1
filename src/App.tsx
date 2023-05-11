@@ -1,10 +1,10 @@
-import { Layout, Space, Spin, Typography, message } from "antd";
+import { Layout, Space, Spin, Typography } from "antd";
 import ActiveRoleSettings from "components/ActiveRoleSettings";
 import CustomControls from "components/CustomControls/CustomControls";
 import ReactFlowBase from "components/ReactFlowBase";
 import SelectBox from "components/SelectBox";
 import StateCollapseBox from "components/StateCollapseBox";
-import { CSSProperties, useCallback, useEffect, useState } from "react";
+import { CSSProperties, useCallback, useEffect } from "react";
 import { ReactFlowProvider } from "reactflow";
 import "reactflow/dist/style.css";
 import type { MainActions, MainState } from "store";
@@ -56,7 +56,6 @@ const storeSelector = (state: MainActions & MainState) => ({
 });
 
 const WorkflowCreator = () => {
-	const [toggleInactiveModal, setToggleInactiveModal] = useState(false);
 	const {
 		processes,
 		addProcess,
@@ -82,8 +81,6 @@ const WorkflowCreator = () => {
 	useEffect(() => {
 		fetchAll();
 	}, []);
-
-	const [messageApi, contextHolder] = message.useMessage();
 
 	const activeRoleColor = roleColor({
 		roleName: activeRole,
@@ -164,7 +161,6 @@ const WorkflowCreator = () => {
 			direction="vertical"
 			style={spaceContainer}
 		>
-			{contextHolder}
 			<Layout style={layoutContainer}>
 				<Layout>
 					<Header style={headerStyle}>
@@ -184,7 +180,6 @@ const WorkflowCreator = () => {
 						>
 							{activeRole}
 						</Title>
-
 						<ActiveRoleSettings
 							roleIsToggled={roleIsToggled}
 							updateColor={setColorForActiveRole}
