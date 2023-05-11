@@ -27,7 +27,7 @@ export default ({
 		content: (
 			<>
 				<Title level={3}>
-					Setting as inactive will remove all properties associated with this role
+					Setting as inactive will remove all transitions associated with this role
 				</Title>
 				<Title level={5}>Are you sure you want to continue this action?</Title>
 			</>

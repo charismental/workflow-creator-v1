@@ -13,7 +13,6 @@ import { roleColor } from "utils";
 import { shallow } from "zustand/shallow";
 import Sidebar from "./components/Sidebar";
 import "./css/style.css";
-import SetAsInactiveWarning from "components/Modals/ToggleRoleActiveState";
 import ToggleRoleActiveState from "components/Modals/ToggleRoleActiveState";
 
 const { Header, Content } = Layout;
@@ -115,21 +114,29 @@ const WorkflowCreator = () => {
 		setActiveRole(name);
 	};
 
-	const openToggleActiveModal = () => {
+	const openToggleActiveModal = (roleName: string) => {
 		setToggleInactiveModal(true);
+		
 		ToggleRoleActiveState({
 			modalOpen: toggleInactiveModal,
 			roleName: activeRole,
 			setModalOpen: setToggleInactiveModal,
-			toggleRoleForProcess: () => toggleRoleForProcess(activeRole),
+			toggleRoleForProcess: () => toggleRoleForProcess(roleName),
 			successMessage: activeStatusRemovedMessage,
 		});
+	};
+
+	const toggleRole = (roleName: string): void => {
+		const { transitions = [] } = activeProcess?.roles?.find((r) => r.roleName === roleName) || {};
+		
+		if (transitions.length) openToggleActiveModal(roleName);
+		else toggleRoleForProcess(roleName);
 	};
 
 	const activeStatusRemovedMessage = () => {
 		messageApi.open({
 			type: "success",
-			content: "Properties have been reset!",
+			content: "Transtions have been Removed",
 			duration: 5,
 			style: { fontSize: "20px" },
 		});
@@ -182,9 +189,7 @@ const WorkflowCreator = () => {
 							roleIsToggled={roleIsToggled}
 							updateColor={setColorForActiveRole}
 							color={activeRoleColor}
-							toggleRole={() =>
-								roleIsToggled ? openToggleActiveModal() : toggleRoleForProcess(activeRole)
-							}
+							toggleRole={() => toggleRole(activeRole)}
 							useStyle={{ flexGrow: 1 }}
 						/>
 					</Header>
@@ -219,7 +224,7 @@ const WorkflowCreator = () => {
 								type={"role"}
 								hasColorInput
 								useStyle={{ width: "100%" }}
-								multiselectHandler={(el) => toggleRoleForProcess(el.label)}
+								multiselectHandler={(el) => toggleRole(el.label)}
 								selectOnChange={setActiveRole}
 							/>
 						</>
