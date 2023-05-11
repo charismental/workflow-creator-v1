@@ -2,7 +2,7 @@ import AxiosDefault from "./AxiosDefault";
 import { WorkflowProcess } from "store/types";
 
 export default async (env?: string) => {
-	AxiosDefault.get(`/api/GetTopLevel?code=${process.env.SECRET_KEY}`, {
+	AxiosDefault.get(`/api/GetTopLevel?code=${process.env.REACT_APP_SECRET_KEY}`, {
 		validateStatus(status) {
 			return status < 500;
 		},
