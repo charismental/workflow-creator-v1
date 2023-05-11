@@ -1,10 +1,10 @@
-import { Layout, Space, Spin, Typography } from "antd";
+import { Layout, Space, Spin, Typography, message } from "antd";
 import ActiveRoleSettings from "components/ActiveRoleSettings";
 import CustomControls from "components/CustomControls/CustomControls";
 import ReactFlowBase from "components/ReactFlowBase";
 import SelectBox from "components/SelectBox";
 import StateCollapseBox from "components/StateCollapseBox";
-import { CSSProperties, useCallback, useEffect } from "react";
+import { CSSProperties, useCallback, useEffect, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
 import "reactflow/dist/style.css";
 import type { MainActions, MainState } from "store";
@@ -73,7 +73,7 @@ const WorkflowCreator = () => {
 		loading,
 		reactFlowInstance,
 	} = useMainStore(storeSelector, shallow);
-
+	const [toggleInactiveModal, setToggleInactiveModal] = useState(false);
 	const filteredStates = useMainStore(
 		useCallback((state) => state.filteredStates, [currentStates])
 	);
@@ -81,6 +81,8 @@ const WorkflowCreator = () => {
 	useEffect(() => {
 		fetchAll();
 	}, []);
+
+	const [messageApi, contextHolder] = message.useMessage();
 
 	const activeRoleColor = roleColor({
 		roleName: activeRole,
@@ -161,6 +163,7 @@ const WorkflowCreator = () => {
 			direction="vertical"
 			style={spaceContainer}
 		>
+			{contextHolder}
 			<Layout style={layoutContainer}>
 				<Layout>
 					<Header style={headerStyle}>
