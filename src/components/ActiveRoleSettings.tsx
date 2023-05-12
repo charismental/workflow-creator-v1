@@ -7,6 +7,8 @@ interface ActiveRoleSettingsProps {
 	useStyle?: any;
 	toggleRole?: () => void;
 	updateColor?: (color: string) => void;
+	updateRoleProperty: (payload: { property: string; value?: any }) => void;
+	roleHasPropertyActive: (property: string) => boolean;
 }
 
 const ActiveRoleSettings: React.FC<ActiveRoleSettingsProps> = ({
@@ -15,19 +17,34 @@ const ActiveRoleSettings: React.FC<ActiveRoleSettingsProps> = ({
 	roleIsToggled,
 	updateColor,
 	toggleRole,
+	updateRoleProperty,
+	roleHasPropertyActive,
 }) => {
 	return (
 		<div style={{ display: "inline-flex", justifyContent: "end", ...useStyle }}>
-			{toggleRole && (
-				<div style={{ display: "flex", paddingTop: "2px", marginRight: "30px", width: "60px" }}>
-					<Checkbox
-						checked={roleIsToggled}
-						onChange={toggleRole}
-					>
-						{roleIsToggled ? "Active" : "Inactive"}
-					</Checkbox>
-				</div>
-			)}
+			<div style={{ display: 'flex', paddingTop: "2px", marginRight: "30px" }}>
+
+				<Checkbox
+					checked={roleIsToggled}
+					onChange={toggleRole}
+				>
+					{roleIsToggled ? "Active" : "Inactive"}
+				</Checkbox>
+
+				<Checkbox
+					checked={roleHasPropertyActive('isUniversal')}
+					onChange={() => updateRoleProperty({ property: 'isUniversal', value: !roleHasPropertyActive('isUniversal') })}
+				>
+					Universal
+				</Checkbox>
+
+				<Checkbox
+					checked={roleHasPropertyActive('isCluster')}
+					onChange={() => updateRoleProperty({ property: 'isCluster', value: !roleHasPropertyActive('isCluster') })}
+				>
+					Cluster
+				</Checkbox>
+			</div>
 			{updateColor && (
 				<input
 					disabled={!roleIsToggled}

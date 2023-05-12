@@ -1,4 +1,4 @@
-import { ModalFuncProps, Typography, Space, Button } from "antd";
+import { ModalFuncProps, Typography } from "antd";
 import ModalInstance from "./ModalInstance";
 import { MainActions } from "store";
 
