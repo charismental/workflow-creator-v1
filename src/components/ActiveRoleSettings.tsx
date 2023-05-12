@@ -33,14 +33,14 @@ const ActiveRoleSettings: React.FC<ActiveRoleSettingsProps> = ({
 
 				<Checkbox
 					checked={roleHasPropertyActive('isUniversal')}
-					onChange={() => updateRoleProperty({ property: 'isUniversal', value: !roleHasPropertyActive('isUniversal') })}
+					onChange={() => updateRoleProperty({ property: 'isUniversal', value: Number(!roleHasPropertyActive('isUniversal')) })}
 				>
 					Universal
 				</Checkbox>
 
 				<Checkbox
 					checked={roleHasPropertyActive('isCluster')}
-					onChange={() => updateRoleProperty({ property: 'isCluster', value: !roleHasPropertyActive('isCluster') })}
+					onChange={() => updateRoleProperty({ property: 'isCluster', value: Number(!roleHasPropertyActive('isCluster')) })}
 				>
 					Cluster
 				</Checkbox>
