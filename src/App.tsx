@@ -14,6 +14,7 @@ import { shallow } from "zustand/shallow";
 import Sidebar from "./components/Sidebar";
 import "./css/style.css";
 import ToggleRoleActiveState from "components/Modals/ToggleRoleActiveState";
+import { WorkflowRole } from "store/types";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -53,6 +54,7 @@ const storeSelector = (state: MainActions & MainState) => ({
 	fetchAll: state.fetchAll,
 	loading: state.globalLoading,
 	reactFlowInstance: state.reactFlowInstance,
+	updateRoleProperty: state.updateRoleProperty,
 });
 
 const WorkflowCreator = () => {
@@ -68,6 +70,7 @@ const WorkflowCreator = () => {
 		setColorForActiveRole,
 		currentStates,
 		addNewState,
+		updateRoleProperty,
 		addNewRole,
 		fetchAll,
 		loading,
@@ -189,6 +192,13 @@ const WorkflowCreator = () => {
 							color={activeRoleColor}
 							toggleRole={() => toggleRole(activeRole)}
 							useStyle={{ flexGrow: 1 }}
+							updateRoleProperty={({ property, value }: { property: string; value?: any }) => updateRoleProperty({ role: activeRole, property, value })}
+							roleHasPropertyActive={(property: string) => {
+								const foundRole: any = roles?.find((r: any) => r.roleName === activeRole);
+
+								return !!foundRole?.[property];
+							}
+						}
 						/>
 					</Header>
 					<ReactFlowProvider>

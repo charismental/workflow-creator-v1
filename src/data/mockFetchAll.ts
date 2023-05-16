@@ -853,75 +853,111 @@ const roles = [
 	{
 		roleId: 1,
 		roleName: "system",
+		isUniversal: 1,
+		isCluster: 1
 	},
 	{
 		roleId: 2,
 		roleName: "Intake-Specialist",
+		isUniversal: 0,
+		isCluster: 1
 	},
 	{
 		roleId: 3,
 		roleName: "Intake-Specialist-Manager",
+		isUniversal: 1,
+		isCluster: 0
 	},
 	{
 		roleId: 4,
 		roleName: "Case-Worker",
+		isUniversal: 0,
+		isCluster: 1
 	},
 	{
 		roleId: 5,
 		roleName: "Case-Worker-Manager",
+		isUniversal: 1,
+		isCluster: 0
 	},
 	{
 		roleId: 6,
 		roleName: "Finance",
+		isUniversal: 0,
+		isCluster: 1
 	},
 	{
 		roleId: 7,
 		roleName: "Multiple",
+		isUniversal: 0,
+		isCluster: 1
 	},
 	{
 		roleId: 8,
 		roleName: "Partner-Final-Reviewer",
+		isUniversal: 1,
+		isCluster: 1
 	},
 	{
 		roleId: 9,
 		roleName: "Partner-Reviewer",
+		isUniversal: 1,
+		isCluster: 1
 	},
 	{
 		roleId: 10,
 		roleName: "Customer-Success",
+		isUniversal: 1,
+		isCluster: 0
 	},
 	{
 		roleId: 15,
 		roleName: "Case-Manager",
+		isUniversal: 0,
+		isCluster: 0
 	},
 	{
 		roleId: 16,
 		roleName: "Case-Manager-Supervisor",
+		isUniversal: 1,
+		isCluster: 0
 	},
 	{
 		roleId: 17,
 		roleName: "Review-Specialist",
+		isUniversal: 0,
+		isCluster: 0
 	},
 	{
 		roleId: 18,
 		roleName: "QA/QC-Specialist",
+		isUniversal: 0,
+		isCluster: 0
 	},
 	{
 		roleId: 19,
 		roleName: "QA/QC-Lead",
+		isUniversal: 1,
+		isCluster: 0
 	},
 	{
 		roleId: 20,
 		roleName: "Review-Lead",
-	 },
-	 {
+		isUniversal: 1,
+		isCluster: 0
+	},
+	{
 		roleId: 21,
 		roleName: "Outreach-Specialist",
-	 },
-	 {
+		isUniversal: 0,
+		isCluster: 0
+	},
+	{
 		roleId: 22,
 		roleName: "Outreach-Lead",
-	 }
+		isUniversal: 1,
+		isCluster: 0
+	}
 ];
 
 const states = [

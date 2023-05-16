@@ -23,7 +23,12 @@ export interface WorkflowState {
 	};
 }
 
-export interface WorkflowRole {
+interface NumberBooleanFields {
+	isUniversal: NumberBoolean;
+	isCluster: NumberBoolean;
+}
+
+export interface WorkflowRole extends NumberBooleanFields {
 	roleId?: number;
 	processId?: number;
 	roleName: string;
@@ -37,3 +42,5 @@ export interface WorkflowProcess {
 	states?: Array<WorkflowState>;
 	roles?: Array<WorkflowRole>;
 }
+
+export type NumberBoolean = 0 | 1;

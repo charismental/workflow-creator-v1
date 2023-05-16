@@ -12,12 +12,10 @@ import {
 	applyNodeChanges,
 } from "reactflow";
 import { devtools } from "zustand/middleware";
-import { WorkflowConnection, WorkflowProcess, WorkflowRole, WorkflowState } from "./types";
+import { NumberBoolean, WorkflowConnection, WorkflowProcess, WorkflowRole, WorkflowState } from "./types";
 import GetAllProcesses from "api/GetAllProcesses";
-import mockFetchAll from "data/mockFetchAll";
 import isEqual from "lodash.isequal";
 import { nodeByState, roleColor, stateByNode, transformNewConnectionToTransition } from "utils";
-// const initialRole = "Intake-Specialist";
 const initialRole = "system";
 
 export interface MainState {
@@ -43,6 +41,7 @@ export interface MainActions {
 	updateProcess: (payload: { processIndex: number; process: WorkflowProcess }) => void;
 	deleteProcess: (processName: string) => void;
 	toggleRoleForProcess: (role: string, color?: string) => void;
+	updateRoleProperty: (payload: { role: string; property: string; value: any }) => void;
 	filteredStates: (existingStates: WorkflowState[]) => string[];
 	addNewState: (name: string) => void;
 	addNewRole: (role: string) => void;
@@ -394,10 +393,14 @@ const useMainStore = create<MainState & MainActions>()(
 					let updatedRoles = roles;
 
 					if (roles.some(({ roleName }) => roleName === role)) {
-						updatedRoles = roles.filter(({ roleName }) => roleName !== role);
+						updatedRoles = roles.filter(({ roleName }) => roleName !== role)
 					} else {
+						const initialNumberBoolean: NumberBoolean = 0;
+
 						const newRole = {
 							roleName: role,
+							isUniversal: initialNumberBoolean,
+							isCluster: initialNumberBoolean,
 							properties: {
 								color: color || roleColor({ roleName: role, allRoles: roles, index: roles.length }),
 							},
@@ -413,6 +416,39 @@ const useMainStore = create<MainState & MainActions>()(
 						},
 						false,
 						"toggleRoleForProcess"
+					);
+				}
+			},
+			updateRoleProperty: ({ role, property, value }) => {
+				const { activeProcess, roles: globalRoles } = get();
+
+				if (activeProcess) {
+					const { roles = [] } = activeProcess;
+
+					const roleInProcessIndex = roles.findIndex(({ roleName }) => roleName === role);
+					const globalRoleIndex = globalRoles.findIndex(({ roleName }) => roleName === role);
+
+					const foundRole = roles[roleInProcessIndex];
+					const foundGlobalRole = globalRoles[globalRoleIndex];
+
+					const updatedRoles = roleInProcessIndex !== -1 ? roles.map((r, i) =>
+						i !== roleInProcessIndex
+							? r
+							: { ...foundRole, [property]: value }
+					) : roles;
+
+					const updatedGlobalRoles = globalRoleIndex !== -1 ? globalRoles.map((r, i) =>
+						i !== globalRoleIndex
+							? r
+							: { ...foundGlobalRole, [property]: value }
+					) : globalRoles;
+
+					set(
+						{
+							activeProcess: { ...activeProcess, roles: updatedRoles }, roles: updatedGlobalRoles,
+						},
+						false,
+						"setColorForActiveRole"
 					);
 				}
 			},
@@ -465,11 +501,15 @@ const useMainStore = create<MainState & MainActions>()(
 			addNewRole: (role: string) =>
 				set(
 					({ roles }) => {
+						const initialNumberBoolean: NumberBoolean = 0;
+
 						const newRole = {
 							roleName: role,
+							isUniversal: initialNumberBoolean,
+							isCluster: initialNumberBoolean,
 						};
 
-						return { roles: roles.concat(newRole) };
+						return { roles: roles.concat(newRole) }
 					},
 					false,
 					"addNewRole"
