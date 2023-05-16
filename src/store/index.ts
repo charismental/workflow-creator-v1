@@ -35,6 +35,7 @@ export interface MainState {
 	showAllRoles: boolean;
 	showAllConnectedStates: boolean;
 	edgeType: string;
+	contextMenuNodeId: string | undefined;
 }
 
 export interface MainActions {
@@ -65,12 +66,17 @@ export interface MainActions {
 	toggleShowAllRoles: () => void;
 	setShowAllConnectedStates: () => void;
 	setEdgeType: (type: string) => void;
+	setContextMenuNodeId: (id: string | undefined) => void;
 }
 
 const useMainStore = create<MainState & MainActions>()(
 	// persist(
 	devtools(
 		(set, get) => ({
+			contextMenuNodeId: undefined,
+			setContextMenuNodeId: (nodeId) => {
+				set({ contextMenuNodeId: nodeId });
+			},
 			activeProcess: null,
 			fetchAll: async (env?: string) => {
 				set({ globalLoading: true }, false, "globalLoading");

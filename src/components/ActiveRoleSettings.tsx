@@ -23,7 +23,6 @@ const ActiveRoleSettings: React.FC<ActiveRoleSettingsProps> = ({
 	return (
 		<div style={{ display: "inline-flex", justifyContent: "end", ...useStyle }}>
 			<div style={{ display: 'flex', paddingTop: "2px", marginRight: "30px" }}>
-
 				<Checkbox
 					checked={roleIsToggled}
 					onChange={toggleRole}

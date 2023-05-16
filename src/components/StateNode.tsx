@@ -1,6 +1,6 @@
 import { RollbackOutlined } from "@ant-design/icons";
-import { Checkbox } from "antd";
-import { CSSProperties, FunctionComponent, useCallback, useState } from "react";
+import { Checkbox, Popover } from "antd";
+import { CSSProperties, FunctionComponent, useState } from "react";
 
 import { Handle, NodeProps, NodeResizer, Position, useStore as useReactFlowStore } from "reactflow";
 import useMainStore from "store";
@@ -28,6 +28,11 @@ const StateNode: FunctionComponent<NodeProps> = ({
     shallow
   );
 
+  const contextMenuNodeId = useMainStore(
+    (state) => state.contextMenuNodeId,
+    shallow
+  );
+
   const updateStateProperties = useMainStore(
     (state) => state.updateStateProperties,
     shallow
@@ -51,9 +56,9 @@ const StateNode: FunctionComponent<NodeProps> = ({
   // todo, use only data.selfConnected
   // update util to always add selfConnected for stateToNode
   const selfConnected = useMainStore(
-      (state) => !!(state.activeProcess?.roles?.find(({ roleName }) => roleName === state.activeRole)?.transitions?.find(({ fromStateName, toStateName }) => [fromStateName, toStateName].every(el => el === id))),
-      shallow
-    ) || data?.selfConnected;
+    (state) => !!(state.activeProcess?.roles?.find(({ roleName }) => roleName === state.activeRole)?.transitions?.find(({ fromStateName, toStateName }) => [fromStateName, toStateName].every(el => el === id))),
+    shallow
+  ) || data?.selfConnected;
 
   const onResize = (_: any, payload: any) => {
     const { height: h, width: w, x, y } = payload;
@@ -81,55 +86,71 @@ const StateNode: FunctionComponent<NodeProps> = ({
   const minWidth = 200;
   const minHeight = 30;
 
-  return (
-    <div
-      className="stateNodeBody"
-      onMouseOver={() => setIsMouseOver(true)}
-      onMouseOut={() => setIsMouseOver(false)}
-      style={{
-        minHeight,
-        minWidth,
-        borderStyle: isTarget ? "dashed" : "solid",
-        backgroundColor: isTarget ? "#ffcce3" : data?.color || "#ccd9f6",
-        ...(data?.w && { width: data.w }),
-        ...(data?.h && { height: data.h }),
-      }}
-    >
-      {selfConnected && <RollbackOutlined rotate={270} style={{ color: 'black', fontSize: '24px', position: 'absolute', top: '-21px', right: '12px' }} />}
-      <NodeResizer
-        onResize={onResize}
-        isVisible={isMouseOver}
-        minWidth={minWidth}
-        minHeight={minHeight}
-        handleStyle={{ zIndex: 400 }}
-      />
-      {!isTarget && isMouseOver && (
-        <>
-          <Checkbox
-            style={checkboxStyle}
-            checked={selfConnected}
-            onChange={toggleSelfConnection}
-          />
-          <div className="state-delete-button" onClick={() => removeState(data.label)} />
-        </>
-      )}
+  const popoverContent = (
+    <>
+      <div style={{ textAlign: 'center' }}>
+        <div>{id}</div>
+        <Checkbox
+          checked={false}
+          onChange={() => console.log('changed')}
+        >
+          one
+        </Checkbox>
+      </div>
+    </>
+  )
 
-      <Handle
-        className="targetHandle"
-        style={{ zIndex: 2 }}
-        position={Position.Top}
-        type="source"
-        isConnectable={isConnectable}
-      />
-      <Handle
-        className="targetHandle"
-        style={targetHandleStyle}
-        position={Position.Bottom}
-        type="target"
-        isConnectable={isConnectable}
-      />
-      {data?.label || "Unknown State"}
-    </div>
+  return (
+    <Popover destroyTooltipOnHide open={contextMenuNodeId === id} content={popoverContent}>
+      <div
+        className="stateNodeBody"
+        onMouseOver={() => setIsMouseOver(true)}
+        onMouseOut={() => setIsMouseOver(false)}
+        style={{
+          minHeight,
+          minWidth,
+          borderStyle: isTarget ? "dashed" : "solid",
+          backgroundColor: isTarget ? "#ffcce3" : data?.color || "#ccd9f6",
+          ...(data?.w && { width: data.w }),
+          ...(data?.h && { height: data.h }),
+        }}
+      >
+        {selfConnected && <RollbackOutlined rotate={270} style={{ color: 'black', fontSize: '24px', position: 'absolute', top: '-21px', right: '12px' }} />}
+        <NodeResizer
+          onResize={onResize}
+          isVisible={isMouseOver}
+          minWidth={minWidth}
+          minHeight={minHeight}
+          handleStyle={{ zIndex: 400 }}
+        />
+        {!isTarget && isMouseOver && (
+          <>
+            <Checkbox
+              style={checkboxStyle}
+              checked={selfConnected}
+              onChange={toggleSelfConnection}
+            />
+            <div className="state-delete-button" onClick={() => removeState(data.label)} />
+          </>
+        )}
+
+        <Handle
+          className="targetHandle"
+          style={{ zIndex: 2 }}
+          position={Position.Top}
+          type="source"
+          isConnectable={isConnectable}
+        />
+        <Handle
+          className="targetHandle"
+          style={targetHandleStyle}
+          position={Position.Bottom}
+          type="target"
+          isConnectable={isConnectable}
+        />
+        {data?.label || "Unknown State"}
+      </div>
+    </Popover>
   );
 };
 
