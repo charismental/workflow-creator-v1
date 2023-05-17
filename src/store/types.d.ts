@@ -1,8 +1,10 @@
+export type Nullable<T> = T | null;
+
 export interface WorkflowConnection {
-	stateTransitionId?: number;
+	stateTransitionId: Nullable<number>;
 	fromStateId?: number;
 	toStateId?: number;
-	processId?: number;
+	processId?: Nullable<number>;
 	fromStateName: string;
 	toStateName: string;
 	properties?: {
@@ -12,7 +14,8 @@ export interface WorkflowConnection {
 }
 
 export interface WorkflowState {
-	stateId?: number;
+	processId?: Nullable<number>;
+	stateId: Nullable<number>;
 	stateName: string;
 	displayOrder?: number;
 	properties?: {
@@ -28,16 +31,18 @@ interface NumberBooleanFields {
 	isCluster: NumberBoolean;
 }
 
-export interface WorkflowRole extends NumberBooleanFields {
-	roleId?: number;
-	processId?: number;
+export interface WorkflowRole {
+	roleId: Nullable<number>;
+	processId?: Nullable<number>;
 	roleName: string;
 	properties?: { color?: string };
 	transitions?: WorkflowConnection[];
+	isUniversal: NumberBoolean;
+	isCluster: NumberBoolean;
 }
 
 export interface WorkflowProcess {
-	ProcessID?: number;
+	ProcessID: Nullable<number>;
 	processName: string;
 	states?: Array<WorkflowState>;
 	roles?: Array<WorkflowRole>;

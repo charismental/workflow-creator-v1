@@ -362,6 +362,7 @@ const useMainStore = create<MainState & MainActions>()(
 				set(
 					({ processes }) => {
 						const newProcess = {
+							ProcessID: null,
 							processName: name,
 							roles: [],
 							states: [],
@@ -395,6 +396,8 @@ const useMainStore = create<MainState & MainActions>()(
 						const initialNumberBoolean: NumberBoolean = 0;
 
 						const newRole = {
+							processId: null,
+							roleId: null,
 							roleName: role,
 							isUniversal: initialNumberBoolean,
 							isCluster: initialNumberBoolean,
@@ -417,16 +420,14 @@ const useMainStore = create<MainState & MainActions>()(
 				}
 			},
 			updateRoleProperty: ({ role, property, value }) => {
-				const { activeProcess, roles: globalRoles } = get();
+				const { activeProcess } = get();
 
 				if (activeProcess) {
 					const { roles = [] } = activeProcess;
 
 					const roleInProcessIndex = roles.findIndex(({ roleName }) => roleName === role);
-					const globalRoleIndex = globalRoles.findIndex(({ roleName }) => roleName === role);
 
 					const foundRole = roles[roleInProcessIndex];
-					const foundGlobalRole = globalRoles[globalRoleIndex];
 
 					const updatedRoles = roleInProcessIndex !== -1 ? roles.map((r, i) =>
 						i !== roleInProcessIndex
@@ -434,18 +435,12 @@ const useMainStore = create<MainState & MainActions>()(
 							: { ...foundRole, [property]: value }
 					) : roles;
 
-					const updatedGlobalRoles = globalRoleIndex !== -1 ? globalRoles.map((r, i) =>
-						i !== globalRoleIndex
-							? r
-							: { ...foundGlobalRole, [property]: value }
-					) : globalRoles;
-
 					set(
 						{
-							activeProcess: { ...activeProcess, roles: updatedRoles }, roles: updatedGlobalRoles,
+							activeProcess: { ...activeProcess, roles: updatedRoles },
 						},
 						false,
-						"setColorForActiveRole"
+						"updateRoleProperty"
 					);
 				}
 			},
@@ -486,6 +481,7 @@ const useMainStore = create<MainState & MainActions>()(
 				set(
 					({ states }) => {
 						const newState = {
+							stateId: null,
 							stateName: name,
 							displayOrder: Math.max(...states.map(({ displayOrder }) => displayOrder || 0)) + 10,
 						};
@@ -501,6 +497,7 @@ const useMainStore = create<MainState & MainActions>()(
 						const initialNumberBoolean: NumberBoolean = 0;
 
 						const newRole = {
+							roleId: null,
 							roleName: role,
 							isUniversal: initialNumberBoolean,
 							isCluster: initialNumberBoolean,
