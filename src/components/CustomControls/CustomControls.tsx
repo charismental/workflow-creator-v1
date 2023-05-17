@@ -1,4 +1,5 @@
 import Icon, {
+	ApartmentOutlined,
 	DeleteOutlined,
 	ExpandOutlined,
 	LockFilled,
@@ -6,14 +7,12 @@ import Icon, {
 	PlusOutlined,
 	ReloadOutlined,
 	SaveOutlined,
-	UnlockOutlined,
-	TableOutlined,
-	ApartmentOutlined,
 	SwapOutlined,
+	TableOutlined,
+	UnlockOutlined,
 } from "@ant-design/icons";
 import { Button, Dropdown, MenuProps, Radio, Space, Tooltip } from "antd";
-import { useCallback, useState } from "react";
-import DownloadButton from "tools/DownloadImage";
+import { useCallback, useEffect, useState } from "react";
 import {
 	ControlProps,
 	Edge,
@@ -24,16 +23,17 @@ import {
 	useStoreApi,
 } from "reactflow";
 import useMainStore from "store";
+import DownloadButton from "tools/DownloadImage";
+import { shallow } from "zustand/shallow";
 import EdgeModal from "../Modals/EdgeModal";
 import NodeModal from "../Modals/NodeModal";
 import CustomControlButtonWithTooltip from "./CustomControlButtonWithTooltip";
 import MapSvg from "./MapSvg";
-import { shallow } from "zustand/shallow";
-import { getItem } from "utils";
 
 interface CustomControlsProps {
 	getCurrentEdges: (() => Edge[]) | undefined;
 	getCurrentNodes: (() => Node[]) | undefined;
+	roleIsToggled: boolean;
 }
 
 const isInteractiveSelector = (s: ReactFlowState) =>
@@ -43,6 +43,7 @@ export default ({
 	getCurrentEdges,
 	getCurrentNodes,
 	onInteractiveChange,
+	roleIsToggled,
 }: CustomControlsProps & ControlProps) => {
 	const store = useStoreApi();
 	const isInteractive = useStore(isInteractiveSelector);
@@ -73,6 +74,14 @@ export default ({
 
 		onInteractiveChange?.(status);
 	};
+
+	useEffect(() => {
+		if (!roleIsToggled) {
+			return onToggleInteractivity();
+		} else if (roleIsToggled && !isInteractive) {
+			return onToggleInteractivity();
+		}
+	}, [roleIsToggled]);
 
 	const getEdgesAndOpenModal = () => {
 		setCurrentEdges(getCurrentEdges ? getCurrentEdges() : []);
@@ -145,8 +154,9 @@ export default ({
 				/>
 				<CustomControlButtonWithTooltip
 					title={"Lock Interactivity"}
-					icon={isInteractive ? <UnlockOutlined /> : <LockFilled />}
+					icon={roleIsToggled && isInteractive ? <UnlockOutlined /> : <LockFilled />}
 					clickEvent={() => onToggleInteractivity()}
+					isDisabled={!roleIsToggled}
 				/>
 				<CustomControlButtonWithTooltip
 					title={"Save Progress"}

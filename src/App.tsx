@@ -1,6 +1,7 @@
 import { Layout, Space, Spin, Typography, message } from "antd";
 import ActiveRoleSettings from "components/ActiveRoleSettings";
 import CustomControls from "components/CustomControls/CustomControls";
+import ToggleRoleActiveState from "components/Modals/ToggleRoleActiveState";
 import ReactFlowBase from "components/ReactFlowBase";
 import SelectBox from "components/SelectBox";
 import StateCollapseBox from "components/StateCollapseBox";
@@ -13,8 +14,6 @@ import { roleColor } from "utils";
 import { shallow } from "zustand/shallow";
 import Sidebar from "./components/Sidebar";
 import "./css/style.css";
-import ToggleRoleActiveState from "components/Modals/ToggleRoleActiveState";
-import { WorkflowRole } from "store/types";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -229,6 +228,7 @@ const WorkflowCreator = () => {
 							/>
 						</Content>
 						<CustomControls
+							roleIsToggled={roleIsToggled}
 							getCurrentEdges={reactFlowInstance?.getEdges}
 							getCurrentNodes={reactFlowInstance?.getNodes}
 						/>
