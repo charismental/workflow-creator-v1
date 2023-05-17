@@ -1,7 +1,7 @@
 import type { MenuProps } from "antd/es/menu";
 import { defaultColors } from "data";
 import { Edge, MarkerType, Position, Node, Connection } from 'reactflow';
-import { WorkflowConnection, WorkflowProcess, WorkflowRole, WorkflowState } from 'store/types';
+import { Nullable, WorkflowConnection, WorkflowProcess, WorkflowRole, WorkflowState } from 'store/types';
 
 interface IntersectionNodeType {
   width: any;
@@ -124,7 +124,7 @@ export function transformNewConnectionToTransition(
   );
 
   return (
-    foundTransition || (source && target ? { fromStateName: source, toStateName: target, properties: { sourceHandle, targetHandle } } : null)
+    foundTransition || (source && target ? { stateTransitionId: null, fromStateName: source, toStateName: target, properties: { sourceHandle, targetHandle } } : null)
   );
 }
 
@@ -197,9 +197,11 @@ export function labelNode({ name, x, y, w }: { name: string, x: number; y: numbe
 export function stateByNode({ node, allStates }: { node: Node | any; allStates: WorkflowState[] }): WorkflowState {
   const { id: stateName, positionAbsolute = { x: 1, y: 1 }, width: w = 200, height: h = 30 } = node;
   const foundState = allStates.find(s => s?.stateName === stateName) || {};
+  let stateId: Nullable<number> = null;
+  if ('stateId' in foundState && typeof foundState.stateId === 'number') stateId = foundState.stateId;
   const properties = { ...positionAbsolute, h, w }
 
-  return { ...foundState, stateName, properties };
+  return { ...foundState, stateId, stateName, properties };
 };
 
 export function roleColor({
