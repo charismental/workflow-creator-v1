@@ -81,17 +81,17 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
 	useEffect(() => {
 		function handleClickOutside(e: any) {
-			const node: Node = e.target
-	
-			if (!document.getElementsByClassName('ant-popover')[0]?.contains(node)) {
+			const node: Node = e.target;
+
+			if (!document.getElementsByClassName("ant-popover")[0]?.contains(node)) {
 				setContextMenuNodeId(undefined);
 			}
 		}
 
-		if (contextMenuNodeId) document.addEventListener('click', handleClickOutside);
-		else document.removeEventListener('click', handleClickOutside);
-		return () => document.removeEventListener('click', handleClickOutside);
-	}, [contextMenuNodeId, setContextMenuNodeId])
+		if (contextMenuNodeId) document.addEventListener("click", handleClickOutside);
+		else document.removeEventListener("click", handleClickOutside);
+		return () => document.removeEventListener("click", handleClickOutside);
+	}, [contextMenuNodeId, setContextMenuNodeId]);
 
 	const edges = computedEdges({
 		roles: activeProcess?.roles || [],
@@ -143,6 +143,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
 			const newState = {
 				stateName: type,
+				stateId: null,
 				displayOrder:
 					Math.max(...activeProcessStates.map(({ displayOrder }) => displayOrder || 0)) + 10,
 				properties: { ...position },

@@ -46,6 +46,14 @@ export interface WorkflowProcess {
 	processName: string;
 	states?: Array<WorkflowState>;
 	roles?: Array<WorkflowRole>;
+	companies?: Array<WorkflowCompany>;
+}
+
+export interface WorkflowCompany {
+	CompanyID: Nullable<number>;
+	CompanyName: string;
+	isInternal: NumberBoolean;
+	IsTrusted: boolean;
 }
 
 export type NumberBoolean = 0 | 1;

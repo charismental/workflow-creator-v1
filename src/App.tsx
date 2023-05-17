@@ -55,6 +55,9 @@ const storeSelector = (state: MainActions & MainState) => ({
 	loading: state.globalLoading,
 	reactFlowInstance: state.reactFlowInstance,
 	updateRoleProperty: state.updateRoleProperty,
+	companies: state.companies,
+	toggleCompanyForProcess: state.toggleCompanyForProcess,
+	addNewCompany: state.addNewCompany,
 });
 
 const WorkflowCreator = () => {
@@ -75,6 +78,9 @@ const WorkflowCreator = () => {
 		fetchAll,
 		loading,
 		reactFlowInstance,
+		companies,
+		toggleCompanyForProcess,
+		addNewCompany,
 	} = useMainStore(storeSelector, shallow);
 	const [toggleInactiveModal, setToggleInactiveModal] = useState(false);
 	const filteredStates = useMainStore(
@@ -105,6 +111,13 @@ const WorkflowCreator = () => {
 		};
 	});
 
+	const companyList = companies.map(({ CompanyName }) => {
+		return {
+			label: CompanyName,
+			value: activeProcess?.companies?.some((c) => c.CompanyName === CompanyName) || false,
+		};
+	});
+
 	const addNewProcessAndSelect = ({ name }: { name: string }) => {
 		addProcess(name);
 		setActiveProcess(name);
@@ -116,9 +129,14 @@ const WorkflowCreator = () => {
 		setActiveRole(name);
 	};
 
+	const addNewCompanyAndToggle = ({ name }: { name: string }) => {
+		addNewCompany(name);
+		toggleCompanyForProcess(name);
+	};
+
 	const openToggleActiveModal = (roleName: string) => {
 		setToggleInactiveModal(true);
-		
+
 		ToggleRoleActiveState({
 			modalOpen: toggleInactiveModal,
 			roleName: activeRole,
@@ -130,7 +148,7 @@ const WorkflowCreator = () => {
 
 	const toggleRole = (roleName: string): void => {
 		const { transitions = [] } = activeProcess?.roles?.find((r) => r.roleName === roleName) || {};
-		
+
 		if (transitions.length) openToggleActiveModal(roleName);
 		else toggleRoleForProcess(roleName);
 	};
@@ -192,13 +210,14 @@ const WorkflowCreator = () => {
 							color={activeRoleColor}
 							toggleRole={() => toggleRole(activeRole)}
 							useStyle={{ flexGrow: 1 }}
-							updateRoleProperty={({ property, value }: { property: string; value?: any }) => updateRoleProperty({ role: activeRole, property, value })}
+							updateRoleProperty={({ property, value }: { property: string; value?: any }) =>
+								updateRoleProperty({ role: activeRole, property, value })
+							}
 							roleHasPropertyActive={(property: string) => {
 								const foundRole: any = roles?.find((r: any) => r.roleName === activeRole);
 
 								return !!foundRole?.[property];
-							}
-						}
+							}}
 						/>
 					</Header>
 					<ReactFlowProvider>
@@ -234,6 +253,14 @@ const WorkflowCreator = () => {
 								useStyle={{ width: "100%" }}
 								multiselectHandler={(el) => toggleRole(el.label)}
 								selectOnChange={setActiveRole}
+							/>
+							<SelectBox
+								addNew={addNewCompanyAndToggle}
+								placeholder="Select Company"
+								items={companyList}
+								type="company"
+								useStyle={{ width: "100%" }}
+								multiselectHandler={(el) => toggleCompanyForProcess(el.label)}
 							/>
 						</>
 					}

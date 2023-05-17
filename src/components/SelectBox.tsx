@@ -6,7 +6,7 @@ import AddNewInput from "./AddNewInput";
 const { Option } = Select;
 
 interface SelectBoxProps {
-	type: "role" | "state" | "process";
+	type: "role" | "state" | "process" | "company";
 	items: string[] | { label: string; value: boolean }[];
 	selectValue?: string;
 	useStyle?: any;
