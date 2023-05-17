@@ -7,14 +7,14 @@ const { Title } = Typography;
 interface SetAsInactiveModalProps {
 	modalOpen: boolean;
 	setModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-	roleName: string;
+	RoleName: string;
 	toggleRoleForProcess: MainActions["toggleRoleForProcess"];
 	successMessage: () => void;
 }
 
 export default ({
 	toggleRoleForProcess,
-	roleName,
+	RoleName,
 	modalOpen,
 	setModalOpen,
 	successMessage,
@@ -27,13 +27,13 @@ export default ({
 		content: (
 			<>
 				<Title level={3}>
-					Setting as inactive will remove all transitions associated with this role
+					Setting as inactive will remove all Transitions associated with this role
 				</Title>
 				<Title level={5}>Are you sure you want to continue this action?</Title>
 			</>
 		),
 		onOk() {
-			toggleRoleForProcess(roleName), successMessage();
+			toggleRoleForProcess(RoleName), successMessage();
 		},
 		okText: "Clear All Properties",
 		okType: "primary",

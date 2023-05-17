@@ -13,15 +13,15 @@ import {
 } from "reactflow";
 import { devtools } from "zustand/middleware";
 import {
-	NumberBoolean,
-	WorkflowConnection,
+	WorkFlowTransition,
 	WorkflowProcess,
 	WorkflowRole,
 	WorkflowState,
 	WorkflowCompany,
-} from "./types";
+} from "../types/workflowTypes";
+import { NumberBoolean } from "../types/genericTypes";
 
-import mockFetchAll from "data/mockFetchAll";
+import mockFetchAll from "data/mockFetchAll_v2";
 import isEqual from "lodash.isequal";
 import { nodeByState, roleColor, stateByNode, transformNewConnectionToTransition } from "utils";
 
@@ -34,8 +34,8 @@ export interface MainState {
 	_hasHydrated: boolean;
 	processes: WorkflowProcess[];
 	edges: Edge[];
-	states: WorkflowState[];
-	roles: WorkflowRole[];
+	States: WorkflowState[];
+	Roles: WorkflowRole[];
 	activeProcess: WorkflowProcess | null;
 	reactFlowInstance: ReactFlowInstance | undefined;
 	showMinimap: boolean;
@@ -43,15 +43,15 @@ export interface MainState {
 	showAllConnectedStates: boolean;
 	edgeType: string;
 	contextMenuNodeId: string | undefined;
-	companies: WorkflowCompany[];
+	Companies: WorkflowCompany[];
 }
 
 export interface MainActions {
 	fetchAll: (env?: string) => Promise<any>;
 	setActiveRole: (role: string) => void;
-	addProcess: (processName: string) => void;
+	addProcess: (ProcessName: string) => void;
 	updateProcess: (payload: { processIndex: number; process: WorkflowProcess }) => void;
-	deleteProcess: (processName: string) => void;
+	deleteProcess: (ProcessName: string) => void;
 	toggleRoleForProcess: (role: string, color?: string) => void;
 	toggleCompanyForProcess: (company: string) => void;
 	updateRoleProperty: (payload: { role: string; property: string; value: any }) => void;
@@ -63,13 +63,13 @@ export interface MainActions {
 	onNodesChange: OnNodesChange;
 	onConnect: OnConnect;
 	removeTransition: (payload: { source: string; target: string }) => void;
-	removeState: (stateName: string) => void;
-	setStatesForActiveProcess: (states: WorkflowState[]) => void;
+	removeState: (StateName: string) => void;
+	setStatesForActiveProcess: (States: WorkflowState[]) => void;
 	updateStateProperties: (payload: {
-		stateName: string;
+		StateName: string;
 		properties: { x?: number; y?: number; h?: number; w?: number };
 	}) => void;
-	setActiveProcess: (processName: string) => void;
+	setActiveProcess: (ProcessName: string) => void;
 	setColorForActiveRole: (newColor: string) => void;
 	setReactFlowInstance: (instance: ReactFlowInstance) => void;
 	setShowMinimap: () => void;
@@ -93,18 +93,23 @@ const useMainStore = create<MainState & MainActions>()(
 				const waitTime = Math.random() * (2500 - 500) + 500;
 				await new Promise((r) => setTimeout(r, waitTime));
 
-				const { processes = [], roles = [], states = [], companies = [] }: any = mockFetchAll;
-				set({ states, roles, processes, companies, globalLoading: false }, false, "fetchAll");
-				const activeProcessName = processes[0]?.processName;
+				const { process } = mockFetchAll;
+				const { States = [], Roles = [], Companies = [] } = process.Globals;
+				set(
+					{ States, Roles, processes: [process], Companies, globalLoading: false },
+					false,
+					"fetchAll"
+				);
+				const activeProcessName = process.ProcessName;
 				get().setActiveProcess(activeProcessName);
 			},
 			globalLoading: false,
 			_hasHydrated: false,
 			setHasHydrated: (state) => set({ _hasHydrated: state }),
 			edges: [],
-			states: [],
-			roles: [],
-			companies: [],
+			States: [],
+			Roles: [],
+			Companies: [],
 			onNodesChange: (changes: NodeChange[] | any[]) => {
 				const { activeProcess, activeRole, showAllRoles } = get();
 
@@ -120,15 +125,15 @@ const useMainStore = create<MainState & MainActions>()(
 				}));
 
 				if (activeProcess) {
-					const activeRoleIndex = (activeProcess?.roles || []).findIndex(
-						({ roleName }) => roleName === activeRole
+					const activeRoleIndex = (activeProcess?.Roles || []).findIndex(
+						({ RoleName }) => RoleName === activeRole
 					);
 
-					const { properties = {} } = activeProcess.roles?.[activeRoleIndex] || {};
+					const { properties = {} } = activeProcess.Roles?.[activeRoleIndex] || {};
 
 					const nodeColor = properties?.color || defaultColors?.[activeRoleIndex];
 
-					const { states: allStates = [] } = activeProcess || {};
+					const { States: allStates = [] } = activeProcess || {};
 
 					const nodes = allStates.map((s, i, arr) =>
 						nodeByState({
@@ -145,7 +150,7 @@ const useMainStore = create<MainState & MainActions>()(
 						{
 							activeProcess: {
 								...activeProcess,
-								states: updatedNodes.map((node) =>
+								States: updatedNodes.map((node) =>
 									stateByNode({
 										node: { ...node, data: { ...node.data, color: nodeColor } },
 										allStates,
@@ -159,26 +164,26 @@ const useMainStore = create<MainState & MainActions>()(
 				}
 			},
 			updateStateProperties: ({
-				stateName,
+				StateName,
 				properties,
 			}: {
-				stateName: string;
+				StateName: string;
 				properties: { x?: number; y?: number; h?: number; w?: number };
 			}) => {
 				const { activeProcess, setStatesForActiveProcess } = get();
 
-				const { states = [] } = activeProcess || {};
+				const { States = [] } = activeProcess || {};
 
-				const foundStateIndex = states.findIndex((state) => state.stateName === stateName);
+				const foundStateIndex = States.findIndex((state) => state.StateName === StateName);
 
 				if (foundStateIndex !== -1) {
 					setStatesForActiveProcess(
-						states.map((s, i) =>
+						States.map((s, i) =>
 							i !== foundStateIndex
 								? s
 								: {
-										...states[foundStateIndex],
-										properties: { ...states[foundStateIndex].properties, ...properties },
+										...States[foundStateIndex],
+										properties: { ...States[foundStateIndex].properties, ...properties },
 								  }
 						)
 					);
@@ -186,13 +191,13 @@ const useMainStore = create<MainState & MainActions>()(
 			},
 			edgeType: "straight",
 			setEdgeType: (type) => set({ edgeType: type }, false, "setEdgeType"),
-			setStatesForActiveProcess: (states: WorkflowState[]) => {
+			setStatesForActiveProcess: (States: WorkflowState[]) => {
 				const { activeProcess } = get();
 
 				if (activeProcess) {
 					set(
 						{
-							activeProcess: { ...activeProcess, states: states },
+							activeProcess: { ...activeProcess, States: States },
 						},
 						false,
 						"setStatesForActiveProcess"
@@ -203,7 +208,7 @@ const useMainStore = create<MainState & MainActions>()(
 				const { activeRole, activeProcess, showAllRoles } = get();
 				const { source, target } = connection;
 
-				const { roles = [] } = activeProcess || {};
+				const { Roles = [] } = activeProcess || {};
 				let roleIndexStr = "";
 
 				const removeIndexPrefixFromName = (prefix: string, name: string): string => {
@@ -213,18 +218,18 @@ const useMainStore = create<MainState & MainActions>()(
 					return name;
 				};
 
-				const foundRoleIndex = roles.findIndex(({ roleName }, i) => {
+				const foundRoleIndex = Roles.findIndex(({ RoleName }, i) => {
 					if (showAllRoles) {
 						roleIndexStr = (source || "").match(/\d+/g)?.[0] || "";
 
 						return Number(roleIndexStr) === i;
 					}
 
-					return roleName === activeRole;
+					return RoleName === activeRole;
 				});
 
 				if (foundRoleIndex !== -1 && activeProcess) {
-					const { transitions = [] } = roles[foundRoleIndex];
+					const { Transitions = [] } = Roles[foundRoleIndex];
 					const updatedConnection = {
 						...connection,
 						...(showAllRoles && {
@@ -232,17 +237,17 @@ const useMainStore = create<MainState & MainActions>()(
 							target: removeIndexPrefixFromName(roleIndexStr, target || ""),
 						}),
 					};
-					const newTransition = transformNewConnectionToTransition(updatedConnection, transitions);
+					const newTransition = transformNewConnectionToTransition(updatedConnection, Transitions);
 
-					const updatedTransitions = [...transitions, ...(newTransition ? [newTransition] : [])];
+					const updatedTransitions = [...Transitions, ...(newTransition ? [newTransition] : [])];
 
-					const updatedRoles = roles.map((r, i) =>
-						i === foundRoleIndex ? { ...r, transitions: updatedTransitions } : r
+					const updatedRoles = Roles.map((r, i) =>
+						i === foundRoleIndex ? { ...r, Transitions: updatedTransitions } : r
 					);
 
 					set(
 						{
-							activeProcess: { ...activeProcess, roles: updatedRoles },
+							activeProcess: { ...activeProcess, Roles: updatedRoles },
 						},
 						false,
 						"onConnect"
@@ -261,7 +266,7 @@ const useMainStore = create<MainState & MainActions>()(
 			removeTransition: ({ source, target }: { source: string; target: string }) => {
 				const { activeRole, activeProcess, showAllRoles } = get();
 
-				const { roles = [] } = activeProcess || {};
+				const { Roles = [] } = activeProcess || {};
 				let roleIndexStr = "";
 
 				const removeIndexPrefixFromName = (prefix: string, name: string): string => {
@@ -271,78 +276,77 @@ const useMainStore = create<MainState & MainActions>()(
 					return name;
 				};
 
-				const foundRoleIndex = roles.findIndex(({ roleName }, i) => {
+				const foundRoleIndex = Roles.findIndex(({ RoleName }, i) => {
 					if (showAllRoles) {
 						roleIndexStr = source.match(/\d+/g)?.[0] || "";
 
 						return Number(roleIndexStr) === i;
 					}
 
-					return roleName === activeRole;
+					return RoleName === activeRole;
 				});
 
 				if (foundRoleIndex !== -1 && activeProcess) {
-					const { transitions = [] } = roles[foundRoleIndex];
+					const { Transitions = [] } = Roles[foundRoleIndex];
 
-					const updatedTransitions = transitions.filter(({ fromStateName, toStateName }) => {
+					const updatedTransitions = Transitions.filter(({ StateName, ToStateName }) => {
 						const updatedSource = showAllRoles
 							? removeIndexPrefixFromName(roleIndexStr, source)
 							: source;
 						const updatedTarget = showAllRoles
 							? removeIndexPrefixFromName(roleIndexStr, target)
 							: target;
-						return fromStateName !== updatedSource || toStateName !== updatedTarget;
+						return StateName !== updatedSource || ToStateName !== updatedTarget;
 					});
 
-					const updatedRoles = roles.map((r, i) =>
-						i === foundRoleIndex ? { ...r, transitions: updatedTransitions } : r
+					const updatedRoles = Roles.map((r, i) =>
+						i === foundRoleIndex ? { ...r, Transitions: updatedTransitions } : r
 					);
 
 					set(
 						{
-							activeProcess: { ...activeProcess, roles: updatedRoles },
+							activeProcess: { ...activeProcess, Roles: updatedRoles },
 						},
 						false,
 						"removeTransition"
 					);
 				}
 			},
-			removeState: (stateName: string) => {
+			removeState: (StateName: string) => {
 				const { activeProcess } = get();
 
-				const { roles = [] } = activeProcess || {};
+				const { Roles = [] } = activeProcess || {};
 
 				if (activeProcess) {
-					const transitionsFilter = (transitions: WorkflowConnection[]) => {
-						return transitions.filter(
-							({ fromStateName, toStateName }) =>
-								fromStateName !== stateName && toStateName !== stateName
+					const TransitionsFilter = (Transitions: WorkFlowTransition[]) => {
+						return Transitions.filter(
+							({ StateName, ToStateName }) => StateName !== StateName && ToStateName !== StateName
 						);
 					};
 
-					const updatedRoles = roles.map((r) => ({
+					const updatedRoles = Roles.map((r) => ({
 						...r,
-						transitions: transitionsFilter(r?.transitions || []),
+						Transitions: TransitionsFilter(r?.Transitions || []),
 					}));
 
-					const updatedStates = activeProcess.states?.filter((s) => s.stateName !== stateName);
+					const updatedStates = activeProcess.States?.filter((s) => s.StateName !== StateName);
 
 					set(
 						{
-							activeProcess: { ...activeProcess, roles: updatedRoles, states: updatedStates },
+							activeProcess: { ...activeProcess, Roles: updatedRoles, States: updatedStates },
 						},
 						false,
 						"removeState"
 					);
 				}
 			},
-			setActiveProcess: (processName: string) =>
+			setActiveProcess: (ProcessName: string) =>
 				set(
 					({ processes, activeProcess }) => {
-						const processToSet = processes.find((p) => p.processName === processName);
+						const processToSet = processes.find((p) => p.ProcessName === ProcessName);
 
 						const previousProcessIndex = processes.findIndex(
-							(p) => p.processName === activeProcess?.processName
+							(p) => p.ProcessName === activeProcess?.ProcessName
 						);
 
 						if (
@@ -384,11 +388,14 @@ const useMainStore = create<MainState & MainActions>()(
 			addProcess: (name: string) =>
 				set(
 					({ processes }) => {
-						const newProcess = {
+						const newProcess: WorkflowProcess = {
 							ProcessID: null,
-							processName: name,
-							roles: [],
-							states: [],
+							ProcessName: name,
+							SessionID: "",
+							Globals: { States: get().States, Roles: get().Roles, Companies: get().Companies },
+							Roles: [],
+							States: [],
+							Companies: [],
 						};
 
 						return { processes: processes.concat(newProcess) };
@@ -397,10 +404,10 @@ const useMainStore = create<MainState & MainActions>()(
 					"addProcess"
 				),
 			// fix
-			deleteProcess: (processName) =>
+			deleteProcess: (ProcessName) =>
 				set(
 					({ processes }) => ({
-						processes: processes.filter((p) => p.processName !== processName),
+						processes: processes.filter((p) => p.ProcessName !== ProcessName),
 					}),
 					false,
 					"deleteProcess"
@@ -409,33 +416,32 @@ const useMainStore = create<MainState & MainActions>()(
 				const { activeProcess } = get();
 
 				if (activeProcess) {
-					const { roles = [] } = activeProcess;
+					const { Roles = [] } = activeProcess;
 
-					let updatedRoles = roles;
+					let updatedRoles = Roles;
 
-					if (roles.some(({ roleName }) => roleName === role)) {
-						updatedRoles = roles.filter(({ roleName }) => roleName !== role);
+					if (Roles.some(({ RoleName }) => RoleName === role)) {
+						updatedRoles = Roles.filter(({ RoleName }) => RoleName !== role);
 					} else {
 						const initialNumberBoolean: NumberBoolean = 0;
 
-						const newRole = {
-							processId: null,
-							roleId: null,
-							roleName: role,
-							isUniversal: initialNumberBoolean,
-							isCluster: initialNumberBoolean,
+						const newRole: WorkflowRole = {
+							RoleId: null,
+							IsCluster: initialNumberBoolean,
+							IsUniversal: initialNumberBoolean,
+							RoleName: role,
+							Transitions: [],
 							properties: {
-								color: color || roleColor({ roleName: role, allRoles: roles, index: roles.length }),
+								color: color || roleColor({ RoleName: role, allRoles: Roles, index: Roles.length }),
 							},
-							transitions: [],
 						};
 
-						updatedRoles = roles.concat(newRole);
+						updatedRoles = Roles.concat(newRole);
 					}
 
 					set(
 						{
-							activeProcess: { ...activeProcess, roles: updatedRoles },
+							activeProcess: { ...activeProcess, Roles: updatedRoles },
 						},
 						false,
 						"toggleRoleForProcess"
@@ -445,12 +451,12 @@ const useMainStore = create<MainState & MainActions>()(
 			toggleCompanyForProcess: (company: string) => {
 				const { activeProcess } = get();
 				if (activeProcess) {
-					const { companies = [] } = activeProcess;
+					const { Companies = [] } = activeProcess;
 
-					let updatedCompanies = companies;
+					let updatedCompanies = Companies;
 
-					if (companies.some(({ CompanyName }) => CompanyName === company)) {
-						updatedCompanies = companies.filter(({ CompanyName }) => CompanyName !== company);
+					if (Companies.some(({ CompanyName }) => CompanyName === company)) {
+						updatedCompanies = Companies.filter(({ CompanyName }) => CompanyName !== company);
 					} else {
 						const initialNumberBoolean: NumberBoolean = 0;
 
@@ -461,10 +467,10 @@ const useMainStore = create<MainState & MainActions>()(
 							IsTrusted: false,
 						};
 
-						updatedCompanies = companies.concat(newCompany);
+						updatedCompanies = Companies.concat(newCompany);
 					}
 					set(
-						{ activeProcess: { ...activeProcess, companies: updatedCompanies } },
+						{ activeProcess: { ...activeProcess, Companies: updatedCompanies } },
 						false,
 						"toggleCompanyForProcess"
 					);
@@ -474,22 +480,22 @@ const useMainStore = create<MainState & MainActions>()(
 				const { activeProcess } = get();
 
 				if (activeProcess) {
-					const { roles = [] } = activeProcess;
+					const { Roles = [] } = activeProcess;
 
-					const roleInProcessIndex = roles.findIndex(({ roleName }) => roleName === role);
+					const roleInProcessIndex = Roles.findIndex(({ RoleName }) => RoleName === role);
 
-					const foundRole = roles[roleInProcessIndex];
+					const foundRole = Roles[roleInProcessIndex];
 
 					const updatedRoles =
 						roleInProcessIndex !== -1
-							? roles.map((r, i) =>
+							? Roles.map((r, i) =>
 									i !== roleInProcessIndex ? r : { ...foundRole, [property]: value }
 							  )
-							: roles;
+							: Roles;
 
 					set(
 						{
-							activeProcess: { ...activeProcess, roles: updatedRoles },
+							activeProcess: { ...activeProcess, Roles: updatedRoles },
 						},
 						false,
 						"updateRoleProperty"
@@ -500,13 +506,13 @@ const useMainStore = create<MainState & MainActions>()(
 				const { activeProcess, activeRole } = get();
 
 				if (activeProcess) {
-					const { roles = [] } = activeProcess;
+					const { Roles = [] } = activeProcess;
 
-					const activeRoleIndex = roles.findIndex(({ roleName }) => roleName === activeRole);
+					const activeRoleIndex = Roles.findIndex(({ RoleName }) => RoleName === activeRole);
 
 					if (activeRoleIndex !== -1) {
-						const foundRole = roles[activeRoleIndex];
-						const updatedRoles = roles.map((r, i) =>
+						const foundRole = Roles[activeRoleIndex];
+						const updatedRoles = Roles.map((r, i) =>
 							i !== activeRoleIndex
 								? r
 								: { ...foundRole, properties: { ...foundRole.properties, color } }
@@ -514,7 +520,7 @@ const useMainStore = create<MainState & MainActions>()(
 
 						set(
 							{
-								activeProcess: { ...activeProcess, roles: updatedRoles },
+								activeProcess: { ...activeProcess, Roles: updatedRoles },
 							},
 							false,
 							"setColorForActiveRole"
@@ -523,46 +529,48 @@ const useMainStore = create<MainState & MainActions>()(
 				}
 			},
 			filteredStates: (existingStates) => {
-				const { states } = get();
+				const { States } = get();
 
-				return states
-					.map((el) => el.stateName)
-					.filter((stateName: string) => !existingStates.some((s) => s.stateName === stateName));
+				return States.map((el) => el.StateName).filter(
+					(StateName: string) => !existingStates.some((s) => s.StateName === StateName)
+				);
 			},
 			addNewState: (name) =>
 				set(
-					({ states }) => {
-						const newState = {
-							stateId: null,
-							stateName: name,
-							displayOrder: Math.max(...states.map(({ displayOrder }) => displayOrder || 0)) + 10,
+					({ States }) => {
+						const newState: WorkflowState = {
+							StateId: null,
+							StateName: name,
+							RequiresRoleAssignment: 0,
+							RequiresUserAssignment: 0,
+							DisplayOrder: Math.max(...States.map(({ DisplayOrder }) => DisplayOrder || 0)) + 10,
 						};
 
-						return { states: states.concat(newState) };
+						return { States: States.concat(newState) };
 					},
 					false,
 					"addNewState"
 				),
 			addNewRole: (role: string) =>
 				set(
-					({ roles }) => {
+					({ Roles }) => {
 						const initialNumberBoolean: NumberBoolean = 0;
 
-						const newRole = {
-							roleId: null,
-							roleName: role,
-							isUniversal: initialNumberBoolean,
-							isCluster: initialNumberBoolean,
+						const newRole: WorkflowRole = {
+							RoleId: null,
+							RoleName: role,
+							IsUniversal: initialNumberBoolean,
+							IsCluster: initialNumberBoolean,
 						};
 
-						return { roles: roles.concat(newRole) };
+						return { Roles: Roles.concat(newRole) };
 					},
 					false,
 					"addNewRole"
 				),
 			addNewCompany: (company: string) =>
 				set(
-					({ companies }) => {
+					({ Companies }) => {
 						const initialNumberBoolean: NumberBoolean = 0;
 
 						const newCompany = {
@@ -571,7 +579,7 @@ const useMainStore = create<MainState & MainActions>()(
 							isInternal: initialNumberBoolean,
 							IsTrusted: false,
 						};
-						return { companies: companies.concat(newCompany) };
+						return { Companies: Companies.concat(newCompany) };
 					},
 					false,
 					"addNewCompany"

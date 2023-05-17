@@ -29,7 +29,7 @@ const selector = (state: MainState & MainActions) => ({
 	onNodesChange: state.onNodesChange,
 	setStatesForActiveProcess: state.setStatesForActiveProcess,
 	onConnect: state.onConnect,
-	activeProcessStates: state.activeProcess?.states || [],
+	activeProcessStates: state.activeProcess?.States || [],
 	reactFlowInstance: state.reactFlowInstance,
 	setReactFlowInstance: state.setReactFlowInstance,
 	showMinimap: state.showMinimap,
@@ -142,10 +142,10 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 			});
 
 			const newState = {
-				stateName: type,
-				stateId: null,
-				displayOrder:
-					Math.max(...activeProcessStates.map(({ displayOrder }) => displayOrder || 0)) + 10,
+				StateName: type,
+				StateId: null,
+				DisplayOrder:
+					Math.max(...activeProcessStates.map(({ DisplayOrder }) => DisplayOrder || 0)) + 10,
 				properties: { ...position },
 			};
 

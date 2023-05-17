@@ -18,7 +18,7 @@ export default ({ allCurrentNodesInCanvas, nodeModalOpen, setNodeModalOpen }: Ed
 			footer={null}
 			onCancel={() => setNodeModalOpen(false)}
 		>
-			<Title level={3}>All Current Nodes (states)</Title>
+			<Title level={3}>All Current Nodes (States)</Title>
 			<div style={{ overflowY: "auto", maxHeight: "calc(100vh - 300px)" }}>
 				{allCurrentNodesInCanvas.length ? (
 					allCurrentNodesInCanvas.map((node, index) => (

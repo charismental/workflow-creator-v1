@@ -47,14 +47,14 @@ const storeSelector = (state: MainActions & MainState) => ({
 	setActiveRole: state.setActiveRole,
 	roles: state.roles,
 	setColorForActiveRole: state.setColorForActiveRole,
-	currentStates: state.states,
+	currentStates: state.States,
 	addNewState: state.addNewState,
 	addNewRole: state.addNewRole,
 	fetchAll: state.fetchAll,
 	loading: state.globalLoading,
 	reactFlowInstance: state.reactFlowInstance,
 	updateRoleProperty: state.updateRoleProperty,
-	companies: state.companies,
+	Companies: state.Companies,
 	toggleCompanyForProcess: state.toggleCompanyForProcess,
 	addNewCompany: state.addNewCompany,
 });
@@ -77,7 +77,7 @@ const WorkflowCreator = () => {
 		fetchAll,
 		loading,
 		reactFlowInstance,
-		companies,
+		Companies,
 		toggleCompanyForProcess,
 		addNewCompany,
 	} = useMainStore(storeSelector, shallow);
@@ -93,27 +93,27 @@ const WorkflowCreator = () => {
 	const [messageApi, contextHolder] = message.useMessage();
 
 	const activeRoleColor = roleColor({
-		roleName: activeRole,
+		RoleName: activeRole,
 		allRoles: activeProcess?.roles || [],
 	});
 
-	const roleIsToggled = !!activeProcess?.roles?.some((r) => r.roleName === activeRole);
+	const roleIsToggled = !!activeProcess?.roles?.some((r) => r.RoleName === activeRole);
 
-	const availableStates = filteredStates(activeProcess?.states || []);
+	const availableStates = filteredStates(activeProcess?.States || []);
 
-	const availableProcesses = processes.map((p) => p.processName);
+	const availableProcesses = processes.map((p) => p.ProcessName);
 
-	const roleList = roles.map(({ roleName }) => {
+	const roleList = roles.map(({ RoleName }) => {
 		return {
-			label: roleName,
-			value: activeProcess?.roles?.some((r) => r.roleName === roleName) || false,
+			label: RoleName,
+			value: activeProcess?.roles?.some((r) => r.RoleName === RoleName) || false,
 		};
 	});
 
-	const companyList = companies.map(({ CompanyName }) => {
+	const companyList = Companies.map(({ CompanyName }) => {
 		return {
 			label: CompanyName,
-			value: activeProcess?.companies?.some((c) => c.CompanyName === CompanyName) || false,
+			value: activeProcess?.Companies?.some((c) => c.CompanyName === CompanyName) || false,
 		};
 	});
 
@@ -133,23 +133,23 @@ const WorkflowCreator = () => {
 		toggleCompanyForProcess(name);
 	};
 
-	const openToggleActiveModal = (roleName: string) => {
+	const openToggleActiveModal = (RoleName: string) => {
 		setToggleInactiveModal(true);
 
 		ToggleRoleActiveState({
 			modalOpen: toggleInactiveModal,
-			roleName: activeRole,
+			RoleName: activeRole,
 			setModalOpen: setToggleInactiveModal,
-			toggleRoleForProcess: () => toggleRoleForProcess(roleName),
+			toggleRoleForProcess: () => toggleRoleForProcess(RoleName),
 			successMessage: activeStatusRemovedMessage,
 		});
 	};
 
-	const toggleRole = (roleName: string): void => {
-		const { transitions = [] } = activeProcess?.roles?.find((r) => r.roleName === roleName) || {};
+	const toggleRole = (RoleName: string): void => {
+		const { Transitions = [] } = activeProcess?.roles?.find((r) => r.RoleName === RoleName) || {};
 
-		if (transitions.length) openToggleActiveModal(roleName);
-		else toggleRoleForProcess(roleName);
+		if (Transitions.length) openToggleActiveModal(RoleName);
+		else toggleRoleForProcess(RoleName);
 	};
 
 	const activeStatusRemovedMessage = () => {
@@ -192,7 +192,7 @@ const WorkflowCreator = () => {
 							selectOnChange={setActiveProcess}
 							addNew={addNewProcessAndSelect}
 							type="process"
-							selectValue={activeProcess?.processName}
+							selectValue={activeProcess?.ProcessName}
 							items={availableProcesses}
 							placeholder="Select Process"
 							hasColorInput={false}
@@ -213,7 +213,7 @@ const WorkflowCreator = () => {
 								updateRoleProperty({ role: activeRole, property, value })
 							}
 							roleHasPropertyActive={(property: string) => {
-								const foundRole: any = roles?.find((r: any) => r.roleName === activeRole);
+								const foundRole: any = roles?.find((r: any) => r.RoleName === activeRole);
 
 								return !!foundRole?.[property];
 							}}
@@ -241,7 +241,7 @@ const WorkflowCreator = () => {
 								items={availableStates}
 								addNew={addNewState}
 								roleColor={activeRoleColor}
-								disabled={!activeProcess?.roles?.some((r) => r.roleName === activeRole)}
+								disabled={!activeProcess?.roles?.some((r) => r.RoleName === activeRole)}
 							/>
 							<SelectBox
 								addNew={addNewRoleAndToggle}
