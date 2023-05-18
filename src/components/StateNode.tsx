@@ -36,10 +36,10 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 	const selfConnected =
 		useMainStore(
 			(state) =>
-				!!state.activeProcess?.roles
+				!!state.activeProcess?.Roles
 					?.find(({ RoleName }) => RoleName === state.activeRole)
-					?.Transitions?.find(({ fromStateName, ToStateName }) =>
-						[fromStateName, ToStateName].every((el) => el === id)
+					?.Transitions?.find(({ StateName, ToStateName }) =>
+						[StateName, ToStateName].every((el) => el === id)
 					),
 			shallow
 		) || data?.selfConnected;

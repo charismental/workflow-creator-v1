@@ -45,7 +45,7 @@ const storeSelector = (state: MainActions & MainState) => ({
 	setActiveProcess: state.setActiveProcess,
 	activeRole: state.activeRole,
 	setActiveRole: state.setActiveRole,
-	roles: state.roles,
+	roles: state.Roles,
 	setColorForActiveRole: state.setColorForActiveRole,
 	currentStates: state.States,
 	addNewState: state.addNewState,
@@ -94,10 +94,10 @@ const WorkflowCreator = () => {
 
 	const activeRoleColor = roleColor({
 		RoleName: activeRole,
-		allRoles: activeProcess?.roles || [],
+		allRoles: activeProcess?.Roles || [],
 	});
 
-	const roleIsToggled = !!activeProcess?.roles?.some((r) => r.RoleName === activeRole);
+	const roleIsToggled = !!activeProcess?.Roles?.some((r) => r.RoleName === activeRole);
 
 	const availableStates = filteredStates(activeProcess?.States || []);
 
@@ -106,7 +106,7 @@ const WorkflowCreator = () => {
 	const roleList = roles.map(({ RoleName }) => {
 		return {
 			label: RoleName,
-			value: activeProcess?.roles?.some((r) => r.RoleName === RoleName) || false,
+			value: activeProcess?.Roles?.some((r) => r.RoleName === RoleName) || false,
 		};
 	});
 
@@ -146,7 +146,7 @@ const WorkflowCreator = () => {
 	};
 
 	const toggleRole = (RoleName: string): void => {
-		const { Transitions = [] } = activeProcess?.roles?.find((r) => r.RoleName === RoleName) || {};
+		const { Transitions = [] } = activeProcess?.Roles?.find((r) => r.RoleName === RoleName) || {};
 
 		if (Transitions.length) openToggleActiveModal(RoleName);
 		else toggleRoleForProcess(RoleName);
@@ -171,7 +171,7 @@ const WorkflowCreator = () => {
 						level={4}
 						style={{ color: "blue" }}
 					>
-						...Loading State
+						
 					</Title>
 				}
 			/>
@@ -241,7 +241,7 @@ const WorkflowCreator = () => {
 								items={availableStates}
 								addNew={addNewState}
 								roleColor={activeRoleColor}
-								disabled={!activeProcess?.roles?.some((r) => r.RoleName === activeRole)}
+								disabled={!activeProcess?.Roles?.some((r) => r.RoleName === activeRole)}
 							/>
 							<SelectBox
 								addNew={addNewRoleAndToggle}

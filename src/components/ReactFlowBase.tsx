@@ -11,6 +11,7 @@ import FloatingEdge from "../components/FloatingEdge";
 import StateNode from "../components/StateNode";
 import { computedEdges, getItem, computedNodes } from "utils";
 import LabelNode from "./LabelNode";
+import { NumberBoolean } from "types/genericTypes";
 
 const { Text } = Typography;
 
@@ -94,7 +95,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 	}, [contextMenuNodeId, setContextMenuNodeId]);
 
 	const edges = computedEdges({
-		roles: activeProcess?.roles || [],
+		roles: activeProcess?.Roles || [],
 		activeRole,
 		showAllRoles,
 		showAllConnections: showAllConnectedStates,
@@ -141,9 +142,13 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 				y: event.clientY - reactFlowBounds.top,
 			});
 
+			const initialNumberBoolean: NumberBoolean = 0;
+
 			const newState = {
+				RequiresRoleAssignment: initialNumberBoolean,
+				RequiresUserAssignment: initialNumberBoolean,
 				StateName: type,
-				StateId: null,
+				StateID: null,
 				DisplayOrder:
 					Math.max(...activeProcessStates.map(({ DisplayOrder }) => DisplayOrder || 0)) + 10,
 				properties: { ...position },

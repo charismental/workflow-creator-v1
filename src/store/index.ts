@@ -426,7 +426,7 @@ const useMainStore = create<MainState & MainActions>()(
 						const initialNumberBoolean: NumberBoolean = 0;
 
 						const newRole: WorkflowRole = {
-							RoleId: null,
+							RoleID: null,
 							IsCluster: initialNumberBoolean,
 							IsUniversal: initialNumberBoolean,
 							RoleName: role,
@@ -539,7 +539,7 @@ const useMainStore = create<MainState & MainActions>()(
 				set(
 					({ States }) => {
 						const newState: WorkflowState = {
-							StateId: null,
+							StateID: null,
 							StateName: name,
 							RequiresRoleAssignment: 0,
 							RequiresUserAssignment: 0,
@@ -557,7 +557,7 @@ const useMainStore = create<MainState & MainActions>()(
 						const initialNumberBoolean: NumberBoolean = 0;
 
 						const newRole: WorkflowRole = {
-							RoleId: null,
+							RoleID: null,
 							RoleName: role,
 							IsUniversal: initialNumberBoolean,
 							IsCluster: initialNumberBoolean,

@@ -18,15 +18,15 @@ export interface WorkflowGlobals {
 
 export interface WorkFlowTransition {
 	StateTransitionID: Nullable<number>;
-	StateId: number;
+	StateID: Nullable<number>;
 	StateName: string;
-	RoleId: number;
-	RoleName: string;
-	AltStateId?: number;
-	toStateId?: number;
+	RoleID: Nullable<number>;
+	RoleName: Nullable<string>;
+	AltStateID?: Nullable<number>;
+	ToStateID?: Nullable<number>;
 	ToStateName: string;
-	ProcessID: number;
-	ProcessName: string;
+	ProcessID: Nullable<number>;
+	ProcessName: Nullable<string>;
 	InternalOnly: boolean;
 	properties?: {
 		sourceHandle?: string | null;
@@ -35,7 +35,7 @@ export interface WorkFlowTransition {
 }
 
 export interface WorkflowState {
-	StateId: Nullable<number>;
+	StateID: Nullable<number>;
 	StateName: string;
 	RequiresRoleAssignment: NumberBoolean;
 	RequiresUserAssignment: NumberBoolean;
@@ -49,7 +49,7 @@ export interface WorkflowState {
 }
 
 export interface WorkflowRole {
-	RoleId: Nullable<number>;
+	RoleID: Nullable<number>;
 	IsCluster: NumberBoolean;
 	IsUniversal: NumberBoolean;
 	RoleName: string;
