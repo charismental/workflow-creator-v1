@@ -19,28 +19,29 @@ const checkboxStyle: CSSProperties = {
 const connectionNodeIdSelector = (state: any) => state.connectionNodeId;
 
 const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.Element => {
-	const removeState = useMainStore((state) => state.removeState, shallow);
-
-	const contextMenuNodeId = useMainStore((state) => state.contextMenuNodeId, shallow);
-
-	const updateStateProperties = useMainStore((state) => state.updateStateProperties, shallow);
-
-	const onConnect = useMainStore((state) => state.onConnect, shallow);
-
-	const removeTransition = useMainStore((state) => state.removeTransition, shallow);
-
-	const showAllRoles = useMainStore((state) => state.showAllRoles, shallow);
+	const removeTransition = useMainStore((state) => state.removeTransition);
+	const [removeState, contextMenuNodeId, updateStateProperties, onConnect, showAllRoles] =
+		useMainStore(
+			(state) => [
+				state.removeState,
+				state.contextMenuNodeId,
+				state.updateStateProperties,
+				state.onConnect,
+				state.showAllRoles,
+			],
+			shallow
+		);
 
 	// todo, use only data.selfConnected
 	// update util to always add selfConnected for stateToNode
 	const selfConnected =
 		useMainStore(
 			(state) =>
-				!!state.activeProcess?.roles
-					?.find(({ RoleName }) => RoleName === state.activeRole)
-					?.Transitions?.find(({ fromStateName, ToStateName }) =>
-						[fromStateName, ToStateName].every((el) => el === id)
-					),
+				!!state.activeProcess?.Roles?.find(
+					({ RoleName }) => RoleName === state.activeRole
+				)?.Transitions?.find(({ StateName, ToStateName }) =>
+					[StateName, ToStateName].every((el) => el === id)
+				),
 			shallow
 		) || data?.selfConnected;
 

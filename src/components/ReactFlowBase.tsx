@@ -2,15 +2,15 @@ import "reactflow/dist/style.css";
 import "../css/style.css";
 import { Typography } from "antd";
 import defaultEdgeOptions from "data/defaultEdgeOptions";
-import { FC, useCallback, useEffect, useRef, useState } from "react";
-import ReactFlow, { Background, BackgroundVariant, Edge, MiniMap, NodeTypes } from "reactflow";
-import useMainStore, { MainActions, MainState } from "store";
-import { shallow } from "zustand/shallow";
+import { FC, useCallback, useEffect, useRef } from "react";
+import ReactFlow, { Background, BackgroundVariant, MiniMap, NodeTypes } from "reactflow";
+import { MainActions, MainState } from "store";
 import CustomConnectionLine from "../components/CustomConnectionLine";
 import FloatingEdge from "../components/FloatingEdge";
 import StateNode from "../components/StateNode";
-import { computedEdges, getItem, computedNodes } from "utils";
+import { computedEdges, computedNodes } from "utils";
 import LabelNode from "./LabelNode";
+import { WorkflowState } from "types/workflowTypes";
 
 const { Text } = Typography;
 
@@ -24,49 +24,43 @@ const nodeTypes: NodeTypes = {
 	label: LabelNode,
 };
 
-const selector = (state: MainState & MainActions) => ({
-	activeProcess: state.activeProcess,
-	onNodesChange: state.onNodesChange,
-	setStatesForActiveProcess: state.setStatesForActiveProcess,
-	onConnect: state.onConnect,
-	activeProcessStates: state.activeProcess?.States || [],
-	reactFlowInstance: state.reactFlowInstance,
-	setReactFlowInstance: state.setReactFlowInstance,
-	showMinimap: state.showMinimap,
-	showAllRoles: state.showAllRoles,
-	showAllConnectedStates: state.showAllConnectedStates,
-	setContextMenuNodeId: state.setContextMenuNodeId,
-	contextMenuNodeId: state.contextMenuNodeId,
-});
-
 interface ReactFlowBaseProps {
 	activeRoleColor?: string;
 	activeRole: any;
 	roleIsToggled: boolean;
+	showMinimap: MainState["showMinimap"];
+	setStatesForActiveProcess: MainActions["setStatesForActiveProcess"];
+	onNodesChange: MainActions["onNodesChange"];
+	onConnect: MainActions["onConnect"];
+	activeProcess: MainState["activeProcess"];
+	reactFlowInstance: MainState["reactFlowInstance"];
+	setReactFlowInstance: MainActions["setReactFlowInstance"];
+	showAllRoles: MainState["showAllRoles"];
+	showAllConnectedStates: MainState["showAllConnectedStates"];
+	setContextMenuNodeId: MainActions["setContextMenuNodeId"];
+	contextMenuNodeId: MainState["contextMenuNodeId"];
 }
 const edgeTypes: any = {
 	floating: FloatingEdge,
 };
 
-const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
+const ReactFlowBase: FC<ReactFlowBaseProps> = ({
+	activeProcess,
+	activeRoleColor,
+	activeRole,
+	roleIsToggled,
+	showAllConnectedStates,
+	showAllRoles,
+	showMinimap,
+	setContextMenuNodeId,
+	setReactFlowInstance,
+	setStatesForActiveProcess,
+	onConnect,
+	onNodesChange,
+	reactFlowInstance,
+	contextMenuNodeId,
+}): JSX.Element => {
 	const reactFlowWrapper = useRef<HTMLDivElement>(null);
-
-	const {
-		showMinimap,
-		setStatesForActiveProcess,
-		onNodesChange,
-		onConnect,
-		activeProcess,
-		activeProcessStates,
-		reactFlowInstance,
-		setReactFlowInstance,
-		showAllRoles,
-		showAllConnectedStates,
-		setContextMenuNodeId,
-		contextMenuNodeId,
-	} = useMainStore(selector, shallow);
-
-	const { activeRole, activeRoleColor, roleIsToggled } = props;
 
 	const fitView = (timeout = 0) =>
 		setTimeout(() => reactFlowInstance && reactFlowInstance.fitView(), timeout);
@@ -93,8 +87,10 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		return () => document.removeEventListener("click", handleClickOutside);
 	}, [contextMenuNodeId, setContextMenuNodeId]);
 
+	const activeProcessStates = activeProcess?.States || [];
+
 	const edges = computedEdges({
-		roles: activeProcess?.roles || [],
+		roles: activeProcess?.Roles || [],
 		activeRole,
 		showAllRoles,
 		showAllConnections: showAllConnectedStates,
@@ -106,14 +102,6 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		activeRole,
 		showAllConnections: showAllConnectedStates,
 	});
-
-	// const openEdgeContextMenu = (e: React.MouseEvent, el: Edge) => {
-	// 	e.preventDefault();
-	// 	return setItems([
-	// 		getItem(<Text style={{ fontSize: "18px" }}>Source: {el.source}</Text>, 1, null),
-	// 		getItem(<Text style={{ fontSize: "18px" }}>Target: {el.target}</Text>, 2, null),
-	// 	]);
-	// };
 
 	const openNodeContextMenu = (e: React.MouseEvent, node: Node | any) => {
 		e.preventDefault();
@@ -141,9 +129,11 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 				y: event.clientY - reactFlowBounds.top,
 			});
 
-			const newState = {
+			const newState: WorkflowState = {
 				StateName: type,
 				StateId: null,
+				RequiresRoleAssignment: 0,
+				RequiresUserAssignment: 0,
 				DisplayOrder:
 					Math.max(...activeProcessStates.map(({ DisplayOrder }) => DisplayOrder || 0)) + 10,
 				properties: { ...position },

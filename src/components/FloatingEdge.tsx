@@ -15,25 +15,16 @@ import { shallow } from "zustand/shallow";
 const foreignObjectSize = 40;
 
 const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd, style }) => {
-	const [removeTransition, showAllRoles, showAllConnections, edgeType] = useMainStore(
-		(state) => [
-			state.removeTransition,
-			state.showAllRoles,
-			state.showAllConnectedStates,
-			state.edgeType,
-		],
+	const [removeTransition, showAllConnections, edgeType] = useMainStore(
+		(state) => [state.removeTransition, state.showAllConnectedStates, state.edgeType],
 		shallow
 	);
 
 	const [isHover, setIsHover] = useState<boolean | null>(null);
 
-	// useEffect(() => {
-	//   if (isHover !== null) updateNodeStyle()
-	// }, [isHover])
-
 	const onEdgeClick = (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
 		event.stopPropagation();
-		console.log(source, target)
+		console.log(source, target);
 		removeTransition({ source, target });
 		setIsHover(false);
 	};
@@ -68,7 +59,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 			default:
 				return getStraightPath(baseParams);
 		}
-	}
+	};
 
 	const [edgePath, labelX, labelY] = currentEdgeType();
 

@@ -2,12 +2,12 @@ import type { MenuProps } from "antd/es/menu";
 import { defaultColors } from "data";
 import { Edge, MarkerType, Position, Node, Connection } from "reactflow";
 import {
-	Nullable,
-	WorkflowConnection,
+	WorkFlowTransition,
 	WorkflowProcess,
 	WorkflowRole,
 	WorkflowState,
-} from "store/types";
+} from "../types/workflowTypes";
+import { Nullable } from "../types/genericTypes";
 
 interface IntersectionNodeType {
 	width: any;
@@ -92,11 +92,11 @@ export function getEdgeParams(source: any, target: any) {
 }
 
 export function transformTransitionsToEdges(
-	Transitions: WorkflowConnection[],
+	Transitions: WorkFlowTransition[],
 	idPrefix: string = ""
 ): Edge[] {
-	const mapper = (transition: WorkflowConnection): Edge | any => {
-		const { fromStateName: source, ToStateName: target, properties = {} } = transition;
+	const mapper = (transition: WorkFlowTransition): Edge | any => {
+		const { StateName: source, ToStateName: target, properties = {} } = transition;
 
 		const { sourceHandle = null, targetHandle = null } = properties;
 
@@ -124,12 +124,12 @@ export function transformTransitionsToEdges(
 // might get weird mama
 export function transformNewConnectionToTransition(
 	connection: Connection,
-	existingTransitions: WorkflowConnection[]
-): WorkflowConnection | null {
+	existingTransitions: WorkFlowTransition[]
+): WorkFlowTransition | null {
 	const { source, target, sourceHandle, targetHandle } = connection;
 
 	const foundTransition = existingTransitions.find(
-		({ fromStateName, ToStateName }) => source === fromStateName && target === ToStateName
+		({ StateName, ToStateName }) => source === StateName && target === ToStateName
 	);
 
 	return (
@@ -137,7 +137,7 @@ export function transformNewConnectionToTransition(
 		(source && target
 			? {
 					StateTransitionID: null,
-					fromStateName: source,
+					StateName: source,
 					ToStateName: target,
 					properties: { sourceHandle, targetHandle },
 			  }
@@ -298,7 +298,7 @@ export function computedNodes({
 	showAllConnections: boolean;
 	activeRole: string;
 }): Node[] {
-	const { States = [], roles = [], ProcessName = "Process Name" } = process || {};
+	const { States = [], Roles = [], ProcessName = "Process Name" } = process || {};
 	const mappedStates = States.map(({ properties }) => properties || {});
 
 	const startingY = Math.min(...mappedStates.map(({ y = 0 }) => y));
@@ -323,7 +323,7 @@ export function computedNodes({
 	if (showAllRoles) {
 		nodes.push(labelNode({ name: ProcessName, x: startingX, y: startingY - 80, w: totalSetWidth }));
 
-		roles.forEach(({ RoleName }, i) => {
+		Roles.forEach(({ RoleName }, i) => {
 			nodes.push(
 				labelNode({ name: RoleName, x: -360, y: yOffset * i + (totalSetHeight / 2 - 20) })
 			);
@@ -345,7 +345,7 @@ export function computedNodes({
 							selfConnected,
 							idPrefix: String(i),
 							yOffset: yOffset * i,
-							color: roleColor({ RoleName: RoleName, allRoles: roles }),
+							color: roleColor({ RoleName: RoleName, allRoles: Roles }),
 						})
 					);
 				});
@@ -359,7 +359,7 @@ export function computedNodes({
 						state,
 						index,
 						allNodesLength: arr.length,
-						color: roleColor({ RoleName: activeRole, allRoles: roles }),
+						color: roleColor({ RoleName: activeRole, allRoles: Roles }),
 						...(showAllConnections && {
 							selfConnected: stateIsSelfConnected({ StateId: state.StateName, process }),
 						}),
@@ -391,7 +391,7 @@ export function computedEdges({
 
 		return allEdges;
 	} else if (showAllConnections) {
-		const allTransitions: WorkflowConnection[] = [];
+		const allTransitions: WorkFlowTransition[] = [];
 
 		roles.forEach(({ Transitions = [] }) => {
 			allTransitions.push(...Transitions);
@@ -399,10 +399,10 @@ export function computedEdges({
 
 		return transformTransitionsToEdges(
 			allTransitions.filter(
-				({ fromStateName, ToStateName }, i) =>
+				({ StateName, ToStateName }, i) =>
 					allTransitions.findIndex(
 						(transtion) =>
-							transtion.fromStateName === fromStateName && transtion.ToStateName === ToStateName
+							transtion.StateName === StateName && transtion.ToStateName === ToStateName
 					) === i
 			)
 		);
@@ -422,19 +422,17 @@ export function stateIsSelfConnected({
 	role?: string;
 	process: WorkflowProcess | null;
 }): boolean {
-	const { roles = [] } = process || {};
+	const { Roles = [] } = process || {};
 	if (!role) {
-		const allTransitions: WorkflowConnection[] = [];
+		const allTransitions: WorkFlowTransition[] = [];
 
-		roles.forEach(({ Transitions = [] }) => allTransitions.push(...Transitions));
+		Roles.forEach(({ Transitions = [] }) => allTransitions.push(...Transitions));
 
-		return allTransitions.some(({ fromStateName, ToStateName }) =>
-			[fromStateName, ToStateName].every((el) => el === StateId)
+		return allTransitions.some(({ StateName, ToStateName }) =>
+			[StateName, ToStateName].every((el) => el === StateId)
 		);
 	}
-	return !!roles
-		.find(({ RoleName }) => RoleName === role)
-		?.Transitions?.find(({ fromStateName, ToStateName }) =>
-			[fromStateName, ToStateName].every((el) => el === StateId)
-		);
+	return !!Roles.find(({ RoleName }) => RoleName === role)?.Transitions?.find(
+		({ StateName, ToStateName }) => [StateName, ToStateName].every((el) => el === StateId)
+	);
 }

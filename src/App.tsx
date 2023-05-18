@@ -45,7 +45,7 @@ const storeSelector = (state: MainActions & MainState) => ({
 	setActiveProcess: state.setActiveProcess,
 	activeRole: state.activeRole,
 	setActiveRole: state.setActiveRole,
-	roles: state.roles,
+	roles: state.Roles,
 	setColorForActiveRole: state.setColorForActiveRole,
 	currentStates: state.States,
 	addNewState: state.addNewState,
@@ -57,12 +57,40 @@ const storeSelector = (state: MainActions & MainState) => ({
 	Companies: state.Companies,
 	toggleCompanyForProcess: state.toggleCompanyForProcess,
 	addNewCompany: state.addNewCompany,
+	edgeType: state.edgeType,
+	setEdgeType: state.setEdgeType,
+	setShowAllConnectedStates: state.setShowAllConnectedStates,
+	setShowMinimap: state.setShowMinimap,
+	toggleShowAllRoles: state.toggleShowAllRoles,
+	contextMenuNodeId: state.contextMenuNodeId,
+	onConnect: state.onConnect,
+	onNodesChange: state.onNodesChange,
+	setContextMenuNodeId: state.setContextMenuNodeId,
+	setReactFlowInstance: state.setReactFlowInstance,
+	setStatesForActiveProcess: state.setStatesForActiveProcess,
+	showAllRoles: state.showAllRoles,
+	showAllConnectedStates: state.showAllConnectedStates,
+	showMinimap: state.showMinimap,
 });
 
 const WorkflowCreator = () => {
 	const {
 		processes,
 		addProcess,
+		showAllRoles,
+		edgeType,
+		showAllConnectedStates,
+		setReactFlowInstance,
+		showMinimap,
+		contextMenuNodeId,
+		setContextMenuNodeId,
+		onNodesChange,
+		setStatesForActiveProcess,
+		toggleShowAllRoles,
+		onConnect,
+		setEdgeType,
+		setShowAllConnectedStates,
+		setShowMinimap,
 		toggleRoleForProcess,
 		activeProcess,
 		setActiveProcess,
@@ -94,10 +122,10 @@ const WorkflowCreator = () => {
 
 	const activeRoleColor = roleColor({
 		RoleName: activeRole,
-		allRoles: activeProcess?.roles || [],
+		allRoles: activeProcess?.Roles || [],
 	});
 
-	const roleIsToggled = !!activeProcess?.roles?.some((r) => r.RoleName === activeRole);
+	const roleIsToggled = !!activeProcess?.Roles?.some((r) => r.RoleName === activeRole);
 
 	const availableStates = filteredStates(activeProcess?.States || []);
 
@@ -106,7 +134,7 @@ const WorkflowCreator = () => {
 	const roleList = roles.map(({ RoleName }) => {
 		return {
 			label: RoleName,
-			value: activeProcess?.roles?.some((r) => r.RoleName === RoleName) || false,
+			value: activeProcess?.Roles?.some((r) => r.RoleName === RoleName) || false,
 		};
 	});
 
@@ -146,7 +174,7 @@ const WorkflowCreator = () => {
 	};
 
 	const toggleRole = (RoleName: string): void => {
-		const { Transitions = [] } = activeProcess?.roles?.find((r) => r.RoleName === RoleName) || {};
+		const { Transitions = [] } = activeProcess?.Roles?.find((r) => r.RoleName === RoleName) || {};
 
 		if (Transitions.length) openToggleActiveModal(RoleName);
 		else toggleRoleForProcess(RoleName);
@@ -225,9 +253,25 @@ const WorkflowCreator = () => {
 								roleIsToggled={roleIsToggled}
 								activeRoleColor={activeRoleColor}
 								activeRole={activeRole}
+								activeProcess={activeProcess}
+								contextMenuNodeId={contextMenuNodeId}
+								onConnect={onConnect}
+								onNodesChange={onNodesChange}
+								reactFlowInstance={reactFlowInstance}
+								setContextMenuNodeId={setContextMenuNodeId}
+								setReactFlowInstance={setReactFlowInstance}
+								setStatesForActiveProcess={setStatesForActiveProcess}
+								showAllConnectedStates={showAllConnectedStates}
+								showAllRoles={showAllRoles}
+								showMinimap={showMinimap}
 							/>
 						</Content>
 						<CustomControls
+							edgeType={edgeType}
+							setEdgeType={setEdgeType}
+							setShowAllConnectedStates={setShowAllConnectedStates}
+							setShowMinimap={setShowMinimap}
+							toggleShowAllRoles={toggleShowAllRoles}
 							roleIsToggled={roleIsToggled}
 							getCurrentEdges={reactFlowInstance?.getEdges}
 							getCurrentNodes={reactFlowInstance?.getNodes}
@@ -241,7 +285,7 @@ const WorkflowCreator = () => {
 								items={availableStates}
 								addNew={addNewState}
 								roleColor={activeRoleColor}
-								disabled={!activeProcess?.roles?.some((r) => r.RoleName === activeRole)}
+								disabled={!activeProcess?.Roles?.some((r) => r.RoleName === activeRole)}
 							/>
 							<SelectBox
 								addNew={addNewRoleAndToggle}

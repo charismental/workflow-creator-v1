@@ -22,7 +22,7 @@ import {
 	useStore,
 	useStoreApi,
 } from "reactflow";
-import useMainStore from "store";
+import { MainState, MainActions } from "store";
 import DownloadButton from "tools/DownloadImage";
 import { shallow } from "zustand/shallow";
 import EdgeModal from "../Modals/EdgeModal";
@@ -34,6 +34,11 @@ interface CustomControlsProps {
 	getCurrentEdges: (() => Edge[]) | undefined;
 	getCurrentNodes: (() => Node[]) | undefined;
 	roleIsToggled: boolean;
+	setShowMinimap: MainActions["setShowMinimap"];
+	toggleShowAllRoles: MainActions["toggleShowAllRoles"];
+	setShowAllConnectedStates: MainActions["setShowAllConnectedStates"];
+	setEdgeType: MainActions["setEdgeType"];
+	edgeType: MainState["edgeType"];
 }
 
 const isInteractiveSelector = (s: ReactFlowState) =>
@@ -44,6 +49,11 @@ export default ({
 	getCurrentNodes,
 	onInteractiveChange,
 	roleIsToggled,
+	setShowMinimap,
+	toggleShowAllRoles,
+	setShowAllConnectedStates,
+	setEdgeType,
+	edgeType,
 }: CustomControlsProps & ControlProps) => {
 	const store = useStoreApi();
 	const isInteractive = useStore(isInteractiveSelector);
@@ -52,18 +62,6 @@ export default ({
 	const [currentEdges, setCurrentEdges] = useState<Edge[]>([]);
 	const [currentNodes, setCurrentNodes] = useState<Node[]>([]);
 	const [nodeModalOpen, setNodeModalOpen] = useState(false);
-	const setShowMinimap = useMainStore(useCallback((state) => state.setShowMinimap, []));
-	const [showAllRoles, toggleShowAllRoles, setShowAllConnectedStates, setEdgeType, edgeType] =
-		useMainStore(
-			(state) => [
-				state.showAllRoles,
-				state.toggleShowAllRoles,
-				state.setShowAllConnectedStates,
-				state.setEdgeType,
-				state.edgeType,
-			],
-			shallow
-		);
 
 	const onToggleInteractivity = (status = !isInteractive) => {
 		store.setState({
