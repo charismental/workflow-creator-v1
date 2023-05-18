@@ -53,7 +53,7 @@ export default ({
 	const [currentNodes, setCurrentNodes] = useState<Node[]>([]);
 	const [nodeModalOpen, setNodeModalOpen] = useState(false);
 	const setShowMinimap = useMainStore(useCallback((state) => state.setShowMinimap, []));
-	const [showAllRoles, toggleShowAllRoles, setShowAllConnectedStates, setEdgeType, edgeType] =
+	const [showAllRoles, toggleShowAllRoles, setShowAllConnectedStates, setEdgeType, edgeType, saveStateSnapshot, revertToSnapshot] =
 		useMainStore(
 			(state) => [
 				state.showAllRoles,
@@ -61,6 +61,8 @@ export default ({
 				state.setShowAllConnectedStates,
 				state.setEdgeType,
 				state.edgeType,
+				state.saveStateSnapshot,
+				state.revertToSnapshot,
 			],
 			shallow
 		);
@@ -161,12 +163,12 @@ export default ({
 				<CustomControlButtonWithTooltip
 					title={"Save Progress"}
 					icon={<SaveOutlined />}
-					clickEvent={() => console.log("you saved a thing!")}
+					clickEvent={saveStateSnapshot}
 				/>
 				<CustomControlButtonWithTooltip
 					title={"Revert To Last Save Point"}
 					icon={<ReloadOutlined />}
-					clickEvent={() => console.log("you reverted a thing!")}
+					clickEvent={revertToSnapshot}
 				/>
 				<CustomControlButtonWithTooltip
 					title={"Delete Progress"}

@@ -32,10 +32,6 @@ export interface MainState {
 	globalLoading: boolean;
 	activeRole: string;
 	_hasHydrated: boolean;
-	processes: WorkflowProcess[];
-	edges: Edge[];
-	States: WorkflowState[];
-	Roles: WorkflowRole[];
 	activeProcess: WorkflowProcess | null;
 	reactFlowInstance: ReactFlowInstance | undefined;
 	showMinimap: boolean;
@@ -43,6 +39,9 @@ export interface MainState {
 	showAllConnectedStates: boolean;
 	edgeType: string;
 	contextMenuNodeId: string | undefined;
+	processes: WorkflowProcess[];
+	States: WorkflowState[];
+	Roles: WorkflowRole[];
 	Companies: WorkflowCompany[];
 }
 
@@ -77,12 +76,34 @@ export interface MainActions {
 	setShowAllConnectedStates: () => void;
 	setEdgeType: (type: string) => void;
 	setContextMenuNodeId: (id: string | undefined) => void;
+	saveStateSnapshot: () => void;
+	revertToSnapshot: () => void;
 }
 
 const useMainStore = create<MainState & MainActions>()(
 	// persist(
 	devtools(
 		(set, get) => ({
+			saveStateSnapshot: () => {
+				const { activeProcess, activeRole, processes, States, Roles, Companies } = get();
+				const snapShot = { activeProcess, activeRole, processes, States, Roles, Companies };
+
+				localStorage.setItem('state-snapshot', JSON.stringify(snapShot));
+			},
+			revertToSnapshot: () => {
+				const foundSnapshot = localStorage.getItem('state-snapshot');
+				if (foundSnapshot) {
+					try {
+						const snapshot = JSON.parse(foundSnapshot);
+
+						const { activeProcess, activeRole, processes, States, Roles, Companies } = snapshot;
+
+						set({ activeProcess, activeRole, processes, States, Roles, Companies })
+					} catch (err) {
+						console.log('Something went wrong while parsing snapshot data')
+					}
+				}
+			},
 			contextMenuNodeId: undefined,
 			setContextMenuNodeId: (nodeId) => {
 				set({ contextMenuNodeId: nodeId });
@@ -106,7 +127,6 @@ const useMainStore = create<MainState & MainActions>()(
 			globalLoading: false,
 			_hasHydrated: false,
 			setHasHydrated: (state) => set({ _hasHydrated: state }),
-			edges: [],
 			States: [],
 			Roles: [],
 			Companies: [],
@@ -182,9 +202,9 @@ const useMainStore = create<MainState & MainActions>()(
 							i !== foundStateIndex
 								? s
 								: {
-										...States[foundStateIndex],
-										properties: { ...States[foundStateIndex].properties, ...properties },
-								  }
+									...States[foundStateIndex],
+									properties: { ...States[foundStateIndex].properties, ...properties },
+								}
 						)
 					);
 				}
@@ -489,8 +509,8 @@ const useMainStore = create<MainState & MainActions>()(
 					const updatedRoles =
 						roleInProcessIndex !== -1
 							? Roles.map((r, i) =>
-									i !== roleInProcessIndex ? r : { ...foundRole, [property]: value }
-							  )
+								i !== roleInProcessIndex ? r : { ...foundRole, [property]: value }
+							)
 							: Roles;
 
 					set(

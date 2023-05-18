@@ -59,7 +59,6 @@ const ActiveRoleSettings: React.FC<ActiveRoleSettingsProps> = ({
 					disabled={!roleIsToggled}
 					value={color}
 					onChange={(e) => updateColor(e.toHexString())}
-					allowClear
 				/>
 			)}
 		</div>
