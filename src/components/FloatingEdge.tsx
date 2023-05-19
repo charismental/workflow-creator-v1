@@ -11,6 +11,7 @@ import {
 import { getEdgeParams } from "../utils";
 import useMainStore from "store";
 import { shallow } from "zustand/shallow";
+import { Nullable } from "types";
 
 const foreignObjectSize = 40;
 
@@ -25,7 +26,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 		shallow
 	);
 
-	const [isHover, setIsHover] = useState<boolean | null>(null);
+	const [isHover, setIsHover] = useState<Nullable<boolean>>(null);
 
 	const hoverEdge = (status: boolean) => {
 		setHoveredEdgeNodes(status ? [source, target] : [])
