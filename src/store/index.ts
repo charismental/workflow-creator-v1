@@ -43,6 +43,7 @@ export interface MainState {
 	States: WorkflowState[];
 	Roles: WorkflowRole[];
 	Companies: WorkflowCompany[];
+	hoveredEdgeNodes: string[];
 }
 
 export interface MainActions {
@@ -78,12 +79,17 @@ export interface MainActions {
 	setContextMenuNodeId: (id: string | undefined) => void;
 	saveStateSnapshot: () => void;
 	revertToSnapshot: () => void;
+	setHoveredEdgeNodes: (nodes: string[]) => void;
 }
 
 const useMainStore = create<MainState & MainActions>()(
 	// persist(
 	devtools(
 		(set, get) => ({
+			hoveredEdgeNodes: [],
+			setHoveredEdgeNodes: (nodes: string[]) => {
+				set({ hoveredEdgeNodes: nodes });
+			},
 			saveStateSnapshot: () => {
 				const { activeProcess, activeRole, processes, States, Roles, Companies } = get();
 				const snapShot = { activeProcess, activeRole, processes, States, Roles, Companies };

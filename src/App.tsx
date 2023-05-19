@@ -7,12 +7,12 @@ import SelectBox from "components/SelectBox";
 import StateCollapseBox from "components/StateCollapseBox";
 import { CSSProperties, useCallback, useEffect, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
-import "reactflow/dist/style.css";
 import type { MainActions, MainState } from "store";
 import useMainStore from "store";
 import { roleColor } from "utils";
 import { shallow } from "zustand/shallow";
 import Sidebar from "./components/Sidebar";
+import "reactflow/dist/style.css";
 import "./css/style.css";
 
 const { Header, Content } = Layout;
@@ -269,25 +269,5 @@ const WorkflowCreator = () => {
 		</Space>
 	);
 };
-
-document.addEventListener("keydown", function (e) {
-	if (e.key === "Shift") {
-		const elements = document.querySelectorAll(".stateNodeBody");
-
-		elements.forEach(function (element) {
-			element.classList.add("drag-handle");
-		});
-	}
-});
-
-document.addEventListener("keyup", function (e) {
-	if (e.key === "Shift") {
-		const elements = document.querySelectorAll(".stateNodeBody");
-
-		elements.forEach(function (element) {
-			element.classList.remove("drag-handle");
-		});
-	}
-});
 
 export default WorkflowCreator;

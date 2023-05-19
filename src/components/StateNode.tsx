@@ -29,6 +29,8 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 
 	const removeTransition = useMainStore((state) => state.removeTransition, shallow);
 
+	const isEdgeHovered = useMainStore((state) => state.hoveredEdgeNodes.includes(id))
+
 	const showAllRoles = useMainStore((state) => state.showAllRoles, shallow);
 
 	// todo, use only data.selfConnected
@@ -62,6 +64,7 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 	};
 
 	const connectionNodeId = useReactFlowStore(connectionNodeIdSelector);
+
 	const isTarget =
 		connectionNodeId &&
 		connectionNodeId !== id &&
@@ -102,6 +105,7 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 					minWidth,
 					borderStyle: isTarget ? "dashed" : "solid",
 					backgroundColor: isTarget ? "#ffcce3" : data?.color || "#ccd9f6",
+					...(isEdgeHovered && { boxShadow: '0 0 4px 4px #0ff' }),
 					...(data?.w && { width: data.w }),
 					...(data?.h && { height: data.h }),
 				}}
