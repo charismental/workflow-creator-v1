@@ -9,7 +9,7 @@ import { shallow } from "zustand/shallow";
 import CustomConnectionLine from "../components/CustomConnectionLine";
 import FloatingEdge from "../components/FloatingEdge";
 import StateNode from "../components/StateNode";
-import { computedEdges, getItem, computedNodes } from "utils";
+import { computedEdges, computedNodes } from "utils";
 import LabelNode from "./LabelNode";
 import { NumberBoolean } from "types/genericTypes";
 

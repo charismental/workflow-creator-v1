@@ -588,22 +588,22 @@ const useMainStore = create<MainState & MainActions>()(
 					(StateName: string) => !existingStates.some((s) => s.StateName === StateName)
 				);
 			},
-			addNewState: (name) =>
-				set(
-					({ States }) => {
-						const newState: WorkflowState = {
-							StateID: null,
-							StateName: name,
-							RequiresRoleAssignment: 0,
-							RequiresUserAssignment: 0,
-							DisplayOrder: Math.max(...States.map(({ DisplayOrder }) => DisplayOrder || 0)) + 10,
-						};
+			addNewState: (name) => {
+				const { States } = get();
+				
+				if (!States.some(({ StateName }) => StateName === name)) {
 
-						return { States: States.concat(newState) };
-					},
-					false,
-					"addNewState"
-				),
+					const newState: WorkflowState = {
+						StateID: null,
+						StateName: name,
+						RequiresRoleAssignment: 0,
+						RequiresUserAssignment: 0,
+						DisplayOrder: Math.max(...States.map(({ DisplayOrder }) => DisplayOrder || 0)) + 10,
+					};
+
+					set({ States: States.concat(newState) }, false, "addNewState");
+				}
+			},
 			addNewRole: (role: string) =>
 				set(
 					({ Roles }) => {

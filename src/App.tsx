@@ -213,7 +213,7 @@ const WorkflowCreator = () => {
 								updateRoleProperty({ role: activeRole, property, value })
 							}
 							roleHasPropertyActive={(property: string) => {
-								const foundRole: any = roles?.find((r: any) => r.RoleName === activeRole);
+								const foundRole: any = activeProcess?.Roles?.find((r: any) => r.RoleName === activeRole);
 
 								return !!foundRole?.[property];
 							}}
