@@ -1,5 +1,6 @@
 import { RollbackOutlined } from "@ant-design/icons";
-import { Checkbox, Popover } from "antd";
+import { Checkbox, Form, Input, Popover } from "antd";
+import Title from "antd/es/typography/Title";
 import { CSSProperties, FunctionComponent, useState } from "react";
 
 import { Handle, NodeProps, NodeResizer, Position, useStore as useReactFlowStore } from "reactflow";
@@ -20,10 +21,13 @@ const connectionNodeIdSelector = (state: any) => state.connectionNodeId;
 
 const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.Element => {
 	const removeState = useMainStore((state) => state.removeState, shallow);
+	const updateStateProperty = useMainStore((state) => state.updateStateProperty);
 
 	const contextMenuNodeId = useMainStore((state) => state.contextMenuNodeId, shallow);
-
+	// todo: consolidate this with updateStateProperty
 	const updateStateProperties = useMainStore((state) => state.updateStateProperties, shallow);
+
+	const foundState = useMainStore((state) => (state?.activeProcess?.States || []).find(({ StateName }) => StateName === id));
 
 	const onConnect = useMainStore((state) => state.onConnect, shallow);
 
@@ -76,18 +80,41 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 	const minWidth = 200;
 	const minHeight = 30;
 
+	const handleDisplayOrderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { value: inputValue } = e.target;
+		const numbersOnlyRegex = /^\d{1,4}$/;
+
+		if (numbersOnlyRegex.test(inputValue) || inputValue === '' || inputValue === '-') {
+			updateStateProperty({ state: id, property: 'DisplayOrder', value: inputValue });
+		}
+	};
+
 	const popoverContent = (
-		<>
-			<div style={{ textAlign: "center" }}>
-				<div>{id}</div>
-				<Checkbox
-					checked={false}
-					onChange={() => console.log("changed")}
-				>
-					one
-				</Checkbox>
-			</div>
-		</>
+		<div style={{ maxWidth: 800 }}>
+			<Title level={4} style={{ marginTop: '0', marginBottom: '12px', textAlign: 'center' }}>{id}</Title>
+			<Form layout="horizontal" labelWrap labelAlign="left" labelCol={{ span: 9 }} wrapperCol={{ span: 9, offset: 3 }} style={{ padding: '12px'}}>
+				<Form.Item label="Display Order">
+					<Input
+						type="number"
+						value={foundState?.DisplayOrder || 0}
+						onChange={handleDisplayOrderChange}
+						maxLength={4}
+					/>
+				</Form.Item>
+				<Form.Item colon={false} label="Requires Role Assignment">
+					<Checkbox
+						checked={!!foundState?.RequiresRoleAssignment}
+						onChange={() => updateStateProperty({ state: id, property: 'RequiresRoleAssignment', value: !foundState?.RequiresRoleAssignment })}
+					/>
+				</Form.Item>
+				<Form.Item colon={false} label="Requires User Assignment">
+					<Checkbox
+						checked={!!foundState?.RequiresUserAssignment}
+						onChange={() => updateStateProperty({ state: id, property: 'RequiresUserAssignment', value: !foundState?.RequiresUserAssignment })}
+					/>
+				</Form.Item>
+			</Form>
+		</div>
 	);
 
 	return (

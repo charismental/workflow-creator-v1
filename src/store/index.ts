@@ -55,6 +55,7 @@ export interface MainActions {
 	toggleRoleForProcess: (role: string, color?: string) => void;
 	toggleCompanyForProcess: (company: string) => void;
 	updateRoleProperty: (payload: { role: string; property: string; value: any }) => void;
+	updateStateProperty: (payload: { state: string; property: string; value: any }) => void;
 	filteredStates: (existingStates: WorkflowState[]) => string[];
 	addNewState: (name: string) => void;
 	addNewRole: (role: string) => void;
@@ -525,6 +526,32 @@ const useMainStore = create<MainState & MainActions>()(
 						},
 						false,
 						"updateRoleProperty"
+					);
+				}
+			},
+			updateStateProperty: ({ state, property, value }) => {
+				const { activeProcess } = get();
+
+				if (activeProcess) {
+					const { States = [] } = activeProcess;
+
+					const stateInProcessIndex = States.findIndex(({ StateName }) => StateName === state);
+
+					const foundState = States[stateInProcessIndex];
+
+					const updatedStates =
+						stateInProcessIndex !== -1
+							? States.map((s, i) =>
+								i !== stateInProcessIndex ? s : { ...foundState, [property]: value }
+							)
+							: States;
+
+					set(
+						{
+							activeProcess: { ...activeProcess, States: updatedStates },
+						},
+						false,
+						"updateStateProperty",
 					);
 				}
 			},
