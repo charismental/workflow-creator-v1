@@ -7,8 +7,11 @@ import {
 	getBezierPath,
 	getSmoothStepPath,
 	useStore as useReactFlowStore,
+	Position,
 } from "reactflow";
-import { getEdgeParams } from "../utils";
+import { getSmartEdge } from "@tisoap/react-flow-smart-edge";
+import { bezierResult, stepResult, straightResult } from "data/edgeOptions";
+import { computedNodes, getEdgeParams } from "../utils";
 import useMainStore from "store";
 import { shallow } from "zustand/shallow";
 import { Nullable } from "types";
@@ -16,15 +19,26 @@ import { Nullable } from "types";
 const foreignObjectSize = 40;
 
 const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd }) => {
-	const [removeTransition, showAllConnections, edgeType, setHoveredEdgeNodes] = useMainStore(
+	const [removeTransition, showAllConnections, edgeType, setHoveredEdgeNodes, activeProcess, showAllRoles, activeRole, showAllConnectedStates] = useMainStore(
 		(state) => [
 			state.removeTransition,
 			state.showAllConnectedStates,
 			state.edgeType,
 			state.setHoveredEdgeNodes,
+			state.activeProcess,
+			state.showAllRoles,
+			state.activeRole,
+			state.showAllConnectedStates
 		],
 		shallow
 	);
+
+	const nodes = computedNodes({
+		process: activeProcess,
+		showAllRoles,
+		activeRole,
+		showAllConnections: showAllConnectedStates,
+	});
 
 	const [isHover, setIsHover] = useState<Nullable<boolean>>(null);
 
@@ -53,6 +67,29 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 
 	const { sx, sy, tx, ty, sourcePos, targetPos } = getEdgeParams(sourceNode, targetNode);
 
+	const getSmartEdgeResponse = getSmartEdge({
+		sourcePosition: sourceNode.sourcePosition || Position.Top,
+		targetPosition: targetNode.sourcePosition || Position.Bottom,
+		sourceX: sx,
+		sourceY: sy,
+		targetX: tx,
+		targetY: ty,
+		nodes: nodes,
+		// Pass down options in the getSmartEdge object
+		options: stepResult,
+			// edgeType === "Straight"
+			// 	? straightResult
+			// 	: edgeType === "Bezier"
+			// 		? bezierResult
+			// 		: stepResult,
+	});
+
+	if (getSmartEdgeResponse === null) {
+		return null;
+	}
+
+	const { edgeCenterX, edgeCenterY, svgPathString } = getSmartEdgeResponse;
+
 	const currentEdgeType = () => {
 		const baseParams = {
 			sourceX: sx,
@@ -80,7 +117,8 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 			<path
 				id={id}
 				className="edge_path"
-				d={edgePath}
+				// d={edgePath}
+				d={svgPathString}
 				markerEnd={markerEnd}
 				stroke={isHover ? "#0ff" : "black"}
 			/>
@@ -90,8 +128,10 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 					onMouseLeave={() => hoverEdge(false)}
 					width={foreignObjectSize}
 					height={foreignObjectSize}
-					x={labelX - foreignObjectSize / 2}
-					y={labelY - foreignObjectSize / 2}
+					x={edgeCenterX - foreignObjectSize / 2}
+					y={edgeCenterY - foreignObjectSize / 2}
+					// x={labelX - foreignObjectSize / 2}
+					// y={labelY - foreignObjectSize / 2}
 					className="edgebutton-foreignobject"
 					requiredExtensions="http://www.w3.org/1999/xhtml"
 				>
