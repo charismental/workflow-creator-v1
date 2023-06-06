@@ -15,7 +15,7 @@ import { Nullable } from "types";
 
 const foreignObjectSize = 40;
 
-const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd }) => {
+const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd, targetX, targetY, sourceX, sourceY }) => {
 	const [removeTransition, showAllConnections, edgeType, setHoveredEdgeNodes] = useMainStore(
 		(state) => [
 			state.removeTransition,
@@ -40,18 +40,18 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 	};
 
 	const sourceNode = useReactFlowStore(
-		useCallback((store) => store.nodeInternals.get(source), [source])
+		useCallback((store: any) => store.nodeInternals.get(source), [source])
 	);
 
 	const targetNode = useReactFlowStore(
-		useCallback((store) => store.nodeInternals.get(target), [target])
+		useCallback((store: any) => store.nodeInternals.get(target), [target])
 	);
 
 	if (!sourceNode || !targetNode || source === target) {
 		return null;
 	}
-
-	const { sx, sy, tx, ty, sourcePos, targetPos } = getEdgeParams(sourceNode, targetNode);
+	console.log('edgetype:', edgeType)
+	const { sx, sy, tx, ty, sourcePos, targetPos } = getEdgeParams({ source: sourceNode, target: targetNode, ...(edgeType !== 'straight' && { sourceHandle: { x: sourceX, y: sourceY }, targetHandle: { x: targetX, y: targetY } }) });
 
 	const currentEdgeType = () => {
 		const baseParams = {

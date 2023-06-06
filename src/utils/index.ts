@@ -75,7 +75,9 @@ function getEdgePosition(node: any, intersectionPoint: any) {
 }
 
 // returns the parameters (sx, sy, tx, ty, sourcePos, targetPos) you need to create an edge
-export function getEdgeParams(source: any, target: any) {
+export function getEdgeParams({ source, target, sourceHandle, targetHandle }: { source: any; target: any; sourceHandle?: { x: number, y: number }; targetHandle?: { x: number; y: number } }) {
+	console.log('getEdgeParams', sourceHandle, targetHandle)
+	
 	const sourceIntersectionPoint = getNodeIntersection(source, target);
 	const targetIntersectionPoint = getNodeIntersection(target, source);
 
@@ -83,10 +85,10 @@ export function getEdgeParams(source: any, target: any) {
 	const targetPos = getEdgePosition(target, targetIntersectionPoint);
 
 	return {
-		sx: sourceIntersectionPoint.x,
-		sy: sourceIntersectionPoint.y,
-		tx: targetIntersectionPoint.x,
-		ty: targetIntersectionPoint.y,
+		sx: sourceHandle?.x || sourceIntersectionPoint.x,
+		sy: sourceHandle?.y || sourceIntersectionPoint.y,
+		tx: targetHandle?.x || targetIntersectionPoint.x,
+		ty: targetHandle?.y || targetIntersectionPoint.y,
 		sourcePos,
 		targetPos,
 	};
@@ -115,7 +117,7 @@ export function transformTransitionsToEdges(
 			targetHandle,
 			source: `${idPrefix}${source}`,
 			target: `${idPrefix}${target}`,
-			id: edgeIdByNodes({ source: `${idPrefix}${source}`, target: `${idPrefix}${target}` }),
+			id: edgeIdByNodes({ source: `${idPrefix}${source}`, target: `${idPrefix}${target}`, sourceHandle, targetHandle }),
 		};
 	};
 
@@ -137,23 +139,23 @@ export function transformNewConnectionToTransition(
 		foundTransition ||
 		(source && target
 			? {
-					StateID: null,
-					ProcessID: null,
-					RoleID: null,
-					RoleName: null,
-					ProcessName: null,
-					InternalOnly: false,
-					StateTransitionID: null,
-					StateName: source,
-					ToStateName: target,
-					properties: { sourceHandle, targetHandle },
-			  }
+				StateID: null,
+				ProcessID: null,
+				RoleID: null,
+				RoleName: null,
+				ProcessName: null,
+				InternalOnly: false,
+				StateTransitionID: null,
+				StateName: source,
+				ToStateName: target,
+				properties: { sourceHandle, targetHandle },
+			}
 			: null)
 	);
 }
 
-export function edgeIdByNodes({ source, target }: { source: string; target: string }): string {
-	return `reactflow__edge-${source}-${target}`;
+export function edgeIdByNodes({ source, target, sourceHandle, targetHandle }: { source: string; target: string; sourceHandle?: string | null; targetHandle?: string | null }): string {
+	return `reactflow__edge-${source}${sourceHandle || ''}-${target}${targetHandle || ''}`;
 }
 
 export function nodeByState({

@@ -101,6 +101,8 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		showAllConnections: showAllConnectedStates,
 	});
 
+	console.log(edges)
+
 	const nodes = computedNodes({
 		process: activeProcess,
 		showAllRoles,

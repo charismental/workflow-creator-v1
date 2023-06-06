@@ -24,6 +24,14 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 	const updateStateProperty = useMainStore((state) => state.updateStateProperty);
 
 	const contextMenuNodeId = useMainStore((state) => state.contextMenuNodeId, shallow);
+
+	const edgeType = useMainStore(
+		(state) => state.edgeType,
+		shallow
+	);
+
+	const isStraightEdge = edgeType === 'straight';
+
 	// todo: consolidate this with updateStateProperty
 	const updateStateProperties = useMainStore((state) => state.updateStateProperties, shallow);
 
@@ -92,7 +100,7 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 	const popoverContent = (
 		<div style={{ maxWidth: 800 }}>
 			<Title level={4} style={{ marginTop: '0', marginBottom: '12px', textAlign: 'center' }}>{id}</Title>
-			<Form layout="horizontal" labelWrap labelAlign="left" labelCol={{ span: 9 }} wrapperCol={{ span: 9, offset: 3 }} style={{ padding: '12px'}}>
+			<Form layout="horizontal" labelWrap labelAlign="left" labelCol={{ span: 9 }} wrapperCol={{ span: 9, offset: 3 }} style={{ padding: '12px' }}>
 				<Form.Item label="Display Order">
 					<Input
 						type="number"
@@ -124,7 +132,7 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 			content={popoverContent}
 		>
 			<div
-				className="stateNodeBody"
+				className={!isStraightEdge ? "stateNodeBody drag-handle" : "stateNodeBody"}
 				onMouseOver={() => setIsMouseOver(true)}
 				onMouseOut={() => setIsMouseOver(false)}
 				style={{
@@ -169,21 +177,84 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 						/>
 					</>
 				)}
-
-				<Handle
-					className="targetHandle"
-					style={{ zIndex: 2 }}
-					position={Position.Top}
-					type="source"
-					isConnectable={isConnectable}
-				/>
-				<Handle
-					className="targetHandle"
-					style={targetHandleStyle}
-					position={Position.Bottom}
-					type="target"
-					isConnectable={isConnectable}
-				/>
+				{isStraightEdge ? (
+					<>
+						<Handle
+							className="full-handle"
+							style={{ zIndex: 2 }}
+							position={Position.Top}
+							type="source"
+							isConnectable={isConnectable}
+						/>
+						<Handle
+							className="full-handle"
+							style={targetHandleStyle}
+							position={Position.Bottom}
+							type="target"
+							isConnectable={isConnectable}
+						/>
+					</>
+				) : (
+					<>
+						<Handle
+							id="t_in_1"
+							style={{ zIndex: 2, left: 15, backgroundColor: 'yellow' }}
+							position={Position.Top}
+							type="source"
+							isConnectable={isConnectable}
+						/>
+						<Handle
+							id="t_in_2"
+							style={{ zIndex: 2, right: 15, backgroundColor: 'yellow' }}
+							position={Position.Top}
+							type="source"
+							isConnectable={isConnectable}
+						/>
+						<Handle
+							id="t_out_1"
+							style={{ zIndex: 2, left: 10, backgroundColor: 'green' }}
+							position={Position.Top}
+							type="target"
+							isConnectable={isConnectable}
+						/>
+						<Handle
+							id="t_out_2"
+							style={{ zIndex: 2, right: 10, backgroundColor: 'green' }}
+							position={Position.Top}
+							type="target"
+							isConnectable={isConnectable}
+						/>
+						{/* start bottom */}
+						<Handle
+							id="b_in_1"
+							style={{ zIndex: 2, left: 15, backgroundColor: 'yellow' }}
+							position={Position.Bottom}
+							type="source"
+							isConnectable={isConnectable}
+						/>
+						<Handle
+							id="b_in_2"
+							style={{ zIndex: 2, right: 15, backgroundColor: 'yellow' }}
+							position={Position.Bottom}
+							type="source"
+							isConnectable={isConnectable}
+						/>
+						<Handle
+							id="b_out_1"
+							style={{ zIndex: 2, left: 10, backgroundColor: 'green' }}
+							position={Position.Bottom}
+							type="target"
+							isConnectable={isConnectable}
+						/>
+						<Handle
+							id="b_out_2"
+							style={{ zIndex: 2, right: 10, backgroundColor: 'green' }}
+							position={Position.Bottom}
+							type="target"
+							isConnectable={isConnectable}
+						/>
+					</>
+				)}
 				{data?.label || "Unknown State"}
 			</div>
 		</Popover>
