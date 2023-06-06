@@ -166,14 +166,6 @@ const WorkflowCreator = () => {
 			<Spin
 				size="large"
 				style={{ position: "absolute", top: "50%", left: "50%" }}
-				tip={
-					<Title
-						level={4}
-						style={{ color: "blue" }}
-					>
-						
-					</Title>
-				}
 			/>
 		);
 	}

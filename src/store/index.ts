@@ -339,7 +339,7 @@ const useMainStore = create<MainState & MainActions>()(
 					);
 				}
 			},
-			removeState: (StateName: string) => {
+			removeState: (stateName: string) => {
 				const { activeProcess } = get();
 
 				const { Roles = [] } = activeProcess || {};
@@ -347,7 +347,7 @@ const useMainStore = create<MainState & MainActions>()(
 				if (activeProcess) {
 					const TransitionsFilter = (Transitions: WorkFlowTransition[]) => {
 						return Transitions.filter(
-							({ StateName, ToStateName }) => StateName !== StateName && ToStateName !== StateName
+							({ StateName, ToStateName }) => StateName !== stateName && ToStateName !== stateName
 						);
 					};
 
@@ -356,7 +356,7 @@ const useMainStore = create<MainState & MainActions>()(
 						Transitions: TransitionsFilter(r?.Transitions || []),
 					}));
 
-					const updatedStates = activeProcess.States?.filter((s) => s.StateName !== StateName);
+					const updatedStates = activeProcess.States?.filter((s) => s.StateName !== stateName);
 
 					set(
 						{

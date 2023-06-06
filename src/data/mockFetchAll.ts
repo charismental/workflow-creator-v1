@@ -17,7 +17,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Application Received",
-						toStateName: "Application Received",
+						ToStateName: "Application Received",
 					},
 					{
 						stateTransitionId: 1,
@@ -26,7 +26,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Application Received",
-						toStateName: "Review",
+						ToStateName: "Review",
 					},
 					{
 						stateTransitionId: 2,
@@ -35,7 +35,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Application Received",
-						toStateName: "QA/QC-Ready",
+						ToStateName: "QA/QC-Ready",
 					},
 					{
 						stateTransitionId: 3,
@@ -44,7 +44,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Application Received",
-						toStateName: "Approved",
+						ToStateName: "Approved",
 					},
 					{
 						stateTransitionId: 4,
@@ -53,7 +53,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Application Received",
-						toStateName: "Pending-Denial",
+						ToStateName: "Pending-Denial",
 					},
 					{
 						stateTransitionId: 5,
@@ -62,7 +62,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Application Received",
-						toStateName: "Denied",
+						ToStateName: "Denied",
 					},
 					{
 						stateTransitionId: 6,
@@ -71,7 +71,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Application Received",
-						toStateName: "Pending-Approval",
+						ToStateName: "Pending-Approval",
 					},
 					{
 						stateTransitionId: 7,
@@ -80,7 +80,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Application Received",
-						toStateName: "Paid",
+						ToStateName: "Paid",
 					},
 				],
 			},
@@ -98,7 +98,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Intake",
-						toStateName: "QA/QC-Ready",
+						ToStateName: "QA/QC-Ready",
 					},
 					{
 						stateTransitionId: 9,
@@ -107,7 +107,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Intake",
-						toStateName: "Pending-Denial",
+						ToStateName: "Pending-Denial",
 					},
 					{
 						stateTransitionId: 10,
@@ -116,7 +116,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "QA/QC-Ready",
-						toStateName: "Intake",
+						ToStateName: "Intake",
 					},
 					{
 						stateTransitionId: 11,
@@ -125,7 +125,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "QA/QC",
-						toStateName: "Intake",
+						ToStateName: "Intake",
 					},
 					{
 						stateTransitionId: 12,
@@ -134,7 +134,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Pending-Denial",
-						toStateName: "Intake",
+						ToStateName: "Intake",
 					},
 					{
 						stateTransitionId: 13,
@@ -143,7 +143,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Pending-Approval",
-						toStateName: "Intake",
+						ToStateName: "Intake",
 					},
 				],
 			},
@@ -161,7 +161,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Application Received",
-						toStateName: "Application Received",
+						ToStateName: "Application Received",
 					},
 					{
 						stateTransitionId: 15,
@@ -170,7 +170,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Application Received",
-						toStateName: "Intake",
+						ToStateName: "Intake",
 					},
 					{
 						stateTransitionId: 16,
@@ -179,7 +179,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Application Received",
-						toStateName: "Pending-Denial",
+						ToStateName: "Pending-Denial",
 					},
 					{
 						stateTransitionId: 17,
@@ -188,7 +188,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Review",
-						toStateName: "Intake",
+						ToStateName: "Intake",
 					},
 					{
 						stateTransitionId: 18,
@@ -197,7 +197,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Intake",
-						toStateName: "Application Received",
+						ToStateName: "Application Received",
 					},
 					{
 						stateTransitionId: 19,
@@ -206,7 +206,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Intake",
-						toStateName: "Review",
+						ToStateName: "Review",
 					},
 					{
 						stateTransitionId: 20,
@@ -215,7 +215,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Intake",
-						toStateName: "Intake",
+						ToStateName: "Intake",
 					},
 					{
 						stateTransitionId: 21,
@@ -224,7 +224,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Intake",
-						toStateName: "QA/QC-Ready",
+						ToStateName: "QA/QC-Ready",
 					},
 					{
 						stateTransitionId: 22,
@@ -233,7 +233,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Intake",
-						toStateName: "Pending-Denial",
+						ToStateName: "Pending-Denial",
 					},
 					{
 						stateTransitionId: 23,
@@ -242,7 +242,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "QA/QC-Ready",
-						toStateName: "Intake",
+						ToStateName: "Intake",
 					},
 					{
 						stateTransitionId: 24,
@@ -251,7 +251,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "QA/QC-Ready",
-						toStateName: "Pending-Denial",
+						ToStateName: "Pending-Denial",
 					},
 					{
 						stateTransitionId: 25,
@@ -260,7 +260,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "QA/QC",
-						toStateName: "Intake",
+						ToStateName: "Intake",
 					},
 					{
 						stateTransitionId: 26,
@@ -269,7 +269,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Pending-Denial",
-						toStateName: "Application Received",
+						ToStateName: "Application Received",
 					},
 					{
 						stateTransitionId: 27,
@@ -278,7 +278,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Pending-Denial",
-						toStateName: "Intake",
+						ToStateName: "Intake",
 					},
 					{
 						stateTransitionId: 28,
@@ -287,7 +287,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Pending-Denial",
-						toStateName: "QA/QC-Ready",
+						ToStateName: "QA/QC-Ready",
 					},
 					{
 						stateTransitionId: 29,
@@ -296,7 +296,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Pending-Approval",
-						toStateName: "Intake",
+						ToStateName: "Intake",
 					},
 				],
 			},
@@ -314,7 +314,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "QA/QC",
-						toStateName: "Intake",
+						ToStateName: "Intake",
 					},
 					{
 						stateTransitionId: 31,
@@ -323,7 +323,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "QA/QC",
-						toStateName: "Pending-Denial",
+						ToStateName: "Pending-Denial",
 					},
 					{
 						stateTransitionId: 32,
@@ -332,7 +332,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "QA/QC",
-						toStateName: "Pending-Approval",
+						ToStateName: "Pending-Approval",
 					},
 					{
 						stateTransitionId: 33,
@@ -341,7 +341,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Pending-Denial",
-						toStateName: "QA/QC",
+						ToStateName: "QA/QC",
 					},
 					{
 						stateTransitionId: 34,
@@ -350,7 +350,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Pending-Approval",
-						toStateName: "QA/QC",
+						ToStateName: "QA/QC",
 					},
 				],
 			},
@@ -368,7 +368,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "QA/QC-Ready",
-						toStateName: "Intake",
+						ToStateName: "Intake",
 					},
 					{
 						stateTransitionId: 36,
@@ -377,7 +377,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "QA/QC-Ready",
-						toStateName: "QA/QC",
+						ToStateName: "QA/QC",
 					},
 					{
 						stateTransitionId: 37,
@@ -386,7 +386,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "QA/QC",
-						toStateName: "Intake",
+						ToStateName: "Intake",
 					},
 					{
 						stateTransitionId: 38,
@@ -395,7 +395,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "QA/QC",
-						toStateName: "QA/QC",
+						ToStateName: "QA/QC",
 					},
 					{
 						stateTransitionId: 39,
@@ -404,7 +404,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "QA/QC",
-						toStateName: "Pending-Denial",
+						ToStateName: "Pending-Denial",
 					},
 					{
 						stateTransitionId: 40,
@@ -413,7 +413,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "QA/QC",
-						toStateName: "Denied",
+						ToStateName: "Denied",
 					},
 					{
 						stateTransitionId: 41,
@@ -422,7 +422,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "QA/QC",
-						toStateName: "Pending-Approval",
+						ToStateName: "Pending-Approval",
 					},
 					{
 						stateTransitionId: 42,
@@ -431,7 +431,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Pending-Denial",
-						toStateName: "QA/QC",
+						ToStateName: "QA/QC",
 					},
 					{
 						stateTransitionId: 43,
@@ -440,7 +440,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Pending-Denial",
-						toStateName: "Denied",
+						ToStateName: "Denied",
 					},
 					{
 						stateTransitionId: 44,
@@ -449,7 +449,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Pending-Denial",
-						toStateName: "Pending-Approval",
+						ToStateName: "Pending-Approval",
 					},
 					{
 						stateTransitionId: 45,
@@ -458,7 +458,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Pending-Denial",
-						toStateName: "Fraud",
+						ToStateName: "Fraud",
 					},
 					{
 						stateTransitionId: 46,
@@ -467,7 +467,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Denied",
-						toStateName: "QA/QC",
+						ToStateName: "QA/QC",
 					},
 					{
 						stateTransitionId: 47,
@@ -476,7 +476,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Denied",
-						toStateName: "Pending-Denial",
+						ToStateName: "Pending-Denial",
 					},
 					{
 						stateTransitionId: 48,
@@ -485,7 +485,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Denied",
-						toStateName: "Fraud",
+						ToStateName: "Fraud",
 					},
 					{
 						stateTransitionId: 49,
@@ -494,7 +494,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Pending-Approval",
-						toStateName: "Intake",
+						ToStateName: "Intake",
 					},
 					{
 						stateTransitionId: 50,
@@ -503,7 +503,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Pending-Approval",
-						toStateName: "QA/QC",
+						ToStateName: "QA/QC",
 					},
 					{
 						stateTransitionId: 51,
@@ -512,7 +512,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Pending-Approval",
-						toStateName: "Denied",
+						ToStateName: "Denied",
 					},
 					{
 						stateTransitionId: 52,
@@ -521,7 +521,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Fraud",
-						toStateName: "Pending-Denial",
+						ToStateName: "Pending-Denial",
 					},
 					{
 						stateTransitionId: 53,
@@ -530,7 +530,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Fraud",
-						toStateName: "Denied",
+						ToStateName: "Denied",
 					},
 					{
 						stateTransitionId: 224,
@@ -539,7 +539,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Award-Outstanding",
-						toStateName: "Paid",
+						ToStateName: "Paid",
 					},
 					{
 						stateTransitionId: 225,
@@ -548,7 +548,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Award-Outstanding",
-						toStateName: "Award-Reissued",
+						ToStateName: "Award-Reissued",
 					},
 					{
 						stateTransitionId: 226,
@@ -557,7 +557,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Award-Reissued",
-						toStateName: "Award-Reissued",
+						ToStateName: "Award-Reissued",
 					},
 				],
 			},
@@ -575,7 +575,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "QA/QC",
-						toStateName: "Denied",
+						ToStateName: "Denied",
 					},
 					{
 						stateTransitionId: 55,
@@ -584,7 +584,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Approved",
-						toStateName: "QA/QC",
+						ToStateName: "QA/QC",
 					},
 					{
 						stateTransitionId: 56,
@@ -593,7 +593,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Approved",
-						toStateName: "Pending-Approval",
+						ToStateName: "Pending-Approval",
 					},
 					{
 						stateTransitionId: 57,
@@ -602,7 +602,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Approved",
-						toStateName: "Paid",
+						ToStateName: "Paid",
 					},
 					{
 						stateTransitionId: 58,
@@ -611,7 +611,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Pending-Denial",
-						toStateName: "Denied",
+						ToStateName: "Denied",
 					},
 					{
 						stateTransitionId: 59,
@@ -620,7 +620,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Pending-Denial",
-						toStateName: "Pending-Approval",
+						ToStateName: "Pending-Approval",
 					},
 					{
 						stateTransitionId: 60,
@@ -629,7 +629,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Pending-Denial",
-						toStateName: "Fraud",
+						ToStateName: "Fraud",
 					},
 					{
 						stateTransitionId: 61,
@@ -638,7 +638,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Denied",
-						toStateName: "QA/QC",
+						ToStateName: "QA/QC",
 					},
 					{
 						stateTransitionId: 62,
@@ -647,7 +647,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Denied",
-						toStateName: "Pending-Denial",
+						ToStateName: "Pending-Denial",
 					},
 					{
 						stateTransitionId: 63,
@@ -656,7 +656,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Denied",
-						toStateName: "Fraud",
+						ToStateName: "Fraud",
 					},
 					{
 						stateTransitionId: 64,
@@ -665,7 +665,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Pending-Approval",
-						toStateName: "QA/QC",
+						ToStateName: "QA/QC",
 					},
 					{
 						stateTransitionId: 65,
@@ -674,7 +674,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Pending-Approval",
-						toStateName: "Approved",
+						ToStateName: "Approved",
 					},
 					{
 						stateTransitionId: 66,
@@ -683,7 +683,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Pending-Approval",
-						toStateName: "Pending-Denial",
+						ToStateName: "Pending-Denial",
 					},
 					{
 						stateTransitionId: 67,
@@ -692,7 +692,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Paid",
-						toStateName: "Approved",
+						ToStateName: "Approved",
 					},
 					{
 						stateTransitionId: 227,
@@ -701,7 +701,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Paid",
-						toStateName: "Award-Outstanding",
+						ToStateName: "Award-Outstanding",
 					},
 					{
 						stateTransitionId: 68,
@@ -710,7 +710,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Fraud",
-						toStateName: "Pending-Denial",
+						ToStateName: "Pending-Denial",
 					},
 					{
 						stateTransitionId: 69,
@@ -719,7 +719,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Fraud",
-						toStateName: "Denied",
+						ToStateName: "Denied",
 					},
 					{
 						stateTransitionId: 228,
@@ -728,7 +728,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Award-Outstanding",
-						toStateName: "Award-Reissued",
+						ToStateName: "Award-Reissued",
 					},
 					{
 						stateTransitionId: 229,
@@ -737,7 +737,7 @@ const processes = [
 						internalOnly: false,
 						ProcessID: 1,
 						fromStateName: "Award-Reissued",
-						toStateName: "Paid",
+						ToStateName: "Paid",
 					},
 				],
 			},
