@@ -410,9 +410,9 @@ const useMainStore = create<MainState & MainActions>()(
 				set(
 					({ processes }) => {
 						const newProcess: WorkflowProcess = {
-							processID: null,
+							processId: null,
 							processName: name,
-							sessionID: "",
+							sessionId: "",
 							globals: { states: get().states, roles: get().roles, companies: get().companies },
 							roles: [],
 							states: [],
@@ -447,7 +447,7 @@ const useMainStore = create<MainState & MainActions>()(
 						const initialNumberBoolean: NumberBoolean = 0;
 
 						const newRole: WorkflowRole = {
-							roleID: null,
+							roleId: null,
 							isCluster: initialNumberBoolean,
 							isUniversal: initialNumberBoolean,
 							roleName: role,
@@ -482,7 +482,7 @@ const useMainStore = create<MainState & MainActions>()(
 						const initialNumberBoolean: NumberBoolean = 0;
 
 						const newCompany = {
-							companyID: null,
+							companyId: null,
 							companyName: company,
 							isInternal: initialNumberBoolean,
 							isTrusted: false,
@@ -588,7 +588,7 @@ const useMainStore = create<MainState & MainActions>()(
 				if (!states.some(({ stateName }) => stateName === name)) {
 
 					const newState: WorkflowState = {
-						stateID: null,
+						stateId: null,
 						stateName: name,
 						requiresRoleAssignment: 0,
 						requiresUserAssignment: 0,
@@ -604,7 +604,7 @@ const useMainStore = create<MainState & MainActions>()(
 						const initialNumberBoolean: NumberBoolean = 0;
 
 						const newRole: WorkflowRole = {
-							roleID: null,
+							roleId: null,
 							roleName: role,
 							isUniversal: initialNumberBoolean,
 							isCluster: initialNumberBoolean,
@@ -621,7 +621,7 @@ const useMainStore = create<MainState & MainActions>()(
 						const initialNumberBoolean: NumberBoolean = 0;
 
 						const newCompany = {
-							companyID: null,
+							companyId: null,
 							companyName: company,
 							isInternal: initialNumberBoolean,
 							isTrusted: false,

@@ -148,7 +148,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 				requiresRoleAssignment: initialNumberBoolean,
 				requiresUserAssignment: initialNumberBoolean,
 				stateName: type,
-				stateID: null,
+				stateId: null,
 				displayOrder:
 					Math.max(...activeProcessStates.map(({ displayOrder }) => displayOrder || 0)) + 10,
 				properties: { ...position },

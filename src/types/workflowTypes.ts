@@ -1,9 +1,9 @@
 import { Nullable, NumberBoolean } from "./genericTypes";
 
 export interface WorkflowProcess {
-	processID: Nullable<number>;
+	processId: Nullable<number>;
 	processName: string;
-	sessionID?: string;
+	sessionId?: string;
 	globals: WorkflowGlobals;
 	states: Array<WorkflowState>;
 	roles: Array<WorkflowRole>;
@@ -17,15 +17,15 @@ export interface WorkflowGlobals {
 }
 
 export interface WorkFlowTransition {
-	stateTransitionID: Nullable<number>;
-	stateID: Nullable<number>;
+	stateTransitionId: Nullable<number>;
+	stateId: Nullable<number>;
 	stateName: string;
-	roleID: Nullable<number>;
+	roleId: Nullable<number>;
 	roleName: Nullable<string>;
-	altStateID?: Nullable<number>;
-	toStateID?: Nullable<number>;
+	altStateId?: Nullable<number>;
+	toStateId?: Nullable<number>;
 	toStateName: string;
-	processID: Nullable<number>;
+	processId: Nullable<number>;
 	processName: Nullable<string>;
 	internalOnly: boolean;
 	properties?: {
@@ -35,7 +35,7 @@ export interface WorkFlowTransition {
 }
 
 export interface WorkflowState {
-	stateID: Nullable<number>;
+	stateId: Nullable<number>;
 	stateName: string;
 	requiresRoleAssignment: NumberBoolean;
 	requiresUserAssignment: NumberBoolean;
@@ -49,7 +49,7 @@ export interface WorkflowState {
 }
 
 export interface WorkflowRole {
-	roleID: Nullable<number>;
+	roleId: Nullable<number>;
 	isCluster: NumberBoolean;
 	isUniversal: NumberBoolean;
 	roleName: string;
@@ -58,7 +58,7 @@ export interface WorkflowRole {
 }
 
 export interface WorkflowCompany {
-	companyID: Nullable<number>;
+	companyId: Nullable<number>;
 	companyName: string;
 	isInternal: NumberBoolean;
 	isTrusted: boolean;

@@ -137,13 +137,13 @@ export function transformNewConnectionToTransition(
 		foundTransition ||
 		(source && target
 			? {
-					stateID: null,
-					processID: null,
-					roleID: null,
+					stateId: null,
+					processId: null,
+					roleId: null,
 					roleName: null,
 					processName: null,
 					internalOnly: false,
-					stateTransitionID: null,
+					stateTransitionId: null,
 					stateName: source,
 					toStateName: target,
 					properties: { sourceHandle, targetHandle },
@@ -252,18 +252,18 @@ export function stateByNode({
 }): WorkflowState {
 	const { id: stateName, positionAbsolute = { x: 1, y: 1 }, width: w = 200, height: h = 30 } = node;
 	const foundState = allStates.find((s) => s?.stateName === stateName) || {};
-	let stateID: Nullable<number> = null;
+	let stateId: Nullable<number> = null;
 	let requiresRoleAssignment: NumberBoolean | any = 0;
 	let requiresUserAssignment: NumberBoolean | any = 0;
 
-	if ("stateID" in foundState && typeof foundState.stateID === "number")
-		stateID = foundState.stateID;
+	if ("stateId" in foundState && typeof foundState.stateId === "number")
+		stateId = foundState.stateId;
 	if ("requiresRoleAssignment" in foundState) requiresRoleAssignment = foundState.requiresRoleAssignment
 	if ("requiresUserAssignment" in foundState) requiresUserAssignment = foundState.requiresUserAssignment
 
 	const properties = { ...positionAbsolute, h, w };
 
-	return { ...foundState, stateID, stateName, properties, requiresUserAssignment, requiresRoleAssignment };
+	return { ...foundState, stateId, stateName, properties, requiresUserAssignment, requiresRoleAssignment };
 }
 
 export function roleColor({
@@ -346,7 +346,7 @@ export function computedNodes({
 				.forEach((state, index, arr) => {
 					const selfConnected = stateIsSelfConnected({
 						role: roleName,
-						StateID: state.stateName,
+						stateId: state.stateName,
 						process,
 					});
 
@@ -374,7 +374,7 @@ export function computedNodes({
 						allNodesLength: arr.length,
 						color: roleColor({ roleName: activeRole, allRoles: roles }),
 						...(showAllConnections && {
-							selfConnected: stateIsSelfConnected({ StateID: state.stateName, process }),
+							selfConnected: stateIsSelfConnected({ stateId: state.stateName, process }),
 						}),
 					})
 				)
@@ -427,11 +427,11 @@ export function computedEdges({
 }
 
 export function stateIsSelfConnected({
-	StateID,
+	stateId,
 	role,
 	process,
 }: {
-	StateID: string;
+	stateId: string;
 	role?: string;
 	process: WorkflowProcess | null;
 }): boolean {
@@ -442,12 +442,12 @@ export function stateIsSelfConnected({
 		roles.forEach(({ transitions = [] }) => allTransitions.push(...transitions));
 
 		return allTransitions.some(({ stateName, toStateName }) =>
-			[stateName, toStateName].every((el) => el === StateID)
+			[stateName, toStateName].every((el) => el === stateId)
 		);
 	}
 	return !!roles
 		.find(({ roleName }) => roleName === role)
 		?.transitions?.find(({ stateName, toStateName }) =>
-			[stateName, toStateName].every((el) => el === StateID)
+			[stateName, toStateName].every((el) => el === stateId)
 		);
 }
