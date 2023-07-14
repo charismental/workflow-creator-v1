@@ -1,33 +1,33 @@
 import { Nullable, NumberBoolean } from "./genericTypes";
 
 export interface WorkflowProcess {
-	ProcessID: Nullable<number>;
-	ProcessName: string;
-	SessionID?: string;
-	Globals: WorkflowGlobals;
-	States: Array<WorkflowState>;
-	Roles: Array<WorkflowRole>;
-	Companies: Array<WorkflowCompany>;
+	processID: Nullable<number>;
+	processName: string;
+	sessionID?: string;
+	globals: WorkflowGlobals;
+	states: Array<WorkflowState>;
+	roles: Array<WorkflowRole>;
+	companies: Array<WorkflowCompany>;
 }
 
 export interface WorkflowGlobals {
-	States: Array<WorkflowState>;
-	Roles: Array<WorkflowRole>;
-	Companies: Array<WorkflowCompany>;
+	states: Array<WorkflowState>;
+	roles: Array<WorkflowRole>;
+	companies: Array<WorkflowCompany>;
 }
 
 export interface WorkFlowTransition {
-	StateTransitionID: Nullable<number>;
-	StateID: Nullable<number>;
-	StateName: string;
-	RoleID: Nullable<number>;
-	RoleName: Nullable<string>;
-	AltStateID?: Nullable<number>;
-	ToStateID?: Nullable<number>;
-	ToStateName: string;
-	ProcessID: Nullable<number>;
-	ProcessName: Nullable<string>;
-	InternalOnly: boolean;
+	stateTransitionID: Nullable<number>;
+	stateID: Nullable<number>;
+	stateName: string;
+	roleID: Nullable<number>;
+	roleName: Nullable<string>;
+	altStateID?: Nullable<number>;
+	toStateID?: Nullable<number>;
+	toStateName: string;
+	processID: Nullable<number>;
+	processName: Nullable<string>;
+	internalOnly: boolean;
 	properties?: {
 		sourceHandle?: string | null;
 		targetHandle?: string | null;
@@ -35,11 +35,11 @@ export interface WorkFlowTransition {
 }
 
 export interface WorkflowState {
-	StateID: Nullable<number>;
-	StateName: string;
-	RequiresRoleAssignment: NumberBoolean;
-	RequiresUserAssignment: NumberBoolean;
-	DisplayOrder?: number;
+	stateID: Nullable<number>;
+	stateName: string;
+	requiresRoleAssignment: NumberBoolean;
+	requiresUserAssignment: NumberBoolean;
+	displayOrder?: number;
 	properties?: {
 		x?: number;
 		y?: number;
@@ -49,17 +49,17 @@ export interface WorkflowState {
 }
 
 export interface WorkflowRole {
-	RoleID: Nullable<number>;
-	IsCluster: NumberBoolean;
-	IsUniversal: NumberBoolean;
-	RoleName: string;
-	Transitions?: WorkFlowTransition[];
+	roleID: Nullable<number>;
+	isCluster: NumberBoolean;
+	isUniversal: NumberBoolean;
+	roleName: string;
+	transitions?: WorkFlowTransition[];
 	properties?: { color?: string };
 }
 
 export interface WorkflowCompany {
-	CompanyID: Nullable<number>;
-	CompanyName: string;
+	companyID: Nullable<number>;
+	companyName: string;
 	isInternal: NumberBoolean;
-	IsTrusted: boolean;
+	isTrusted: boolean;
 }

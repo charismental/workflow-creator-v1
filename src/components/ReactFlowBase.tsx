@@ -30,7 +30,7 @@ const selector = (state: MainState & MainActions) => ({
 	onNodesChange: state.onNodesChange,
 	setStatesForActiveProcess: state.setStatesForActiveProcess,
 	onConnect: state.onConnect,
-	activeProcessStates: state.activeProcess?.States || [],
+	activeProcessStates: state.activeProcess?.states || [],
 	reactFlowInstance: state.reactFlowInstance,
 	setReactFlowInstance: state.setReactFlowInstance,
 	showMinimap: state.showMinimap,
@@ -95,7 +95,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 	}, [contextMenuNodeId, setContextMenuNodeId]);
 
 	const edges = computedEdges({
-		roles: activeProcess?.Roles || [],
+		roles: activeProcess?.roles || [],
 		activeRole,
 		showAllRoles,
 		showAllConnections: showAllConnectedStates,
@@ -145,12 +145,12 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 			const initialNumberBoolean: NumberBoolean = 0;
 
 			const newState = {
-				RequiresRoleAssignment: initialNumberBoolean,
-				RequiresUserAssignment: initialNumberBoolean,
-				StateName: type,
-				StateID: null,
-				DisplayOrder:
-					Math.max(...activeProcessStates.map(({ DisplayOrder }) => DisplayOrder || 0)) + 10,
+				requiresRoleAssignment: initialNumberBoolean,
+				requiresUserAssignment: initialNumberBoolean,
+				stateName: type,
+				stateID: null,
+				displayOrder:
+					Math.max(...activeProcessStates.map(({ displayOrder }) => displayOrder || 0)) + 10,
 				properties: { ...position },
 			};
 
