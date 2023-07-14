@@ -1,4 +1,4 @@
-import { Checkbox } from "antd";
+import { Checkbox, ColorPicker } from "antd";
 import React from "react";
 
 interface ActiveRoleSettingsProps {
@@ -22,8 +22,7 @@ const ActiveRoleSettings: React.FC<ActiveRoleSettingsProps> = ({
 }) => {
 	return (
 		<div style={{ display: "inline-flex", justifyContent: "end", ...useStyle }}>
-			<div style={{ display: 'flex', paddingTop: "2px", marginRight: "30px" }}>
-
+			<div style={{ display: "flex", paddingTop: "2px", marginRight: "30px" }}>
 				<Checkbox
 					checked={roleIsToggled}
 					onChange={toggleRole}
@@ -32,27 +31,34 @@ const ActiveRoleSettings: React.FC<ActiveRoleSettingsProps> = ({
 				</Checkbox>
 
 				<Checkbox
-					checked={roleHasPropertyActive('isUniversal')}
-					onChange={() => updateRoleProperty({ property: 'isUniversal', value: Number(!roleHasPropertyActive('isUniversal')) })}
+					checked={roleHasPropertyActive("IsUniversal")}
+					onChange={() =>
+						updateRoleProperty({
+							property: "IsUniversal",
+							value: Number(!roleHasPropertyActive("IsUniversal")),
+						})
+					}
 				>
 					Universal
 				</Checkbox>
 
 				<Checkbox
-					checked={roleHasPropertyActive('isCluster')}
-					onChange={() => updateRoleProperty({ property: 'isCluster', value: Number(!roleHasPropertyActive('isCluster')) })}
+					checked={roleHasPropertyActive("IsCluster")}
+					onChange={() =>
+						updateRoleProperty({
+							property: "IsCluster",
+							value: Number(!roleHasPropertyActive("IsCluster")),
+						})
+					}
 				>
 					Cluster
 				</Checkbox>
 			</div>
 			{updateColor && (
-				<input
+				<ColorPicker
 					disabled={!roleIsToggled}
-					type="color"
-					name="color"
-					id="colorRef"
 					value={color}
-					onChange={(e) => updateColor(e.target.value)}
+					onChange={(e) => updateColor(e.toHexString())}
 				/>
 			)}
 		</div>

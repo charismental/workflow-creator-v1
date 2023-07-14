@@ -11,32 +11,34 @@ import {
 import { getEdgeParams } from "../utils";
 import useMainStore from "store";
 import { shallow } from "zustand/shallow";
+import { Nullable } from "types";
 
 const foreignObjectSize = 40;
 
-const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd, style }) => {
-	const [removeTransition, showAllRoles, showAllConnections, edgeType] = useMainStore(
+const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd }) => {
+	const [removeTransition, showAllConnections, edgeType, setHoveredEdgeNodes] = useMainStore(
 		(state) => [
 			state.removeTransition,
-			state.showAllRoles,
 			state.showAllConnectedStates,
 			state.edgeType,
+			state.setHoveredEdgeNodes,
 		],
 		shallow
 	);
 
-	const [isHover, setIsHover] = useState<boolean | null>(null);
+	const [isHover, setIsHover] = useState<Nullable<boolean>>(null);
 
-	// useEffect(() => {
-	//   if (isHover !== null) updateNodeStyle()
-	// }, [isHover])
+	const hoverEdge = (status: boolean) => {
+		setHoveredEdgeNodes(status ? [source, target] : [])
+		setIsHover(status);
+	};
 
 	const onEdgeClick = (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
 		event.stopPropagation();
-		console.log(source, target)
 		removeTransition({ source, target });
-		setIsHover(false);
+		hoverEdge(false);
 	};
+
 	const sourceNode = useReactFlowStore(
 		useCallback((store) => store.nodeInternals.get(source), [source])
 	);
@@ -60,6 +62,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 			sourcePosition: sourcePos,
 			targetPosition: targetPos,
 		};
+
 		switch (edgeType) {
 			case "step":
 				return getSmoothStepPath(baseParams);
@@ -83,8 +86,8 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 			/>
 			{!showAllConnections && (
 				<foreignObject
-					onMouseOver={() => setIsHover(true)}
-					onMouseLeave={() => setIsHover(false)}
+					onMouseOver={() => hoverEdge(true)}
+					onMouseLeave={() => hoverEdge(false)}
 					width={foreignObjectSize}
 					height={foreignObjectSize}
 					x={labelX - foreignObjectSize / 2}

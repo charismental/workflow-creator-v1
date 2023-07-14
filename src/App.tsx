@@ -1,20 +1,19 @@
 import { Layout, Space, Spin, Typography, message } from "antd";
 import ActiveRoleSettings from "components/ActiveRoleSettings";
 import CustomControls from "components/CustomControls/CustomControls";
+import ToggleRoleActiveState from "components/Modals/ToggleRoleActiveState";
 import ReactFlowBase from "components/ReactFlowBase";
 import SelectBox from "components/SelectBox";
 import StateCollapseBox from "components/StateCollapseBox";
 import { CSSProperties, useCallback, useEffect, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
-import "reactflow/dist/style.css";
 import type { MainActions, MainState } from "store";
 import useMainStore from "store";
 import { roleColor } from "utils";
 import { shallow } from "zustand/shallow";
 import Sidebar from "./components/Sidebar";
+import "reactflow/dist/style.css";
 import "./css/style.css";
-import ToggleRoleActiveState from "components/Modals/ToggleRoleActiveState";
-import { WorkflowRole } from "store/types";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -46,15 +45,18 @@ const storeSelector = (state: MainActions & MainState) => ({
 	setActiveProcess: state.setActiveProcess,
 	activeRole: state.activeRole,
 	setActiveRole: state.setActiveRole,
-	roles: state.roles,
+	roles: state.Roles,
 	setColorForActiveRole: state.setColorForActiveRole,
-	currentStates: state.states,
+	currentStates: state.States,
 	addNewState: state.addNewState,
 	addNewRole: state.addNewRole,
 	fetchAll: state.fetchAll,
 	loading: state.globalLoading,
 	reactFlowInstance: state.reactFlowInstance,
 	updateRoleProperty: state.updateRoleProperty,
+	Companies: state.Companies,
+	toggleCompanyForProcess: state.toggleCompanyForProcess,
+	addNewCompany: state.addNewCompany,
 });
 
 const WorkflowCreator = () => {
@@ -75,6 +77,9 @@ const WorkflowCreator = () => {
 		fetchAll,
 		loading,
 		reactFlowInstance,
+		Companies,
+		toggleCompanyForProcess,
+		addNewCompany,
 	} = useMainStore(storeSelector, shallow);
 	const [toggleInactiveModal, setToggleInactiveModal] = useState(false);
 	const filteredStates = useMainStore(
@@ -88,20 +93,27 @@ const WorkflowCreator = () => {
 	const [messageApi, contextHolder] = message.useMessage();
 
 	const activeRoleColor = roleColor({
-		roleName: activeRole,
-		allRoles: activeProcess?.roles || [],
+		RoleName: activeRole,
+		allRoles: activeProcess?.Roles || [],
 	});
 
-	const roleIsToggled = !!activeProcess?.roles?.some((r) => r.roleName === activeRole);
+	const roleIsToggled = !!activeProcess?.Roles?.some((r) => r.RoleName === activeRole);
 
-	const availableStates = filteredStates(activeProcess?.states || []);
+	const availableStates = filteredStates(activeProcess?.States || []);
 
-	const availableProcesses = processes.map((p) => p.processName);
+	const availableProcesses = processes.map((p) => p.ProcessName);
 
-	const roleList = roles.map(({ roleName }) => {
+	const roleList = roles.map(({ RoleName }) => {
 		return {
-			label: roleName,
-			value: activeProcess?.roles?.some((r) => r.roleName === roleName) || false,
+			label: RoleName,
+			value: activeProcess?.Roles?.some((r) => r.RoleName === RoleName) || false,
+		};
+	});
+
+	const companyList = Companies.map(({ CompanyName }) => {
+		return {
+			label: CompanyName,
+			value: activeProcess?.Companies?.some((c) => c.CompanyName === CompanyName) || false,
 		};
 	});
 
@@ -116,23 +128,28 @@ const WorkflowCreator = () => {
 		setActiveRole(name);
 	};
 
-	const openToggleActiveModal = (roleName: string) => {
+	const addNewCompanyAndToggle = ({ name }: { name: string }) => {
+		addNewCompany(name);
+		toggleCompanyForProcess(name);
+	};
+
+	const openToggleActiveModal = (RoleName: string) => {
 		setToggleInactiveModal(true);
-		
+
 		ToggleRoleActiveState({
 			modalOpen: toggleInactiveModal,
-			roleName: activeRole,
+			RoleName: activeRole,
 			setModalOpen: setToggleInactiveModal,
-			toggleRoleForProcess: () => toggleRoleForProcess(roleName),
+			toggleRoleForProcess: () => toggleRoleForProcess(RoleName),
 			successMessage: activeStatusRemovedMessage,
 		});
 	};
 
-	const toggleRole = (roleName: string): void => {
-		const { transitions = [] } = activeProcess?.roles?.find((r) => r.roleName === roleName) || {};
-		
-		if (transitions.length) openToggleActiveModal(roleName);
-		else toggleRoleForProcess(roleName);
+	const toggleRole = (RoleName: string): void => {
+		const { Transitions = [] } = activeProcess?.Roles?.find((r) => r.RoleName === RoleName) || {};
+
+		if (Transitions.length) openToggleActiveModal(RoleName);
+		else toggleRoleForProcess(RoleName);
 	};
 
 	const activeStatusRemovedMessage = () => {
@@ -149,14 +166,6 @@ const WorkflowCreator = () => {
 			<Spin
 				size="large"
 				style={{ position: "absolute", top: "50%", left: "50%" }}
-				tip={
-					<Title
-						level={4}
-						style={{ color: "blue" }}
-					>
-						...Loading State
-					</Title>
-				}
 			/>
 		);
 	}
@@ -175,7 +184,7 @@ const WorkflowCreator = () => {
 							selectOnChange={setActiveProcess}
 							addNew={addNewProcessAndSelect}
 							type="process"
-							selectValue={activeProcess?.processName}
+							selectValue={activeProcess?.ProcessName}
 							items={availableProcesses}
 							placeholder="Select Process"
 							hasColorInput={false}
@@ -192,13 +201,14 @@ const WorkflowCreator = () => {
 							color={activeRoleColor}
 							toggleRole={() => toggleRole(activeRole)}
 							useStyle={{ flexGrow: 1 }}
-							updateRoleProperty={({ property, value }: { property: string; value?: any }) => updateRoleProperty({ role: activeRole, property, value })}
+							updateRoleProperty={({ property, value }: { property: string; value?: any }) =>
+								updateRoleProperty({ role: activeRole, property, value })
+							}
 							roleHasPropertyActive={(property: string) => {
-								const foundRole: any = roles?.find((r: any) => r.roleName === activeRole);
+								const foundRole: any = activeProcess?.Roles?.find((r: any) => r.RoleName === activeRole);
 
 								return !!foundRole?.[property];
-							}
-						}
+							}}
 						/>
 					</Header>
 					<ReactFlowProvider>
@@ -210,6 +220,7 @@ const WorkflowCreator = () => {
 							/>
 						</Content>
 						<CustomControls
+							roleIsToggled={roleIsToggled}
 							getCurrentEdges={reactFlowInstance?.getEdges}
 							getCurrentNodes={reactFlowInstance?.getNodes}
 						/>
@@ -222,7 +233,7 @@ const WorkflowCreator = () => {
 								items={availableStates}
 								addNew={addNewState}
 								roleColor={activeRoleColor}
-								disabled={!activeProcess?.roles?.some((r) => r.roleName === activeRole)}
+								disabled={!activeProcess?.Roles?.some((r) => r.RoleName === activeRole)}
 							/>
 							<SelectBox
 								addNew={addNewRoleAndToggle}
@@ -235,6 +246,14 @@ const WorkflowCreator = () => {
 								multiselectHandler={(el) => toggleRole(el.label)}
 								selectOnChange={setActiveRole}
 							/>
+							<SelectBox
+								addNew={addNewCompanyAndToggle}
+								placeholder="Select Company"
+								items={companyList}
+								type="company"
+								useStyle={{ width: "100%" }}
+								multiselectHandler={(el) => toggleCompanyForProcess(el.label)}
+							/>
 						</>
 					}
 				/>
@@ -242,25 +261,5 @@ const WorkflowCreator = () => {
 		</Space>
 	);
 };
-
-document.addEventListener("keydown", function (e) {
-	if (e.key === "Shift") {
-		const elements = document.querySelectorAll(".stateNodeBody");
-
-		elements.forEach(function (element) {
-			element.classList.add("drag-handle");
-		});
-	}
-});
-
-document.addEventListener("keyup", function (e) {
-	if (e.key === "Shift") {
-		const elements = document.querySelectorAll(".stateNodeBody");
-
-		elements.forEach(function (element) {
-			element.classList.remove("drag-handle");
-		});
-	}
-});
 
 export default WorkflowCreator;

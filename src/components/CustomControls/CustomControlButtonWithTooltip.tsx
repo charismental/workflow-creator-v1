@@ -4,9 +4,11 @@ export default ({
     title,
     icon,
     clickEvent,
+    isDisabled
 }: {
     title: string;
     icon?: React.ReactNode;
+    isDisabled?: boolean,
     clickEvent:
         | (React.MouseEventHandler<HTMLAnchorElement> & React.MouseEventHandler<HTMLButtonElement>)
         | undefined;
@@ -20,6 +22,7 @@ export default ({
                 icon={icon}
                 type={"default"}
                 onClick={clickEvent}
+                disabled={isDisabled}
             />
         </Tooltip>
     );

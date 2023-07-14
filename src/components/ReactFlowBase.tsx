@@ -1,7 +1,6 @@
 import "reactflow/dist/style.css";
 import "../css/style.css";
-import { DragOutlined } from "@ant-design/icons";
-import { Descriptions, Dropdown, Typography, MenuProps } from "antd";
+import { Typography } from "antd";
 import defaultEdgeOptions from "data/defaultEdgeOptions";
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, { Background, BackgroundVariant, Edge, MiniMap, NodeTypes } from "reactflow";
@@ -10,8 +9,9 @@ import { shallow } from "zustand/shallow";
 import CustomConnectionLine from "../components/CustomConnectionLine";
 import FloatingEdge from "../components/FloatingEdge";
 import StateNode from "../components/StateNode";
-import { computedEdges, getItem, computedNodes } from "utils";
+import { computedEdges, computedNodes } from "utils";
 import LabelNode from "./LabelNode";
+import { NumberBoolean } from "types/genericTypes";
 
 const { Text } = Typography;
 
@@ -30,12 +30,14 @@ const selector = (state: MainState & MainActions) => ({
 	onNodesChange: state.onNodesChange,
 	setStatesForActiveProcess: state.setStatesForActiveProcess,
 	onConnect: state.onConnect,
-	activeProcessStates: state.activeProcess?.states || [],
+	activeProcessStates: state.activeProcess?.States || [],
 	reactFlowInstance: state.reactFlowInstance,
 	setReactFlowInstance: state.setReactFlowInstance,
 	showMinimap: state.showMinimap,
 	showAllRoles: state.showAllRoles,
 	showAllConnectedStates: state.showAllConnectedStates,
+	setContextMenuNodeId: state.setContextMenuNodeId,
+	contextMenuNodeId: state.contextMenuNodeId,
 });
 
 interface ReactFlowBaseProps {
@@ -61,10 +63,11 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		setReactFlowInstance,
 		showAllRoles,
 		showAllConnectedStates,
+		setContextMenuNodeId,
+		contextMenuNodeId,
 	} = useMainStore(selector, shallow);
 
 	const { activeRole, activeRoleColor, roleIsToggled } = props;
-	const [items, setItems] = useState<MenuProps["items"]>();
 
 	const fitView = (timeout = 0) =>
 		setTimeout(() => reactFlowInstance && reactFlowInstance.fitView(), timeout);
@@ -77,8 +80,22 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		fitView(50);
 	}, [reactFlowInstance]);
 
+	useEffect(() => {
+		function handleClickOutside(e: any) {
+			const node: Node = e.target;
+
+			if (!document.getElementsByClassName("ant-popover")[0]?.contains(node)) {
+				setContextMenuNodeId(undefined);
+			}
+		}
+
+		if (contextMenuNodeId) document.addEventListener("click", handleClickOutside);
+		else document.removeEventListener("click", handleClickOutside);
+		return () => document.removeEventListener("click", handleClickOutside);
+	}, [contextMenuNodeId, setContextMenuNodeId]);
+
 	const edges = computedEdges({
-		roles: activeProcess?.roles || [],
+		roles: activeProcess?.Roles || [],
 		activeRole,
 		showAllRoles,
 		showAllConnections: showAllConnectedStates,
@@ -91,62 +108,17 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		showAllConnections: showAllConnectedStates,
 	});
 
-	const openEdgeContextMenu = (e: React.MouseEvent, el: Edge) => {
-		e.preventDefault();
-		return setItems([
-			getItem(<Text style={{ fontSize: "18px" }}>Source: {el.source}</Text>, 1, null),
-			getItem(<Text style={{ fontSize: "18px" }}>Target: {el.target}</Text>, 2, null),
-		]);
-	};
+	// const openEdgeContextMenu = (e: React.MouseEvent, el: Edge) => {
+	// 	e.preventDefault();
+	// 	return setItems([
+	// 		getItem(<Text style={{ fontSize: "18px" }}>Source: {el.source}</Text>, 1, null),
+	// 		getItem(<Text style={{ fontSize: "18px" }}>Target: {el.target}</Text>, 2, null),
+	// 	]);
+	// };
 
 	const openNodeContextMenu = (e: React.MouseEvent, node: Node | any) => {
 		e.preventDefault();
-		setItems([
-			getItem(
-				<Text style={{ fontSize: "18px", textDecoration: "underline" }}>{node.id}</Text>,
-				3,
-				null,
-				[
-					getItem(
-						<Text style={{ fontSize: "18px" }}>Position</Text>,
-						"pos",
-						<DragOutlined />,
-						[
-							getItem(<Text style={{ fontSize: "18px" }}>X: {node.position.x}</Text>, "x"),
-							getItem(<Text style={{ fontSize: "18px" }}>Y: {node.position.y}</Text>, "y"),
-						],
-						"group"
-					),
-					getItem(
-						<Text style={{ fontSize: "18px" }}>Dimensions</Text>,
-						"dim",
-						<DragOutlined rotate={45} />,
-						[
-							getItem(<Text style={{ fontSize: "18px" }}>W: {node.width}</Text>, "w"),
-							getItem(<Text style={{ fontSize: "18px" }}>H: {node.height}</Text>, "h"),
-						],
-						"group"
-					),
-				],
-				"group"
-			),
-		]);
-	};
-
-	const openPaneContextMenu = (e: React.MouseEvent<Element, MouseEvent>) => {
-		e.preventDefault();
-		return setItems([
-			getItem(
-				<Descriptions
-					style={{ fontSize: "18px", width: "min-content" }}
-					title={`Process Name: ${activeProcess?.processName || "Unknown Process Name"}`}
-				>
-					<Descriptions.Item label={"Active Role:"}>{activeRole}</Descriptions.Item>
-				</Descriptions>,
-				1,
-				null
-			),
-		]);
+		setContextMenuNodeId(node.id);
 	};
 
 	const onDragOver = useCallback((event: any) => {
@@ -170,10 +142,15 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 				y: event.clientY - reactFlowBounds.top,
 			});
 
+			const initialNumberBoolean: NumberBoolean = 0;
+
 			const newState = {
-				stateName: type,
-				displayOrder:
-					Math.max(...activeProcessStates.map(({ displayOrder }) => displayOrder || 0)) + 10,
+				RequiresRoleAssignment: initialNumberBoolean,
+				RequiresUserAssignment: initialNumberBoolean,
+				StateName: type,
+				StateID: null,
+				DisplayOrder:
+					Math.max(...activeProcessStates.map(({ DisplayOrder }) => DisplayOrder || 0)) + 10,
 				properties: { ...position },
 			};
 
@@ -185,66 +162,57 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
 	return (
 		<>
-			<Dropdown
-				destroyPopupOnHide
-				trigger={["contextMenu"]}
-				menu={{ items }}
+			<div
+				className="reactflow-wrapper"
+				ref={reactFlowWrapper}
+				id="download"
+				style={!roleIsToggled ? { pointerEvents: "none" } : {}}
 			>
-				<div
-					className="reactflow-wrapper"
-					ref={reactFlowWrapper}
-					id="download"
-					style={!roleIsToggled ? { pointerEvents: "none" } : {}}
+				<ReactFlow
+					nodes={nodes}
+					edges={edges}
+					onNodesChange={onNodesChange}
+					onConnect={onConnect}
+					onInit={setReactFlowInstance}
+					onDrop={onDrop}
+					onDragOver={onDragOver}
+					fitView
+					snapToGrid
+					nodeTypes={nodeTypes}
+					edgeTypes={edgeTypes}
+					proOptions={{ hideAttribution: true }}
+					defaultEdgeOptions={defaultEdgeOptions}
+					connectionLineComponent={CustomConnectionLine}
+					connectionLineStyle={connectionLineStyle}
+					onNodeContextMenu={openNodeContextMenu}
 				>
-					<ReactFlow
-						nodes={nodes}
-						edges={edges}
-						onNodesChange={onNodesChange}
-						onConnect={onConnect}
-						onInit={setReactFlowInstance}
-						onDrop={onDrop}
-						onDragOver={onDragOver}
-						fitView
-						snapToGrid
-						nodeTypes={nodeTypes}
-						edgeTypes={edgeTypes}
-						proOptions={{ hideAttribution: true }}
-						defaultEdgeOptions={defaultEdgeOptions}
-						connectionLineComponent={CustomConnectionLine}
-						connectionLineStyle={connectionLineStyle}
-						onEdgeContextMenu={openEdgeContextMenu}
-						onNodeContextMenu={openNodeContextMenu}
-						onPaneContextMenu={openPaneContextMenu}
-					>
-						{showMinimap && (
-							<MiniMap
-								nodeColor={activeRoleColor}
-								nodeStrokeColor={"black"}
-								nodeStrokeWidth={6}
-								zoomable
-								maskStrokeColor="darkGray"
-								maskStrokeWidth={20}
-								pannable
-							/>
-						)}
-						{!roleIsToggled && (
-							<div
-								style={{
-									zIndex: 5000000,
-									backgroundColor: "darkGrey",
-									opacity: 0.5,
-									width: "100%",
-									height: "100%",
-									position: "relative",
-									cursor: "not-allowed",
-								}}
-							/>
-						)}
-						<Background variant={BackgroundVariant.Dots} />
-						{/* <Controls /> */}
-					</ReactFlow>
-				</div>
-			</Dropdown>
+					{showMinimap && (
+						<MiniMap
+							nodeColor={activeRoleColor}
+							nodeStrokeColor={"black"}
+							nodeStrokeWidth={6}
+							zoomable
+							maskStrokeColor="darkGray"
+							maskStrokeWidth={20}
+							pannable
+						/>
+					)}
+					{!roleIsToggled && (
+						<div
+							style={{
+								zIndex: 5000000,
+								backgroundColor: "darkGrey",
+								opacity: 0.5,
+								width: "100%",
+								height: "100%",
+								position: "relative",
+								cursor: "not-allowed",
+							}}
+						/>
+					)}
+					<Background variant={BackgroundVariant.Dots} />
+				</ReactFlow>
+			</div>
 		</>
 	);
 };
