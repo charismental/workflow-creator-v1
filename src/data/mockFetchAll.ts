@@ -1,7 +1,7 @@
 const processes = [
 	{
 		ProcessId: 1,
-		ProcessName: "WA DSHS Immigrant Relief 3",
+		processName: "WA DSHS Immigrant Relief 3",
 		roles: [
 			{
 				ProcessId: 1,
@@ -832,19 +832,19 @@ const processes = [
 	},
 	{
 		ProcessId: 5,
-		ProcessName: "Long Beach 1st HomeBuyer P1",
+		processName: "Long Beach 1st HomeBuyer P1",
 		roles: [],
 		states: [],
 	},
 	{
 		ProcessId: 9,
-		ProcessName: "Long Beach 1st HomeBuyer P2",
+		processName: "Long Beach 1st HomeBuyer P2",
 		roles: [],
 		states: [],
 	},
 	{
 		ProcessId: 12,
-		ProcessName: "Whatcom-LTRG",
+		processName: "Whatcom-LTRG",
 		roles: [],
 		states: [],
 	},

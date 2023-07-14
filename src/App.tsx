@@ -14,6 +14,7 @@ import { shallow } from "zustand/shallow";
 import Sidebar from "./components/Sidebar";
 import "reactflow/dist/style.css";
 import "./css/style.css";
+import getSessionProcess from "api/getSessionProcess";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -38,7 +39,7 @@ const activeRoleTitleStyle: CSSProperties = {
 const layoutContainer: CSSProperties = { width: "100%", height: "100vh" };
 
 const storeSelector = (state: MainActions & MainState) => ({
-	processes: state.processes,
+	sessions: state.sessions,
 	addProcess: state.addProcess,
 	toggleRoleForProcess: state.toggleRoleForProcess,
 	activeProcess: state.activeProcess,
@@ -50,7 +51,7 @@ const storeSelector = (state: MainActions & MainState) => ({
 	currentStates: state.states,
 	addNewState: state.addNewState,
 	addNewRole: state.addNewRole,
-	fetchAll: state.fetchAll,
+	getAllSessions: state.getAllSessions,
 	loading: state.globalLoading,
 	reactFlowInstance: state.reactFlowInstance,
 	updateRoleProperty: state.updateRoleProperty,
@@ -61,7 +62,7 @@ const storeSelector = (state: MainActions & MainState) => ({
 
 const WorkflowCreator = () => {
 	const {
-		processes,
+		sessions,
 		addProcess,
 		toggleRoleForProcess,
 		activeProcess,
@@ -74,7 +75,7 @@ const WorkflowCreator = () => {
 		addNewState,
 		updateRoleProperty,
 		addNewRole,
-		fetchAll,
+		getAllSessions,
 		loading,
 		reactFlowInstance,
 		Companies,
@@ -87,10 +88,16 @@ const WorkflowCreator = () => {
 	);
 
 	useEffect(() => {
-		fetchAll();
+		getAllSessions();
 	}, []);
 
 	const [messageApi, contextHolder] = message.useMessage();
+
+	const findProcessAndSetActive = (processName: string) => {
+		const foundProcess = sessions.find((p) => p.processName === processName);
+		const { sessionId = null } = foundProcess || {};
+		if (sessionId) getSessionProcess(sessionId).then((res) => setActiveProcess(res));
+	}
 
 	const activeRoleColor = roleColor({
 		roleName: activeRole,
@@ -99,27 +106,26 @@ const WorkflowCreator = () => {
 
 	const roleIsToggled = !!activeProcess?.roles?.some((r) => r.roleName === activeRole);
 
-	const availableStates = filteredStates(activeProcess?.states || []);
+	const availableStates = filteredStates((activeProcess?.states || []).sort((a, b) => (a?.displayOrder || 0) - (b?.displayOrder || 0)));
 
-	const availableProcesses = processes.map((p) => p.processName);
+	const availableSessions = sessions.map((p) => p.processName).sort((a, b) => a.localeCompare(b));
 
 	const roleList = roles.map(({ roleName }) => {
 		return {
 			label: roleName,
 			value: activeProcess?.roles?.some((r) => r.roleName === roleName) || false,
 		};
-	});
+	})
 
 	const companyList = Companies.map(({ companyName }) => {
 		return {
 			label: companyName,
 			value: activeProcess?.companies?.some((c) => c.companyName === companyName) || false,
 		};
-	});
+	}).sort((a, b) => a.label.localeCompare(b.label));
 
 	const addNewProcessAndSelect = ({ name }: { name: string }) => {
 		addProcess(name);
-		setActiveProcess(name);
 	};
 
 	const addNewRoleAndToggle = ({ name, color }: { name: string; color: string }) => {
@@ -181,11 +187,11 @@ const WorkflowCreator = () => {
 					<Header style={headerStyle}>
 						<SelectBox
 							useStyle={{ flexGrow: 1, maxWidth: "360px" }}
-							selectOnChange={setActiveProcess}
+							selectOnChange={findProcessAndSetActive}
 							addNew={addNewProcessAndSelect}
 							type="process"
 							selectValue={activeProcess?.processName}
-							items={availableProcesses}
+							items={availableSessions}
 							placeholder="Select Process"
 							hasColorInput={false}
 						/>

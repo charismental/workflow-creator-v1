@@ -99,7 +99,7 @@ export function transformTransitionsToEdges(
 	const mapper = (transition: WorkFlowTransition): Edge | any => {
 		const { stateName: source, toStateName: target, properties = {} } = transition;
 
-		const { sourceHandle = null, targetHandle = null } = properties;
+		const { sourceHandle = null, targetHandle = null } = properties || {};
 
 		return {
 			style: {
@@ -179,7 +179,7 @@ export function nodeByState({
 	const defaultYPadding = 40;
 	const divisor = 5; // todo: dynamic value based on allNodesLength if provided
 
-	const { x: propX, y: propY, w: propW, h: propH } = properties;
+	const { x: propX, y: propY, w: propW, h: propH } = properties || {};
 
 	const x = typeof propX === "number" ? propX : (index % divisor) * (defaultW + defaultXPadding);
 	const y =

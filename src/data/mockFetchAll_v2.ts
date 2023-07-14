@@ -4,6 +4,9 @@ const process: WorkflowProcess = {
 	processId: 8,
 	processName: "ladv",
 	sessionId: "5BB6AE0B-1B8D-4B28-A93F-03D2463E4992",
+	dateCreated: "2023-05-18T00:27:20.9533333Z",
+	dateUpdated: "2023-06-29T23:10:21.1566667Z",
+	datePublished: null,
 	globals: {
 		states: [
 			{

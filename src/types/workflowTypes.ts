@@ -1,9 +1,15 @@
 import { Nullable, NumberBoolean } from "./genericTypes";
 
-export interface WorkflowProcess {
+export interface WorkflowSession {
 	processId: Nullable<number>;
 	processName: string;
-	sessionId?: string;
+	sessionId: Nullable<string>;
+	dateCreated: Nullable<string>,
+	dateUpdated: Nullable<string>,
+	datePublished: Nullable<string>
+}
+
+export interface WorkflowProcess extends WorkflowSession {
 	globals: WorkflowGlobals;
 	states: Array<WorkflowState>;
 	roles: Array<WorkflowRole>;

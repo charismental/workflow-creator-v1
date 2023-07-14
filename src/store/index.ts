@@ -12,20 +12,21 @@ import {
 	applyNodeChanges,
 } from "reactflow";
 import { devtools } from "zustand/middleware";
-import getAllSessions from "api/getAllSessions";
+import getAllSessions from "api/getAllSessions"; // todo: import from index
+import getSessionProcess from "api/getSessionProcess";
 import {
 	WorkFlowTransition,
 	WorkflowProcess,
 	WorkflowRole,
 	WorkflowState,
 	WorkflowCompany,
+	WorkflowSession,
 } from "../types/workflowTypes";
 import { NumberBoolean } from "../types/genericTypes";
 
-// import mockFetchAll from "data/mockFetchAll_v2";
+// import mockGetAllSessions from "data/mockGetAllSessions_v2";
 import isEqual from "lodash.isequal";
 import { nodeByState, roleColor, stateByNode, transformNewConnectionToTransition } from "utils";
-const initialRole = "system";
 
 export interface MainState {
 	globalLoading: boolean;
@@ -38,6 +39,7 @@ export interface MainState {
 	showAllConnectedStates: boolean;
 	edgeType: string;
 	contextMenuNodeId: string | undefined;
+	sessions: WorkflowSession[];
 	processes: WorkflowProcess[];
 	states: WorkflowState[];
 	roles: WorkflowRole[];
@@ -46,11 +48,11 @@ export interface MainState {
 }
 
 export interface MainActions {
-	fetchAll: (env?: string) => Promise<any>;
+	getAllSessions: (env?: string) => Promise<any>;
 	setActiveRole: (role: string) => void;
-	addProcess: (ProcessName: string) => void;
+	addProcess: (processName: string) => void;
 	updateProcess: (payload: { processIndex: number; process: WorkflowProcess }) => void;
-	deleteProcess: (ProcessName: string) => void;
+	deleteProcess: (processName: string) => void;
 	toggleRoleForProcess: (role: string, color?: string) => void;
 	toggleCompanyForProcess: (company: string) => void;
 	updateRoleProperty: (payload: { role: string; property: string; value: any }) => void;
@@ -69,7 +71,7 @@ export interface MainActions {
 		stateName: string;
 		properties: { x?: number; y?: number; h?: number; w?: number };
 	}) => void;
-	setActiveProcess: (ProcessName: string) => void;
+	setActiveProcess: (process: WorkflowProcess) => void;
 	setColorForActiveRole: (newColor: string) => void;
 	setReactFlowInstance: (instance: ReactFlowInstance) => void;
 	setShowMinimap: () => void;
@@ -86,6 +88,7 @@ const useMainStore = create<MainState & MainActions>()(
 	// persist(
 	devtools(
 		(set, get) => ({
+			sessions: [],
 			hoveredEdgeNodes: [],
 			setHoveredEdgeNodes: (nodes: string[]) => {
 				set({ hoveredEdgeNodes: nodes });
@@ -115,15 +118,19 @@ const useMainStore = create<MainState & MainActions>()(
 				set({ contextMenuNodeId: nodeId });
 			},
 			activeProcess: null,
-			fetchAll: async (env?: string) => {
+			getAllSessions: async (env?: string) => {
 				set({ globalLoading: true }, false, "globalLoading");
-				const waitTime = Math.random() * (2500 - 500) + 500;
-				await new Promise((r) => setTimeout(r, waitTime));
-				// const { processes = [], roles = [], states = [] }: any = mockFetchAll;
-				const { processes = [], roles = [], states = [] }: any = getAllSessions();
-				set({ states, roles, processes, globalLoading: false }, false, "fetchAll");
-				const activeProcessName = processes[0]?.processName;
-				get().setActiveProcess(activeProcessName);
+				// const waitTime = Math.random() * (2500 - 500) + 500;
+				// await new Promise((r) => setTimeout(r, waitTime));
+				// const { processes = [], roles = [], states = [] }: any = mockGetAllSessions;
+				const sessions: WorkflowSession[] = await getAllSessions();
+				set({ sessions, globalLoading: false }, false, "getAllSessions");
+				const { sessionId = '' } = sessions?.[0] || {};
+				if (sessionId) {
+					const sessionProcess = await getSessionProcess(sessionId);
+
+					if (sessionProcess) get().setActiveProcess(sessionProcess);
+				}
 			},
 			globalLoading: false,
 			_hasHydrated: false,
@@ -361,33 +368,38 @@ const useMainStore = create<MainState & MainActions>()(
 					);
 				}
 			},
-			setActiveProcess: (processName: string) =>
+			setActiveProcess: (process: WorkflowProcess) =>
 				set(
-					({ processes, activeProcess }) => {
-						const processToSet = processes.find((p) => p.processName === processName);
+					() => {
+						const { globals } = process;
+						const { states, roles, companies } = globals;
+						const sortRoles = (roles: WorkflowRole[]) => [...roles].sort((a, b) => a.roleName.localeCompare(b.roleName));
+						const { roles: activeProcessRoles = [] } = process;
+						const activeRole = sortRoles(activeProcessRoles)?.[0]?.roleName || sortRoles(roles)?.[0]?.roleName || "";
+						// const processToSet = processes.find((p) => p.processName === processName);
 
-						const previousProcessIndex = processes.findIndex(
-							(p) => p.processName === activeProcess?.processName
-						);
+						// const previousProcessIndex = processes.findIndex(
+						// 	(p) => p.processName === activeProcess?.processName
+						// );
 
-						if (
-							activeProcess &&
-							previousProcessIndex !== -1 &&
-							!isEqual(processes[previousProcessIndex], activeProcess)
-						) {
-							const updatedProcesses = processes.map((p, i) =>
-								i !== previousProcessIndex ? { ...p } : { ...activeProcess }
-							);
+						// if (
+						// 	activeProcess &&
+						// 	previousProcessIndex !== -1 &&
+						// 	!isEqual(processes[previousProcessIndex], activeProcess)
+						// ) {
+						// 	const updatedProcesses = processes.map((p, i) =>
+						// 		i !== previousProcessIndex ? { ...p } : { ...activeProcess }
+						// 	);
 
-							return { activeProcess: processToSet, processes: updatedProcesses };
-						}
+						// 	return { activeProcess: processToSet, processes: updatedProcesses };
+						// }
 
-						return { activeProcess: processToSet };
+						return { activeProcess: process, states, roles: sortRoles(roles), companies, activeRole };
 					},
 					false,
 					"setActiveProcess"
 				),
-			activeRole: initialRole,
+			activeRole: '',
 			setActiveRole: (role) => set(() => ({ activeRole: role }), false, "setActiveRole"),
 			processes: [],
 			updateProcess: ({
@@ -408,17 +420,20 @@ const useMainStore = create<MainState & MainActions>()(
 				),
 			addProcess: (name: string) =>
 				set(
-					({ processes }) => {
+					({ processes, setActiveProcess, states, roles, companies }) => {
 						const newProcess: WorkflowProcess = {
 							processId: null,
+							sessionId: null,
 							processName: name,
-							sessionId: "",
-							globals: { states: get().states, roles: get().roles, companies: get().companies },
+							dateCreated: null,
+							dateUpdated: null,
+							datePublished: null,
+							globals: { states, roles, companies },
 							roles: [],
 							states: [],
 							companies: [],
 						};
-
+						setActiveProcess(newProcess);
 						return { processes: processes.concat(newProcess) };
 					},
 					false,
