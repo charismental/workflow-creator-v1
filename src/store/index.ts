@@ -14,6 +14,8 @@ import {
 import { devtools } from "zustand/middleware";
 import getAllSessions from "api/getAllSessions"; // todo: import from index
 import getSessionProcess from "api/getSessionProcess";
+import createProcess from "api/createProcess";
+
 import {
 	WorkFlowTransition,
 	WorkflowProcess,
@@ -25,7 +27,6 @@ import {
 import { NumberBoolean } from "../types/genericTypes";
 
 // import mockGetAllSessions from "data/mockGetAllSessions_v2";
-import isEqual from "lodash.isequal";
 import { nodeByState, roleColor, stateByNode, transformNewConnectionToTransition } from "utils";
 
 export interface MainState {
@@ -50,7 +51,7 @@ export interface MainState {
 export interface MainActions {
 	getAllSessions: (env?: string) => Promise<any>;
 	setActiveRole: (role: string) => void;
-	addProcess: (processName: string) => void;
+	addProcess: (processName: string) => void | any;
 	updateProcess: (payload: { processIndex: number; process: WorkflowProcess }) => void;
 	deleteProcess: (processName: string) => void;
 	toggleRoleForProcess: (role: string, color?: string) => void;
@@ -421,27 +422,17 @@ const useMainStore = create<MainState & MainActions>()(
 					false,
 					"updateProcess"
 				),
-			addProcess: (name: string) =>
-				set(
-					({ processes, setActiveProcess, states, roles, companies }) => {
-						const newProcess: WorkflowProcess = {
-							processId: null,
-							sessionId: null,
-							processName: name,
-							dateCreated: null,
-							dateUpdated: null,
-							datePublished: null,
-							globals: { states, roles, companies },
-							roles: [],
-							states: [],
-							companies: [],
-						};
-						setActiveProcess(newProcess);
-						return { processes: processes.concat(newProcess) };
-					},
+			addProcess: async (name: string) => {
+				const newProcess = await createProcess(name);
+				set(({ processes, setActiveProcess, sessions }) => {
+					const { globals, roles, states, companies, ...session } = newProcess;
+					setActiveProcess(newProcess);
+					return { processes: [...processes, newProcess], sessions: [...sessions, session] };
+				},
 					false,
 					"addProcess"
-				),
+				);
+			},
 			// fix
 			deleteProcess: (processName) =>
 				set(

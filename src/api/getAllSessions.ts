@@ -1,5 +1,5 @@
 import AxiosDefault from "./AxiosDefault";
-import { WorkflowProcess, WorkflowSession } from "../types/workflowTypes";
+import { WorkflowSession } from "../types/workflowTypes";
 import endpoints from "./endpointsEnum";
 
 // function lowercaseProperties(el: any): any {
