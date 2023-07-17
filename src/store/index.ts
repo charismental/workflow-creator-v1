@@ -210,9 +210,9 @@ const useMainStore = create<MainState & MainActions>()(
 							i !== foundStateIndex
 								? s
 								: {
-										...states[foundStateIndex],
-										properties: { ...states[foundStateIndex].properties, ...properties },
-								  }
+									...states[foundStateIndex],
+									properties: { ...states[foundStateIndex].properties, ...properties },
+								}
 						)
 					);
 				}
@@ -599,7 +599,7 @@ const useMainStore = create<MainState & MainActions>()(
 			},
 			addNewState: (name) => {
 				const { states } = get();
-				
+
 				if (!states.some(({ stateName }) => stateName === name)) {
 
 					const newState: WorkflowState = {
