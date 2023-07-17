@@ -65,7 +65,7 @@ export interface MainActions {
 	onNodesChange: OnNodesChange;
 	onConnect: OnConnect;
 	removeTransition: (payload: { source: string; target: string }) => void;
-	removeState: (StateName: string) => void;
+	removeState: (stateName: string) => void;
 	setStatesForActiveProcess: (States: WorkflowState[]) => void;
 	updateStateProperties: (payload: {
 		stateName: string;
@@ -257,7 +257,10 @@ const useMainStore = create<MainState & MainActions>()(
 				});
 
 				if (foundRoleIndex !== -1 && activeProcess) {
-					const { transitions = [] } = roles[foundRoleIndex];
+					const { transitions: roleTransitions } = roles[foundRoleIndex];
+
+					const transitions = roleTransitions || [];
+
 					const updatedConnection = {
 						...connection,
 						...(showAllRoles && {

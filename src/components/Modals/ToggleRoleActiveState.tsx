@@ -7,14 +7,14 @@ const { Title } = Typography;
 interface SetAsInactiveModalProps {
 	modalOpen: boolean;
 	setModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-	RoleName: string;
+	roleName: string;
 	toggleRoleForProcess: MainActions["toggleRoleForProcess"];
 	successMessage: () => void;
 }
 
 export default ({
 	toggleRoleForProcess,
-	RoleName,
+	roleName,
 	modalOpen,
 	setModalOpen,
 	successMessage,
@@ -33,7 +33,7 @@ export default ({
 			</>
 		),
 		onOk() {
-			toggleRoleForProcess(RoleName), successMessage();
+			toggleRoleForProcess(roleName), successMessage();
 		},
 		okText: "Clear All Properties",
 		okType: "primary",

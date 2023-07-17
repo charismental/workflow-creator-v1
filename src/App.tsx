@@ -139,14 +139,14 @@ const WorkflowCreator = () => {
 		toggleCompanyForProcess(name);
 	};
 
-	const openToggleActiveModal = (RoleName: string) => {
+	const openToggleActiveModal = (roleName: string) => {
 		setToggleInactiveModal(true);
 
 		ToggleRoleActiveState({
 			modalOpen: toggleInactiveModal,
-			RoleName: activeRole,
+			roleName: activeRole,
 			setModalOpen: setToggleInactiveModal,
-			toggleRoleForProcess: () => toggleRoleForProcess(RoleName),
+			toggleRoleForProcess: () => toggleRoleForProcess(roleName),
 			successMessage: activeStatusRemovedMessage,
 		});
 	};
@@ -154,7 +154,7 @@ const WorkflowCreator = () => {
 	const toggleRole = (roleName: string): void => {
 		const { transitions = [] } = activeProcess?.roles?.find((r) => r.roleName === roleName) || {};
 
-		if (transitions.length) openToggleActiveModal(roleName);
+		if (Array.isArray(transitions) && transitions.length) openToggleActiveModal(roleName);
 		else toggleRoleForProcess(roleName);
 	};
 
@@ -211,7 +211,7 @@ const WorkflowCreator = () => {
 								updateRoleProperty({ role: activeRole, property, value })
 							}
 							roleHasPropertyActive={(property: string) => {
-								const foundRole: any = activeProcess?.roles?.find((r: any) => r.RoleName === activeRole);
+								const foundRole: any = activeProcess?.roles?.find((r: any) => r.roleName === activeRole);
 
 								return !!foundRole?.[property];
 							}}
