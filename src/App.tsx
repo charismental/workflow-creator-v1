@@ -41,6 +41,7 @@ const layoutContainer: CSSProperties = { width: "100%", height: "100vh" };
 const storeSelector = (state: MainActions & MainState) => ({
 	sessions: state.sessions,
 	addProcess: state.addProcess,
+	deleteSession: state.deleteSession,
 	toggleRoleForProcess: state.toggleRoleForProcess,
 	activeProcess: state.activeProcess,
 	setActiveProcess: state.setActiveProcess,
@@ -81,6 +82,7 @@ const WorkflowCreator = () => {
 		Companies,
 		toggleCompanyForProcess,
 		addNewCompany,
+		deleteSession,
 	} = useMainStore(storeSelector, shallow);
 	const [toggleInactiveModal, setToggleInactiveModal] = useState(false);
 	const filteredStates = useMainStore(
@@ -109,6 +111,8 @@ const WorkflowCreator = () => {
 	const availableStates = filteredStates((activeProcess?.states || []).sort((a, b) => (a?.displayOrder || 0) - (b?.displayOrder || 0)));
 
 	const availableSessions = sessions.map((p) => p.processName).sort((a, b) => a.localeCompare(b));
+	// overkill
+	const publishedSessions = sessions.filter((p) => p.processId !== null).map((p) => p.processName);
 
 	const roleList = roles.map(({ roleName }) => {
 		return {
@@ -189,6 +193,8 @@ const WorkflowCreator = () => {
 							useStyle={{ flexGrow: 1, maxWidth: "360px" }}
 							selectOnChange={findProcessAndSetActive}
 							addNew={addNewProcessAndSelect}
+							canDelete={(el) => !publishedSessions.includes(el)}
+							deleteHandler={deleteSession}
 							type="process"
 							selectValue={activeProcess?.processName}
 							items={availableSessions}

@@ -1,4 +1,4 @@
-import { PlusCircleOutlined, PlusCircleTwoTone } from "@ant-design/icons";
+import { PlusCircleOutlined, PlusCircleTwoTone, DeleteTwoTone } from "@ant-design/icons";
 import { Checkbox, Divider, InputRef, Select, Space } from "antd";
 import React, { useRef, useState } from "react";
 import AddNewInput from "./AddNewInput";
@@ -16,6 +16,8 @@ interface SelectBoxProps {
 	placeholder?: string;
 	hasColorInput?: boolean;
 	multiselectHandler?: (el: any) => void;
+	canDelete?: (el: any) => boolean;
+	deleteHandler?: (el: any) => void;
 }
 
 const SelectBox: React.FC<SelectBoxProps> = ({
@@ -27,6 +29,8 @@ const SelectBox: React.FC<SelectBoxProps> = ({
 	type,
 	placeholder,
 	multiselectHandler,
+	canDelete,
+	deleteHandler,
 	isDraggable = false,
 	hasColorInput = false,
 }) => {
@@ -133,15 +137,27 @@ const SelectBox: React.FC<SelectBoxProps> = ({
 								onClick={() => selectOnChange && selectOnChange(label)}
 							>
 								<div>{label}</div>
-								{multiselectHandler && typeof item !== "string" && (
-									<Checkbox
-										checked={item.value}
-										onClick={(e: any) => {
-											e.stopPropagation();
-											multiselectHandler(item);
-										}}
-									/>
-								)}
+								<div style={{ display: "flex", justifyContent: "space-between", alignSelf: "center" }}>
+									{canDelete?.(item) && deleteHandler && (
+										<DeleteTwoTone
+											twoToneColor="#eb2f96"
+											onClick={(e: any) => {
+												e.stopPropagation();
+												deleteHandler(item);
+											}}
+										/>
+									)}
+									{multiselectHandler && typeof item !== "string" && (
+										<Checkbox
+											checked={item.value}
+											onClick={(e: any) => {
+												e.stopPropagation();
+												multiselectHandler(item);
+											}}
+										/>
+									)}
+
+								</div>
 							</div>
 						)}
 					</Option>

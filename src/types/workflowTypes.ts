@@ -3,7 +3,7 @@ import { Nullable, NumberBoolean } from "./genericTypes";
 export interface WorkflowSession {
 	processId: Nullable<number>;
 	processName: string;
-	sessionId: Nullable<string>;
+	sessionId: string;
 	dateCreated: Nullable<string>,
 	dateUpdated: Nullable<string>,
 	datePublished: Nullable<string>

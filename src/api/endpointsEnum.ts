@@ -6,4 +6,5 @@ export default {
     getAllSessions: "/api/GetAllSessions",
     saveProcess: "/api/SaveProcess",
     publishProcess: "/api/PublishProcess",
+    deleteSession: "api/DeleteSession",
 }
