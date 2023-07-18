@@ -59,6 +59,7 @@ const storeSelector = (state: MainActions & MainState) => ({
 	Companies: state.companies,
 	toggleCompanyForProcess: state.toggleCompanyForProcess,
 	addNewCompany: state.addNewCompany,
+	cloneProcess: state.cloneProcess,
 });
 
 const WorkflowCreator = () => {
@@ -83,6 +84,7 @@ const WorkflowCreator = () => {
 		toggleCompanyForProcess,
 		addNewCompany,
 		deleteSession,
+		cloneProcess,
 	} = useMainStore(storeSelector, shallow);
 	const [toggleInactiveModal, setToggleInactiveModal] = useState(false);
 	const filteredStates = useMainStore(
@@ -194,7 +196,9 @@ const WorkflowCreator = () => {
 							selectOnChange={findProcessAndSetActive}
 							addNew={addNewProcessAndSelect}
 							canDelete={(el) => !publishedSessions.includes(el)}
+							canClone={(el) => !publishedSessions.includes(el)}
 							deleteHandler={deleteSession}
+							cloneHandler={cloneProcess}
 							type="process"
 							selectValue={activeProcess?.processName}
 							items={availableSessions}

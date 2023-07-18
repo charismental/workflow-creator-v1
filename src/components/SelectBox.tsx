@@ -1,4 +1,4 @@
-import { PlusCircleOutlined, PlusCircleTwoTone, DeleteTwoTone } from "@ant-design/icons";
+import { PlusCircleOutlined, PlusCircleTwoTone, DeleteTwoTone, CopyTwoTone } from "@ant-design/icons";
 import { Checkbox, Divider, InputRef, Select, Space } from "antd";
 import React, { useRef, useState } from "react";
 import AddNewInput from "./AddNewInput";
@@ -17,7 +17,9 @@ interface SelectBoxProps {
 	hasColorInput?: boolean;
 	multiselectHandler?: (el: any) => void;
 	canDelete?: (el: any) => boolean;
+	canClone?: (el: any) => boolean;
 	deleteHandler?: (el: any) => void;
+	cloneHandler?: (el: any) => void;
 }
 
 const SelectBox: React.FC<SelectBoxProps> = ({
@@ -30,7 +32,9 @@ const SelectBox: React.FC<SelectBoxProps> = ({
 	placeholder,
 	multiselectHandler,
 	canDelete,
+	canClone,
 	deleteHandler,
+	cloneHandler,
 	isDraggable = false,
 	hasColorInput = false,
 }) => {
@@ -138,6 +142,15 @@ const SelectBox: React.FC<SelectBoxProps> = ({
 							>
 								<div>{label}</div>
 								<div style={{ display: "flex", justifyContent: "space-between", alignSelf: "center" }}>
+									{canClone?.(item) && cloneHandler && (
+										<CopyTwoTone
+											style={{ marginRight: "4px" }}
+											onClick={(e: any) => {
+												e.stopPropagation();
+												cloneHandler(item);
+											}}
+										/>
+									)}
 									{canDelete?.(item) && deleteHandler && (
 										<DeleteTwoTone
 											twoToneColor="#eb2f96"
@@ -156,7 +169,6 @@ const SelectBox: React.FC<SelectBoxProps> = ({
 											}}
 										/>
 									)}
-
 								</div>
 							</div>
 						)}

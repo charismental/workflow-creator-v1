@@ -15,6 +15,7 @@ import getAllSessions from "api/getAllSessions"; // todo: import from index
 import getSessionProcess from "api/getSessionProcess";
 import createProcess from "api/createProcess";
 import deleteSession from "api/deleteSession";
+import cloneProcess from "api/cloneProcess";
 
 import {
     WorkFlowTransition,
@@ -51,6 +52,7 @@ export interface MainState {
 export interface MainActions {
     getAllSessions: (env?: string) => Promise<any>;
     deleteSession: (sessionId: string) => Promise<void>;
+    cloneProcess: (processName: string) => Promise<void>;
     setActiveRole: (role: string) => void;
     addProcess: (processName: string) => void | any;
     updateProcess: (payload: { processIndex: number; process: WorkflowProcess }) => void;
@@ -136,7 +138,16 @@ const useMainStore = create<MainState & MainActions>()(
                     )
                 }
             },
-            getAllSessions: async (env?: string) => {
+            cloneProcess: async (processName: string) => {
+                // const { sessions } = get();
+                // todo: make it better
+                const cloned = await cloneProcess({ processName, newProcessName: `${processName} - Copy` });
+
+                if (cloned?.sessionId) {
+                    get().setActiveProcess(cloned);
+                }
+            },
+            getAllSessions: async () => {
                 set({ globalLoading: true }, false, "globalLoading");
                 const sessions: WorkflowSession[] = await getAllSessions();
                 set({ sessions, globalLoading: false }, false, "getAllSessions");
