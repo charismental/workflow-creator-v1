@@ -22,13 +22,21 @@ import {
 	useStore,
 	useStoreApi,
 } from "reactflow";
-import useMainStore from "store";
 import DownloadButton from "tools/DownloadImage";
 import { shallow } from "zustand/shallow";
 import EdgeModal from "../Modals/EdgeModal";
 import NodeModal from "../Modals/NodeModal";
 import CustomControlButtonWithTooltip from "./CustomControlButtonWithTooltip";
 import MapSvg from "./MapSvg";
+import {
+	setEdgeType,
+	useMainState,
+	toggleShowAllRoles,
+	setShowAllConnectedStates,
+	setShowMinimap,
+	saveStateSnapshot,
+	revertToSnapshot,
+} from "../../store";
 
 interface CustomControlsProps {
 	getCurrentEdges: (() => Edge[]) | undefined;
@@ -52,20 +60,7 @@ export default ({
 	const [currentEdges, setCurrentEdges] = useState<Edge[]>([]);
 	const [currentNodes, setCurrentNodes] = useState<Node[]>([]);
 	const [nodeModalOpen, setNodeModalOpen] = useState(false);
-	const setShowMinimap = useMainStore(useCallback((state) => state.setShowMinimap, []));
-	const [showAllRoles, toggleShowAllRoles, setShowAllConnectedStates, setEdgeType, edgeType, saveStateSnapshot, revertToSnapshot] =
-		useMainStore(
-			(state) => [
-				state.showAllRoles,
-				state.toggleShowAllRoles,
-				state.setShowAllConnectedStates,
-				state.setEdgeType,
-				state.edgeType,
-				state.saveStateSnapshot,
-				state.revertToSnapshot,
-			],
-			shallow
-		);
+	const { showAllRoles, edgeType } = useMainState();
 
 	const onToggleInteractivity = (status = !isInteractive) => {
 		store.setState({

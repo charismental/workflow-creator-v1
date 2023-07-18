@@ -22,10 +22,10 @@ import endpoints from "./endpointsEnum";
 
 export default async (env?: string): Promise<WorkflowSession[]> => {
 	const { data = [] } = await AxiosDefault.get(endpoints.getAllSessions, {
-		validateStatus(status) {
+		validateStatus(status: any) {
 			return status < 500;
 		},
-	})
+	});
 
 	return data;
 };

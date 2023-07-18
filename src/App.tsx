@@ -7,8 +7,22 @@ import SelectBox from "components/SelectBox";
 import StateCollapseBox from "components/StateCollapseBox";
 import { CSSProperties, useCallback, useEffect, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
-import type { MainActions, MainState } from "store";
-import useMainStore from "store";
+import {
+	MainState,
+	useMainState,
+	addProcess,
+	toggleRoleForProcess,
+	setActiveProcess,
+	setActiveRole,
+	setColorForActiveRole,
+	addNewState,
+	updateRoleProperty,
+	addNewRole,
+	filteredStates,
+	getAllSessionsFromApi,
+	toggleCompanyForProcess,
+	addNewCompany,
+} from "./store";
 import { roleColor } from "utils";
 import { shallow } from "zustand/shallow";
 import Sidebar from "./components/Sidebar";
@@ -16,6 +30,16 @@ import "reactflow/dist/style.css";
 import "./css/style.css";
 import getSessionProcess from "api/getSessionProcess";
 
+const {
+	sessions,
+	activeProcess,
+	activeRole,
+	roles,
+	globalLoading,
+	reactFlowInstance,
+	companies,
+	states: currentStates,
+} = useMainState();
 const { Header, Content } = Layout;
 const { Title } = Typography;
 
@@ -38,57 +62,11 @@ const activeRoleTitleStyle: CSSProperties = {
 
 const layoutContainer: CSSProperties = { width: "100%", height: "100vh" };
 
-const storeSelector = (state: MainActions & MainState) => ({
-	sessions: state.sessions,
-	addProcess: state.addProcess,
-	toggleRoleForProcess: state.toggleRoleForProcess,
-	activeProcess: state.activeProcess,
-	setActiveProcess: state.setActiveProcess,
-	activeRole: state.activeRole,
-	setActiveRole: state.setActiveRole,
-	roles: state.roles,
-	setColorForActiveRole: state.setColorForActiveRole,
-	currentStates: state.states,
-	addNewState: state.addNewState,
-	addNewRole: state.addNewRole,
-	getAllSessions: state.getAllSessions,
-	loading: state.globalLoading,
-	reactFlowInstance: state.reactFlowInstance,
-	updateRoleProperty: state.updateRoleProperty,
-	Companies: state.companies,
-	toggleCompanyForProcess: state.toggleCompanyForProcess,
-	addNewCompany: state.addNewCompany,
-});
-
 const WorkflowCreator = () => {
-	const {
-		sessions,
-		addProcess,
-		toggleRoleForProcess,
-		activeProcess,
-		setActiveProcess,
-		activeRole,
-		setActiveRole,
-		roles,
-		setColorForActiveRole,
-		currentStates,
-		addNewState,
-		updateRoleProperty,
-		addNewRole,
-		getAllSessions,
-		loading,
-		reactFlowInstance,
-		Companies,
-		toggleCompanyForProcess,
-		addNewCompany,
-	} = useMainStore(storeSelector, shallow);
 	const [toggleInactiveModal, setToggleInactiveModal] = useState(false);
-	const filteredStates = useMainStore(
-		useCallback((state) => state.filteredStates, [currentStates])
-	);
 
 	useEffect(() => {
-		getAllSessions();
+		getAllSessionsFromApi();
 	}, []);
 
 	const [messageApi, contextHolder] = message.useMessage();
@@ -97,7 +75,7 @@ const WorkflowCreator = () => {
 		const foundProcess = sessions.find((p) => p.processName === processName);
 		const { sessionId = null } = foundProcess || {};
 		if (sessionId) getSessionProcess(sessionId).then((res) => setActiveProcess(res));
-	}
+	};
 
 	const activeRoleColor = roleColor({
 		roleName: activeRole,
@@ -106,7 +84,15 @@ const WorkflowCreator = () => {
 
 	const roleIsToggled = !!activeProcess?.roles?.some((r) => r.roleName === activeRole);
 
-	const availableStates = filteredStates((activeProcess?.states || []).sort((a, b) => (a?.displayOrder || 0) - (b?.displayOrder || 0)));
+	const availableStates = useCallback(
+		() =>
+			filteredStates(
+				(activeProcess?.states || []).sort(
+					(a, b) => (a?.displayOrder || 0) - (b?.displayOrder || 0)
+				)
+			),
+		[currentStates]
+	);
 
 	const availableSessions = sessions.map((p) => p.processName).sort((a, b) => a.localeCompare(b));
 
@@ -115,14 +101,16 @@ const WorkflowCreator = () => {
 			label: roleName,
 			value: activeProcess?.roles?.some((r) => r.roleName === roleName) || false,
 		};
-	})
+	});
 
-	const companyList = Companies.map(({ companyName }) => {
-		return {
-			label: companyName,
-			value: activeProcess?.companies?.some((c) => c.companyName === companyName) || false,
-		};
-	}).sort((a, b) => a.label.localeCompare(b.label));
+	const companyList = companies
+		.map(({ companyName }) => {
+			return {
+				label: companyName,
+				value: activeProcess?.companies?.some((c) => c.companyName === companyName) || false,
+			};
+		})
+		.sort((a, b) => a.label.localeCompare(b.label));
 
 	const addNewProcessAndSelect = ({ name }: { name: string }) => {
 		addProcess(name);
@@ -167,7 +155,7 @@ const WorkflowCreator = () => {
 		});
 	};
 
-	if (loading) {
+	if (globalLoading) {
 		return (
 			<Spin
 				size="large"
@@ -211,7 +199,9 @@ const WorkflowCreator = () => {
 								updateRoleProperty({ role: activeRole, property, value })
 							}
 							roleHasPropertyActive={(property: string) => {
-								const foundRole: any = activeProcess?.roles?.find((r: any) => r.roleName === activeRole);
+								const foundRole: any = activeProcess?.roles?.find(
+									(r: any) => r.roleName === activeRole
+								);
 
 								return !!foundRole?.[property];
 							}}
@@ -236,7 +226,7 @@ const WorkflowCreator = () => {
 					children={
 						<>
 							<StateCollapseBox
-								items={availableStates}
+								items={availableStates()}
 								addNew={addNewState}
 								roleColor={activeRoleColor}
 								disabled={!activeProcess?.roles?.some((r) => r.roleName === activeRole)}
