@@ -38,6 +38,7 @@ const selector = (state: MainState & MainActions) => ({
 	showAllConnectedStates: state.showAllConnectedStates,
 	setContextMenuNodeId: state.setContextMenuNodeId,
 	contextMenuNodeId: state.contextMenuNodeId,
+	states: state.states,
 });
 
 interface ReactFlowBaseProps {
@@ -65,6 +66,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		showAllConnectedStates,
 		setContextMenuNodeId,
 		contextMenuNodeId,
+		states,
 	} = useMainStore(selector, shallow);
 
 	const { activeRole, activeRoleColor, roleIsToggled } = props;
@@ -144,13 +146,18 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
 			const initialNumberBoolean: NumberBoolean = 0;
 
+			// let displayOrder = 10;
+			// if (activeProcessStates.length) {
+			// 	displayOrder = Math.max(...activeProcessStates.map(({ displayOrder = 0 }) => displayOrder || 0)) + 10
+			// }
+			const foundState = states.find((s) => s.stateName === type);
+
 			const newState = {
+				...(foundState && { ...foundState }),
 				requiresRoleAssignment: initialNumberBoolean,
 				requiresUserAssignment: initialNumberBoolean,
 				stateName: type,
-				stateId: null,
-				displayOrder:
-					Math.max(...activeProcessStates.map(({ displayOrder }) => displayOrder || 0)) + 10,
+				stateId: foundState?.stateId || null,
 				properties: { ...position },
 			};
 

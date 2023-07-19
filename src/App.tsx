@@ -1,4 +1,5 @@
-import { Layout, Space, Spin, Typography, message } from "antd";
+import { Button, Layout, Space, Spin, Typography, message } from "antd";
+import { SaveTwoTone } from "@ant-design/icons";
 import ActiveRoleSettings from "components/ActiveRoleSettings";
 import CustomControls from "components/CustomControls/CustomControls";
 import ToggleRoleActiveState from "components/Modals/ToggleRoleActiveState";
@@ -60,6 +61,7 @@ const storeSelector = (state: MainActions & MainState) => ({
 	toggleCompanyForProcess: state.toggleCompanyForProcess,
 	addNewCompany: state.addNewCompany,
 	cloneProcess: state.cloneProcess,
+	saveProcess: state.saveProcess,
 });
 
 const WorkflowCreator = () => {
@@ -85,6 +87,7 @@ const WorkflowCreator = () => {
 		addNewCompany,
 		deleteSession,
 		cloneProcess,
+		saveProcess,
 	} = useMainStore(storeSelector, shallow);
 	const [toggleInactiveModal, setToggleInactiveModal] = useState(false);
 	const filteredStates = useMainStore(
@@ -191,20 +194,24 @@ const WorkflowCreator = () => {
 			<Layout style={layoutContainer}>
 				<Layout>
 					<Header style={headerStyle}>
-						<SelectBox
-							useStyle={{ flexGrow: 1, maxWidth: "360px" }}
-							selectOnChange={findProcessAndSetActive}
-							addNew={addNewProcessAndSelect}
-							canDelete={(el) => !publishedSessions.includes(el)}
-							canClone={(el) => publishedSessions.includes(el)}
-							deleteHandler={deleteSession}
-							cloneHandler={cloneProcess}
-							type="process"
-							selectValue={activeProcess?.processName}
-							items={availableSessions}
-							placeholder="Select Process"
-							hasColorInput={false}
-						/>
+						<div>
+							<SelectBox
+								useStyle={{ flexGrow: 1, maxWidth: "360px" }}
+								selectOnChange={findProcessAndSetActive}
+								addNew={addNewProcessAndSelect}
+								canDelete={(el) => !publishedSessions.includes(el)}
+								canClone={(el) => publishedSessions.includes(el)}
+								deleteHandler={deleteSession}
+								cloneHandler={cloneProcess}
+								type="process"
+								selectValue={activeProcess?.processName}
+								items={availableSessions}
+								placeholder="Select Process"
+								hasColorInput={false}
+							/>
+							{/* compute saveDisabled prop, handle twoToneColor for disabled */}
+							<Button onClick={saveProcess} style={{ marginLeft: '6px' }} size="large" type="text" icon={<SaveTwoTone />} />
+						</div>
 						<Title
 							level={2}
 							style={activeRoleTitleStyle}

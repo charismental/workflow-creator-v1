@@ -16,6 +16,7 @@ import getSessionProcess from "api/getSessionProcess";
 import createProcess from "api/createProcess";
 import deleteSession from "api/deleteSession";
 import cloneProcess from "api/cloneProcess";
+import saveProcess from "api/saveProcess";
 
 import {
     WorkFlowTransition,
@@ -53,6 +54,7 @@ export interface MainActions {
     getAllSessions: (env?: string) => Promise<any>;
     deleteSession: (sessionId: string) => Promise<void>;
     cloneProcess: (processName: string) => Promise<void>;
+    saveProcess: () => Promise<void>;
     setActiveRole: (role: string) => void;
     addProcess: (processName: string) => void | any;
     updateProcess: (payload: { processIndex: number; process: WorkflowProcess }) => void;
@@ -137,6 +139,18 @@ const useMainStore = create<MainState & MainActions>()(
                         "deleteSession",
                     )
                 }
+            },
+            saveProcess: async () => {
+                const { activeProcess, states, roles, companies } = get();
+                if (!activeProcess) return;
+
+                set({ globalLoading: true }, false, "globalLoading");
+                const savePayload = { ...activeProcess, globals: { states, roles, companies }}
+
+                const saved = await saveProcess(savePayload);
+
+                if (saved?.sessionId) get().setActiveProcess(saved);
+                set({ globalLoading: false }, false, "globalLoading");
             },
             cloneProcess: async (processName: string) => {
                 const { sessions } = get();
@@ -482,12 +496,14 @@ const useMainStore = create<MainState & MainActions>()(
                     "deleteProcess"
                 ),
             toggleRoleForProcess: (role, color) => {
-                const { activeProcess } = get();
+                const { activeProcess, roles: globalRoles } = get();
 
                 if (activeProcess) {
                     const { roles = [] } = activeProcess;
 
                     let updatedRoles = roles;
+
+                    const foundRole = globalRoles.find(({ roleName }) => roleName === role);
 
                     if (roles.some(({ roleName }) => roleName === role)) {
                         updatedRoles = roles.filter(({ roleName }) => roleName !== role);
@@ -495,7 +511,7 @@ const useMainStore = create<MainState & MainActions>()(
                         const initialNumberBoolean: NumberBoolean = 0;
 
                         const newRole: WorkflowRole = {
-                            roleId: null,
+                            roleId: foundRole?.roleId || null,
                             isCluster: initialNumberBoolean,
                             isUniversal: initialNumberBoolean,
                             roleName: role,
