@@ -287,7 +287,7 @@ const useMainStore = create<MainState & MainActions>()(
                 }
             },
             onConnect: (connection: Connection) => {
-                const { activeRole, activeProcess, showAllRoles } = get();
+                const { activeRole, activeProcess, showAllRoles, states } = get();
                 const { source, target } = connection;
 
                 const { roles = [] } = activeProcess || {};
@@ -311,7 +311,7 @@ const useMainStore = create<MainState & MainActions>()(
                 });
 
                 if (foundRoleIndex !== -1 && activeProcess) {
-                    const { transitions: roleTransitions } = roles[foundRoleIndex];
+                    const { transitions: roleTransitions, roleId, roleName } = roles[foundRoleIndex];
 
                     const transitions = roleTransitions || [];
 
@@ -322,7 +322,13 @@ const useMainStore = create<MainState & MainActions>()(
                             target: removeIndexPrefixFromName(roleIndexStr, target || ""),
                         }),
                     };
-                    const newTransition = transformNewConnectionToTransition(updatedConnection, transitions);
+                    const newTransition = transformNewConnectionToTransition({
+                        connection: updatedConnection,
+                        existingTransitions: transitions,
+                        allStates: states,
+                        roleId,
+                        roleName,
+                    });
 
                     const updatedTransitions = [...transitions, ...(newTransition ? [newTransition] : [])];
 

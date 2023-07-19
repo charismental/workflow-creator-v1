@@ -124,8 +124,19 @@ export function transformTransitionsToEdges(
 
 // might get weird mama
 export function transformNewConnectionToTransition(
+{
+	connection,
+	existingTransitions,
+	allStates,
+	roleId,
+	roleName,
+}: {
 	connection: Connection,
-	existingTransitions: WorkFlowTransition[]
+	existingTransitions: WorkFlowTransition[],
+	allStates: WorkflowState[],
+	roleId: Nullable<number>,
+	roleName: string,
+}
 ): WorkFlowTransition | null {
 	const { source, target, sourceHandle, targetHandle } = connection;
 
@@ -133,17 +144,22 @@ export function transformNewConnectionToTransition(
 		({ stateName, toStateName }) => source === stateName && target === toStateName
 	);
 
+	const foundState = (name: string): WorkflowState | undefined => {
+		return allStates.find((s) => s.stateName === name);
+	}
+
+	const foundFromState = foundState(source || '');
+	const foundToState = foundState(target || '');
+
 	return (
 		foundTransition ||
 		(source && target
 			? {
-					stateId: null,
-					processId: null,
-					roleId: null,
-					roleName: null,
-					processName: null,
+					stateId: foundFromState?.stateId || null,
+					altStateId: foundToState?.stateId || null,
+					roleId,
+					roleName,
 					internalOnly: false,
-					stateTransitionId: null,
 					stateName: source,
 					toStateName: target,
 					properties: { sourceHandle, targetHandle },

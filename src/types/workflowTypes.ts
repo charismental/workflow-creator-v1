@@ -23,16 +23,12 @@ export interface WorkflowGlobals {
 }
 
 export interface WorkFlowTransition {
-	stateTransitionId: Nullable<number>;
 	stateId: Nullable<number>;
 	stateName: string;
 	roleId: Nullable<number>;
 	roleName: Nullable<string>;
 	altStateId?: Nullable<number>;
-	toStateId?: Nullable<number>;
 	toStateName: string;
-	processId: Nullable<number>;
-	processName: Nullable<string>;
 	internalOnly: boolean;
 	properties?: {
 		sourceHandle?: string | null;
