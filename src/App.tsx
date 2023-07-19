@@ -196,7 +196,7 @@ const WorkflowCreator = () => {
 							selectOnChange={findProcessAndSetActive}
 							addNew={addNewProcessAndSelect}
 							canDelete={(el) => !publishedSessions.includes(el)}
-							canClone={(el) => !publishedSessions.includes(el)}
+							canClone={(el) => publishedSessions.includes(el)}
 							deleteHandler={deleteSession}
 							cloneHandler={cloneProcess}
 							type="process"

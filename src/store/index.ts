@@ -139,9 +139,23 @@ const useMainStore = create<MainState & MainActions>()(
                 }
             },
             cloneProcess: async (processName: string) => {
-                // const { sessions } = get();
-                // todo: make it better
-                const cloned = await cloneProcess({ processName, newProcessName: `${processName} - Copy` });
+                const { sessions } = get();
+                const invalidNames = sessions.map(({ processName }) => processName);
+
+                const nameUpdater = (name: string, invalid: string[] = []): string => {
+                    let updatedName = name;
+                    const namePieces = updatedName.split(' - copy');
+                    const currentCount = parseInt(namePieces[1], 10) || 0;
+
+                    if (namePieces.length === 1) (updatedName += ' - copy 1');
+                    else (updatedName = `${namePieces[0]} - copy ${currentCount + 1}`);
+
+                    return invalid.includes(updatedName) ?
+                        nameUpdater(updatedName) :
+                        updatedName;
+                }
+
+                const cloned = await cloneProcess({ processName, newProcessName: nameUpdater(processName, invalidNames) });
 
                 if (cloned?.sessionId) {
                     get().setActiveProcess(cloned);
