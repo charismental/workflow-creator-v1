@@ -196,7 +196,7 @@ const WorkflowCreator = () => {
 					<Header style={headerStyle}>
 						<div>
 							<SelectBox
-								useStyle={{ flexGrow: 1, maxWidth: "360px" }}
+								useStyle={{ maxWidth: "360px", minWidth: "300px" }}
 								selectOnChange={findProcessAndSetActive}
 								addNew={addNewProcessAndSelect}
 								canDelete={(el) => !publishedSessions.includes(el)}
