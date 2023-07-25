@@ -141,11 +141,13 @@ const useMainStore = create<MainState & MainActions>()(
                 }
             },
             saveProcess: async () => {
-                const { activeProcess, states, roles, companies } = get();
+                const { activeProcess } = get();
                 if (!activeProcess) return;
 
                 set({ globalLoading: true }, false, "globalLoading");
-                const savePayload = { ...activeProcess, globals: { states, roles, companies }}
+                // not necessary to include globals in payload
+                const { globals, ...activeProcessWithoutGlobals } = activeProcess;
+                const savePayload = { ...activeProcessWithoutGlobals}
 
                 const saved = await saveProcess(savePayload);
 
@@ -435,7 +437,7 @@ const useMainStore = create<MainState & MainActions>()(
                 set(
                     () => {
                         const { globals } = process;
-                        const { states, roles, companies } = globals;
+                        const { states = [], roles = [], companies = [] } = globals || {};
                         const sortRoles = (roles: WorkflowRole[]) => [...roles].sort((a, b) => a.roleName.localeCompare(b.roleName));
                         const { roles: activeProcessRoles = [] } = process;
                         const activeRole = sortRoles(activeProcessRoles)?.[0]?.roleName || sortRoles(roles)?.[0]?.roleName || "";

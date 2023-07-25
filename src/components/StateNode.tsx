@@ -77,7 +77,7 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 	const targetHandleStyle = { zIndex: isTarget ? 3 : 1 };
 
 	// do something here => initial width: 200, minWidth: 50?
-	const minWidth = 200;
+	const minWidth = 120;
 	const minHeight = 30;
 
 	const handleDisplayOrderChange = (e: React.ChangeEvent<HTMLInputElement>) => {

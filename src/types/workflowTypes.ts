@@ -10,7 +10,7 @@ export interface WorkflowSession {
 }
 
 export interface WorkflowProcess extends WorkflowSession {
-	globals: WorkflowGlobals;
+	globals?: WorkflowGlobals;
 	states: Array<WorkflowState>;
 	roles: Array<WorkflowRole>;
 	companies: Array<WorkflowCompany>;

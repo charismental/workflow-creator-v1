@@ -144,7 +144,6 @@ const SelectBox: React.FC<SelectBoxProps> = ({
 								<div style={{ display: "flex", justifyContent: "space-between", alignSelf: "center" }}>
 									{canClone?.(item) && cloneHandler && (
 										<CopyTwoTone
-											style={{ marginRight: "4px" }}
 											onClick={(e: any) => {
 												e.stopPropagation();
 												cloneHandler(item);
@@ -154,6 +153,7 @@ const SelectBox: React.FC<SelectBoxProps> = ({
 									{canDelete?.(item) && deleteHandler && (
 										<DeleteTwoTone
 											twoToneColor="#eb2f96"
+											style={{ marginLeft: "4px" }}
 											onClick={(e: any) => {
 												e.stopPropagation();
 												deleteHandler(item);
