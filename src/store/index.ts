@@ -147,7 +147,7 @@ const useMainStore = create<MainState & MainActions>()(
                 set({ globalLoading: true }, false, "globalLoading");
                 // not necessary to include globals in payload
                 const { globals, ...activeProcessWithoutGlobals } = activeProcess;
-                const savePayload = { ...activeProcessWithoutGlobals}
+                const savePayload = { ...activeProcessWithoutGlobals }
 
                 const saved = await saveProcess(savePayload);
 
@@ -167,14 +167,40 @@ const useMainStore = create<MainState & MainActions>()(
                     else (updatedName = `${namePieces[0]} - copy ${currentCount + 1}`);
 
                     return invalid.includes(updatedName) ?
-                        nameUpdater(updatedName) :
+                        nameUpdater(updatedName, invalid) :
                         updatedName;
                 }
 
                 const cloned = await cloneProcess({ processName, newProcessName: nameUpdater(processName, invalidNames) });
 
                 if (cloned?.sessionId) {
+                    const {
+                        dateCreated = null,
+                        datePublished = null,
+                        dateUpdated = null,
+                        processId = null,
+                        processName,
+                        sessionId,
+                    } = cloned
+
+                    const clonedSession = {
+                        dateCreated,
+                        datePublished,
+                        dateUpdated,
+                        processId,
+                        processName,
+                        sessionId,
+                    }
+
                     get().setActiveProcess(cloned);
+
+                    set(
+                        {
+                            sessions: [...sessions, clonedSession]
+                        },
+                        false,
+                        "cloneProcess"
+                    );
                 }
             },
             getAllSessions: async () => {
