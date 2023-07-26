@@ -30,6 +30,7 @@ import { NumberBoolean } from "../types/genericTypes";
 
 // import mockGetAllSessions from "data/mockGetAllSessions_v2";
 import { nodeByState, roleColor, stateByNode, transformNewConnectionToTransition } from "utils";
+import isEqual from "lodash.isequal";
 
 export interface MainState {
     globalLoading: boolean;
@@ -48,9 +49,11 @@ export interface MainState {
     roles: WorkflowRole[];
     companies: WorkflowCompany[];
     hoveredEdgeNodes: string[];
+    unsavedChanges: boolean;
 }
 
 export interface MainActions {
+    setUnsavedChanges: (status: boolean) => void;
     getAllSessions: (env?: string) => Promise<any>;
     deleteSession: (sessionId: string) => Promise<void>;
     cloneProcess: (processName: string) => Promise<void>;
@@ -58,7 +61,6 @@ export interface MainActions {
     setActiveRole: (role: string) => void;
     addProcess: (processName: string) => void | any;
     updateProcess: (payload: { processIndex: number; process: WorkflowProcess }) => void;
-    deleteProcess: (processName: string) => void;
     toggleRoleForProcess: (role: string, color?: string) => void;
     toggleCompanyForProcess: (company: string) => void;
     updateRoleProperty: (payload: { role: string; property: string; value: any }) => void;
@@ -94,6 +96,8 @@ const useMainStore = create<MainState & MainActions>()(
     // persist(
     devtools(
         (set, get) => ({
+            unsavedChanges: false,
+            setUnsavedChanges: (status) => set({ unsavedChanges: status }),
             sessions: [],
             hoveredEdgeNodes: [],
             setHoveredEdgeNodes: (nodes: string[]) => {
@@ -152,7 +156,7 @@ const useMainStore = create<MainState & MainActions>()(
                 const saved = await saveProcess(savePayload);
 
                 if (saved?.sessionId) get().setActiveProcess(saved);
-                set({ globalLoading: false }, false, "globalLoading");
+                set({ globalLoading: false, unsavedChanges: false }, false, "globalLoading");
             },
             cloneProcess: async (processName: string) => {
                 const { sessions } = get();
@@ -196,7 +200,8 @@ const useMainStore = create<MainState & MainActions>()(
 
                     set(
                         {
-                            sessions: [...sessions, clonedSession]
+                            sessions: [...sessions, clonedSession],
+                            unsavedChanges: false,
                         },
                         false,
                         "cloneProcess"
@@ -255,17 +260,18 @@ const useMainStore = create<MainState & MainActions>()(
                     );
 
                     const updatedNodes = applyNodeChanges(mappedChanges, nodes);
+                    const updatedStates = updatedNodes.map((node) =>
+                        stateByNode({
+                            node: { ...node, data: { ...node.data, color: nodeColor } },
+                            allStates,
+                        })
+                    )
 
                     set(
                         {
                             activeProcess: {
                                 ...activeProcess,
-                                states: updatedNodes.map((node) =>
-                                    stateByNode({
-                                        node: { ...node, data: { ...node.data, color: nodeColor } },
-                                        allStates,
-                                    })
-                                ),
+                                states: updatedStates,
                             },
                         },
                         false,
@@ -520,15 +526,6 @@ const useMainStore = create<MainState & MainActions>()(
                     "addProcess"
                 );
             },
-            // fix
-            deleteProcess: (processName) =>
-                set(
-                    ({ processes }) => ({
-                        processes: processes.filter((p) => p.processName !== processName),
-                    }),
-                    false,
-                    "deleteProcess"
-                ),
             toggleRoleForProcess: (role, color) => {
                 const { activeProcess, roles: globalRoles } = get();
 

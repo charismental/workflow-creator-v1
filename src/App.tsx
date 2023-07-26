@@ -1,4 +1,5 @@
 import { Button, Layout, Space, Spin, Typography, message } from "antd";
+import { blue, grey } from "@ant-design/colors";
 import { SaveTwoTone } from "@ant-design/icons";
 import ActiveRoleSettings from "components/ActiveRoleSettings";
 import CustomControls from "components/CustomControls/CustomControls";
@@ -6,7 +7,7 @@ import ToggleRoleActiveState from "components/Modals/ToggleRoleActiveState";
 import ReactFlowBase from "components/ReactFlowBase";
 import SelectBox from "components/SelectBox";
 import StateCollapseBox from "components/StateCollapseBox";
-import { CSSProperties, useCallback, useEffect, useState } from "react";
+import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
 import type { MainActions, MainState } from "store";
 import useMainStore from "store";
@@ -16,6 +17,8 @@ import Sidebar from "./components/Sidebar";
 import "reactflow/dist/style.css";
 import "./css/style.css";
 import getSessionProcess from "api/getSessionProcess";
+import { Nullable, WorkflowProcess, WorkflowState } from "types";
+import isEqual from "lodash.isequal";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -40,6 +43,8 @@ const activeRoleTitleStyle: CSSProperties = {
 const layoutContainer: CSSProperties = { width: "100%", height: "100vh" };
 
 const storeSelector = (state: MainActions & MainState) => ({
+	unsavedChanges: state.unsavedChanges,
+	setUnsavedChanges: state.setUnsavedChanges,
 	sessions: state.sessions,
 	addProcess: state.addProcess,
 	deleteSession: state.deleteSession,
@@ -66,6 +71,8 @@ const storeSelector = (state: MainActions & MainState) => ({
 
 const WorkflowCreator = () => {
 	const {
+		unsavedChanges,
+		setUnsavedChanges,
 		sessions,
 		addProcess,
 		toggleRoleForProcess,
@@ -97,6 +104,24 @@ const WorkflowCreator = () => {
 	useEffect(() => {
 		getAllSessions();
 	}, []);
+
+	const usePreviousProcess = (value: Nullable<WorkflowProcess>) => {
+		const ref: any = useRef();
+		useEffect(() => {
+			ref.current = value;
+		});
+
+		return ref.current;
+	}
+
+	const previousProcess = usePreviousProcess(activeProcess);
+
+	useEffect(() => {
+		if (previousProcess?.sessionId && previousProcess.sessionId === activeProcess?.sessionId && !isEqual(previousProcess, activeProcess)) {
+			// states will be different first pass until saved (adding properties automatically)
+			if ((previousProcess?.states || []).some((state: WorkflowState) => state?.properties !== null)) setUnsavedChanges(true);
+		}
+	}, [activeProcess])
 
 	const [messageApi, contextHolder] = message.useMessage();
 
@@ -210,7 +235,7 @@ const WorkflowCreator = () => {
 								hasColorInput={false}
 							/>
 							{/* compute saveDisabled prop, handle twoToneColor for disabled */}
-							<Button onClick={saveProcess} style={{ marginLeft: '6px' }} size="large" type="text" icon={<SaveTwoTone />} />
+							<Button disabled={!unsavedChanges} onClick={saveProcess} style={{ marginLeft: '6px' }} size="large" type="text" icon={<SaveTwoTone twoToneColor={unsavedChanges ? blue.primary : grey[0]} />} />
 						</div>
 						<Title
 							level={2}
