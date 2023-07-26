@@ -1,6 +1,6 @@
 import { Button, Layout, Space, Spin, Typography, message } from "antd";
 import { blue, grey } from "@ant-design/colors";
-import { SaveTwoTone } from "@ant-design/icons";
+import { SaveTwoTone, SendOutlined } from "@ant-design/icons";
 import ActiveRoleSettings from "components/ActiveRoleSettings";
 import CustomControls from "components/CustomControls/CustomControls";
 import ToggleRoleActiveState from "components/Modals/ToggleRoleActiveState";
@@ -67,6 +67,7 @@ const storeSelector = (state: MainActions & MainState) => ({
 	addNewCompany: state.addNewCompany,
 	cloneProcess: state.cloneProcess,
 	saveProcess: state.saveProcess,
+	publishProcess: state.publishProcess,
 });
 
 const WorkflowCreator = () => {
@@ -95,6 +96,7 @@ const WorkflowCreator = () => {
 		deleteSession,
 		cloneProcess,
 		saveProcess,
+		publishProcess,
 	} = useMainStore(storeSelector, shallow);
 	const [toggleInactiveModal, setToggleInactiveModal] = useState(false);
 	const filteredStates = useMainStore(
@@ -209,6 +211,7 @@ const WorkflowCreator = () => {
 			/>
 		);
 	}
+	const canPublish = !unsavedChanges && !!activeProcess?.sessionId;
 
 	return (
 		<Space
@@ -224,7 +227,8 @@ const WorkflowCreator = () => {
 								useStyle={{ maxWidth: "360px", minWidth: "300px" }}
 								selectOnChange={findProcessAndSetActive}
 								addNew={addNewProcessAndSelect}
-								canDelete={(el) => !publishedSessions.includes(el)}
+								canDelete={() => true}
+								// canDelete={(el) => !publishedSessions.includes(el)}
 								canClone={(el) => publishedSessions.includes(el)}
 								deleteHandler={deleteSession}
 								cloneHandler={cloneProcess}
@@ -234,8 +238,8 @@ const WorkflowCreator = () => {
 								placeholder="Select Process"
 								hasColorInput={false}
 							/>
-							{/* compute saveDisabled prop, handle twoToneColor for disabled */}
-							<Button disabled={!unsavedChanges} onClick={saveProcess} style={{ marginLeft: '6px' }} size="large" type="text" icon={<SaveTwoTone twoToneColor={unsavedChanges ? blue.primary : grey[0]} />} />
+							<Button disabled={!unsavedChanges} onClick={saveProcess} style={{ marginLeft: '4px' }} size="large" type="text" icon={<SaveTwoTone twoToneColor={unsavedChanges ? blue.primary : grey[0]} />} />
+							<Button disabled={!canPublish} onClick={publishProcess} style={{ marginLeft: '2px' }} size="large" type="text" icon={<SendOutlined style={{ color: canPublish ? blue.primary : grey[0] }} />} />
 						</div>
 						<Title
 							level={2}

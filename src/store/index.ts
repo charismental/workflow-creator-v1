@@ -17,6 +17,7 @@ import createProcess from "api/createProcess";
 import deleteSession from "api/deleteSession";
 import cloneProcess from "api/cloneProcess";
 import saveProcess from "api/saveProcess";
+import publishProcess from "api/publishProcess";
 
 import {
     WorkFlowTransition,
@@ -30,7 +31,6 @@ import { NumberBoolean } from "../types/genericTypes";
 
 // import mockGetAllSessions from "data/mockGetAllSessions_v2";
 import { nodeByState, roleColor, stateByNode, transformNewConnectionToTransition } from "utils";
-import isEqual from "lodash.isequal";
 
 export interface MainState {
     globalLoading: boolean;
@@ -58,6 +58,7 @@ export interface MainActions {
     deleteSession: (sessionId: string) => Promise<void>;
     cloneProcess: (processName: string) => Promise<void>;
     saveProcess: () => Promise<void>;
+    publishProcess: () => Promise<void>;
     setActiveRole: (role: string) => void;
     addProcess: (processName: string) => void | any;
     updateProcess: (payload: { processIndex: number; process: WorkflowProcess }) => void;
@@ -148,7 +149,7 @@ const useMainStore = create<MainState & MainActions>()(
                 const { activeProcess } = get();
                 if (!activeProcess) return;
 
-                set({ globalLoading: true }, false, "globalLoading");
+                set({ globalLoading: true }, false, "saveProcess");
                 // not necessary to include globals in payload
                 const { globals, ...activeProcessWithoutGlobals } = activeProcess;
                 const savePayload = { ...activeProcessWithoutGlobals }
@@ -156,7 +157,18 @@ const useMainStore = create<MainState & MainActions>()(
                 const saved = await saveProcess(savePayload);
 
                 if (saved?.sessionId) get().setActiveProcess(saved);
-                set({ globalLoading: false, unsavedChanges: false }, false, "globalLoading");
+                set({ globalLoading: false, unsavedChanges: false }, false, "saveProcess");
+            },
+            publishProcess: async () => {
+                const { activeProcess } = get();
+                if (!activeProcess?.sessionId) return;
+
+                set({ globalLoading: true }, false, "publishProcess");
+
+                const published = await publishProcess(activeProcess);
+                // snackbar?
+                if (published?.sessionId) get().setActiveProcess(published);
+                set({ globalLoading: false }, false, "publishProcess");
             },
             cloneProcess: async (processName: string) => {
                 const { sessions } = get();
