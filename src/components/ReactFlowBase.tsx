@@ -76,7 +76,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
 	useEffect(() => {
 		fitView();
-	}, [showAllRoles, showAllConnectedStates]);
+	}, [showAllRoles, showAllConnectedStates, activeProcess?.sessionId]);
 
 	useEffect(() => {
 		fitView(50);
