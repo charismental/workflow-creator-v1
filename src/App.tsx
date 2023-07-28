@@ -1,24 +1,35 @@
-import { Button, Layout, Space, Spin, Typography, message } from "antd";
+import "reactflow/dist/style.css";
+import "./css/style.css";
+import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
+import { ReactFlowProvider } from "reactflow";
+import { Button, Layout, Space, Spin, Typography } from "antd";
 import { blue, grey } from "@ant-design/colors";
 import { SaveTwoTone, SendOutlined } from "@ant-design/icons";
+import isEqual from "lodash.isequal";
+
+// store
+import { shallow } from "zustand/shallow";
+import type { MainActions, MainState } from "store";
+import useMainStore from "store";
+
+// components
+import ReactFlowBase from "components/ReactFlowBase";
+import topMessage from "components/TopMessage";
 import ActiveRoleSettings from "components/ActiveRoleSettings";
 import CustomControls from "components/CustomControls/CustomControls";
 import ToggleRoleActiveState from "components/Modals/ToggleRoleActiveState";
-import ReactFlowBase from "components/ReactFlowBase";
 import SelectBox from "components/SelectBox";
 import StateCollapseBox from "components/StateCollapseBox";
-import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
-import { ReactFlowProvider } from "reactflow";
-import type { MainActions, MainState } from "store";
-import useMainStore from "store";
-import { roleColor } from "utils";
-import { shallow } from "zustand/shallow";
 import Sidebar from "./components/Sidebar";
-import "reactflow/dist/style.css";
-import "./css/style.css";
-import getSessionProcess from "api/getSessionProcess";
+
+// utils
+import { roleColor } from "utils";
+
+// types
 import { Nullable, WorkflowProcess, WorkflowState } from "types";
-import isEqual from "lodash.isequal";
+
+// api
+import getSessionProcess from "api/getSessionProcess";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -26,6 +37,7 @@ const { Title } = Typography;
 const spaceContainer: CSSProperties = {
 	width: "100%",
 };
+
 const headerStyle: CSSProperties = {
 	backgroundColor: "#fff",
 	padding: "25px",
@@ -34,6 +46,7 @@ const headerStyle: CSSProperties = {
 	justifyContent: "space-between",
 	alignItems: "center",
 };
+
 const activeRoleTitleStyle: CSSProperties = {
 	flexGrow: 2,
 	textAlign: "center",
@@ -125,8 +138,6 @@ const WorkflowCreator = () => {
 		}
 	}, [activeProcess])
 
-	const [messageApi, contextHolder] = message.useMessage();
-
 	const findProcessAndSetActive = (processName: string) => {
 		const foundProcess = sessions.find((p) => p.processName === processName);
 		const { sessionId = null } = foundProcess || {};
@@ -183,7 +194,11 @@ const WorkflowCreator = () => {
 			roleName: activeRole,
 			setModalOpen: setToggleInactiveModal,
 			toggleRoleForProcess: () => toggleRoleForProcess(roleName),
-			successMessage: activeStatusRemovedMessage,
+			successMessage: () => topMessage({
+				type: 'success',
+				content: 'Transitions have been removed',
+				duration: 5
+			}),
 		});
 	};
 
@@ -192,15 +207,6 @@ const WorkflowCreator = () => {
 
 		if (Array.isArray(transitions) && transitions.length) openToggleActiveModal(roleName);
 		else toggleRoleForProcess(roleName);
-	};
-
-	const activeStatusRemovedMessage = () => {
-		messageApi.open({
-			type: "success",
-			content: "Transtions have been Removed",
-			duration: 5,
-			style: { fontSize: "20px" },
-		});
 	};
 
 	if (loading) {
@@ -213,12 +219,23 @@ const WorkflowCreator = () => {
 	}
 	const canPublish = !unsavedChanges && !!activeProcess?.sessionId;
 
+	const saveProcessHandler = async () => {
+		topMessage({ type: 'loading', content: 'Saving process', duration: 5, key: "saveProcess" })
+		const success = await saveProcess();
+		
+		topMessage({
+			type: success ? 'success' : 'error',
+			content: success ? 'Process saved' : 'Error saving process',
+			duration: 5,
+			key: "saveProcess"
+		});
+	}
+
 	return (
 		<Space
 			direction="vertical"
 			style={spaceContainer}
 		>
-			{contextHolder}
 			<Layout style={layoutContainer}>
 				<Layout>
 					<Header style={headerStyle}>
@@ -238,7 +255,7 @@ const WorkflowCreator = () => {
 								placeholder="Select Process"
 								hasColorInput={false}
 							/>
-							<Button disabled={!unsavedChanges} onClick={saveProcess} style={{ marginLeft: '4px' }} size="large" type="text" icon={<SaveTwoTone twoToneColor={unsavedChanges ? blue.primary : grey[0]} />} />
+							<Button disabled={!unsavedChanges} onClick={saveProcessHandler} style={{ marginLeft: '4px' }} size="large" type="text" icon={<SaveTwoTone twoToneColor={unsavedChanges ? blue.primary : grey[0]} />} />
 							<Button disabled={!canPublish} onClick={publishProcess} style={{ marginLeft: '2px' }} size="large" type="text" icon={<SendOutlined style={{ color: canPublish ? blue.primary : grey[0] }} />} />
 						</div>
 						<Title

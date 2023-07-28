@@ -57,7 +57,7 @@ export interface MainActions {
     getAllSessions: (env?: string) => Promise<any>;
     deleteSession: (sessionId: string) => Promise<void>;
     cloneProcess: (processName: string) => Promise<void>;
-    saveProcess: () => Promise<void>;
+    saveProcess: () => Promise<boolean>;
     publishProcess: () => Promise<void>;
     setActiveRole: (role: string) => void;
     addProcess: (processName: string) => void | any;
@@ -146,18 +146,25 @@ const useMainStore = create<MainState & MainActions>()(
                 }
             },
             saveProcess: async () => {
+                // handle for success/failure, return message?
                 const { activeProcess } = get();
-                if (!activeProcess) return;
+                if (!activeProcess) return false;
 
-                set({ globalLoading: true }, false, "saveProcess");
                 // not necessary to include globals in payload
                 const { globals, ...activeProcessWithoutGlobals } = activeProcess;
                 const savePayload = { ...activeProcessWithoutGlobals }
 
                 const saved = await saveProcess(savePayload);
+                const success = !!saved?.sessionId;
 
-                if (saved?.sessionId) get().setActiveProcess(saved);
-                set({ globalLoading: false, unsavedChanges: false }, false, "saveProcess");
+                if (success) {
+                    get().setActiveProcess(saved);
+                    setTimeout(() => {
+                        set({ unsavedChanges: false }, false, "saveProcess");
+                    }, 0)
+                }
+
+                return success;
             },
             publishProcess: async () => {
                 const { activeProcess } = get();
