@@ -85,7 +85,7 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 		const numbersOnlyRegex = /^\d{1,4}$/;
 
 		if (numbersOnlyRegex.test(inputValue) || inputValue === '' || inputValue === '-') {
-			updateStateProperty({ state: id, property: 'DisplayOrder', value: inputValue });
+			updateStateProperty({ state: id, property: 'displayOrder', value: inputValue });
 		}
 	};
 
@@ -104,13 +104,13 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 				<Form.Item colon={false} label="Requires Role Assignment">
 					<Checkbox
 						checked={!!foundState?.requiresRoleAssignment}
-						onChange={() => updateStateProperty({ state: id, property: 'RequiresRoleAssignment', value: !foundState?.requiresRoleAssignment })}
+						onChange={() => updateStateProperty({ state: id, property: 'requiresRoleAssignment', value: !foundState?.requiresRoleAssignment })}
 					/>
 				</Form.Item>
 				<Form.Item colon={false} label="Requires User Assignment">
 					<Checkbox
 						checked={!!foundState?.requiresUserAssignment}
-						onChange={() => updateStateProperty({ state: id, property: 'RequiresUserAssignment', value: !foundState?.requiresUserAssignment })}
+						onChange={() => updateStateProperty({ state: id, property: 'requiresUserAssignment', value: !foundState?.requiresUserAssignment })}
 					/>
 				</Form.Item>
 			</Form>
