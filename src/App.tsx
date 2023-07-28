@@ -220,13 +220,19 @@ const WorkflowCreator = () => {
 	const canPublish = !unsavedChanges && !!activeProcess?.sessionId;
 
 	const saveProcessHandler = async () => {
-		topMessage({ type: 'loading', content: 'Saving process', duration: 5, key: "saveProcess" })
-		const success = await saveProcess();
+		topMessage({
+			type: 'loading',
+			content: 'Saving process',
+			duration: 4,
+			key: "saveProcess"
+		})
 		
+		const success = await saveProcess();
+
 		topMessage({
 			type: success ? 'success' : 'error',
 			content: success ? 'Process saved' : 'Error saving process',
-			duration: 5,
+			duration: 3,
 			key: "saveProcess"
 		});
 	}

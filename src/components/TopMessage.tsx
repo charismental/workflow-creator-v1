@@ -10,10 +10,8 @@ export interface TopMessageProps {
     key?: string;
 }
 
-const TopMessage: any = (props: TopMessageProps) => {
+export default (props: TopMessageProps) => {
     const { type = 'success', content = '', duration = 5, onClose, key } = props;
 
     return message[type]({ content, duration, onClose, ...(key && { key }) });
 };
-
-export default TopMessage;
