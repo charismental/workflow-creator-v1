@@ -9,7 +9,7 @@ export interface ModalProps {
 	title: string;
 	closeable?: boolean;
 	open: boolean;
-	content: ReactNode | string;
+	content?: ReactNode | string;
 	onCancel?: () => void;
 	okText?: string;
 	onOk?: () => void;
@@ -40,8 +40,8 @@ export default (props: ModalProps) => {
 		// cancelButtonProps: { type: "default", size: "large" },
 		maskClosable: closeable,
 		title,
-		content,
 		open,
+		...(content && { content }),
 		...(okText && { okText }),
 		...(cancelText && { cancelText }),
 		...(onOk && { onOk }),

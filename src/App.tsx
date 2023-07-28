@@ -30,6 +30,7 @@ import { Nullable, WorkflowProcess, WorkflowState } from "types";
 
 // api
 import getSessionProcess from "api/getSessionProcess";
+import ModalInstance, { ModalType } from "components/Modals/ModalInstance";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -141,7 +142,39 @@ const WorkflowCreator = () => {
 	const findProcessAndSetActive = (processName: string) => {
 		const foundProcess = sessions.find((p) => p.processName === processName);
 		const { sessionId = null } = foundProcess || {};
-		if (sessionId) getSessionProcess(sessionId).then((res) => setActiveProcess(res));
+		if (!sessionId) return;
+
+		if (unsavedChanges) {
+			const type: ModalType = "confirm";
+
+			const modalOptions = {
+				open: true,
+				title: "Unsaved Changes",
+				okText: "Save",
+				closeable: false,
+				type,
+				content: (
+					<div>
+						You have unsaved changes. Would you like to save before continuing?
+					</div>
+				),
+				// async/await?
+				onOk() {
+					saveProcessHandler()
+						.then(async (success) => {
+							if (!success) throw new Error('Error saving process');
+							const fetchedProcess = await getSessionProcess(sessionId)
+							setActiveProcess(fetchedProcess)
+						})
+						.catch((err) => console.error(err))
+
+				},
+			};
+			ModalInstance(modalOptions)
+		} else {
+			getSessionProcess(sessionId).then((res) => setActiveProcess(res));
+		}
+
 	}
 
 	const activeRoleColor = roleColor({
@@ -226,7 +259,7 @@ const WorkflowCreator = () => {
 			duration: 4,
 			key: "saveProcess"
 		})
-		
+
 		const success = await saveProcess();
 
 		topMessage({
@@ -235,6 +268,8 @@ const WorkflowCreator = () => {
 			duration: 3,
 			key: "saveProcess"
 		});
+
+		return success;
 	}
 
 	return (
