@@ -92,7 +92,7 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 	const popoverContent = (
 		<div style={{ maxWidth: 800 }}>
 			<Title level={4} style={{ marginTop: '0', marginBottom: '12px', textAlign: 'center' }}>{id}</Title>
-			<Form layout="horizontal" labelWrap labelAlign="left" labelCol={{ span: 9 }} wrapperCol={{ span: 9, offset: 3 }} style={{ padding: '12px'}}>
+			<Form layout="horizontal" labelWrap labelAlign="left" labelCol={{ span: 9 }} wrapperCol={{ span: 9, offset: 3 }} style={{ padding: '12px' }}>
 				<Form.Item label="Display Order">
 					<Input
 						type="number"
@@ -184,7 +184,16 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 					type="target"
 					isConnectable={isConnectable}
 				/>
-				{data?.label || "Unknown State"}
+				<div
+					style={{
+						whiteSpace: 'nowrap',
+						overflow: 'hidden',
+						textOverflow: 'ellipsis',
+						padding: '0 4px',
+					}}
+				>
+					{data?.label || "Unknown State"}
+				</div>
 			</div>
 		</Popover>
 	);
