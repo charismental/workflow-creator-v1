@@ -138,9 +138,9 @@ const SelectBox: React.FC<SelectBoxProps> = ({
 						) : (
 							<div
 								style={{ display: "flex", justifyContent: "space-between" }}
-								onClick={() => selectOnChange && selectOnChange(label)}
+								onClick={() => selectValue !== label && selectOnChange && selectOnChange(label)}
 							>
-								<div>{label}</div>
+								<div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
 								<div style={{ display: "flex", justifyContent: "space-between", alignSelf: "center" }}>
 									{canClone?.(item) && cloneHandler && (
 										<CopyTwoTone

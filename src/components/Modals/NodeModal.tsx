@@ -34,6 +34,8 @@ export default ({ allCurrentNodesInCanvas, nodeModalOpen, setNodeModalOpen }: Ed
 							</Space>
 							<div style={{ textIndent: "30px" }}>Width: {node.width}</div>
 							<div style={{ textIndent: "30px" }}>Height: {node.height}</div>
+							<div style={{ textIndent: "30px" }}>X: {node.position.x}</div>
+							<div style={{ textIndent: "30px" }}>Y: {node.position.y}</div>
 						</div>
 					))
 				) : (

@@ -119,7 +119,7 @@ export function transformTransitionsToEdges(
 		};
 	};
 
-	return Transitions.map(mapper);
+	return Array.isArray(Transitions) ? Transitions.map(mapper) : [];
 }
 
 // might get weird mama
@@ -423,7 +423,7 @@ export function computedEdges({
 		const allTransitions: WorkFlowTransition[] = [];
 
 		roles.forEach(({ transitions = [] }) => {
-			allTransitions.push(...transitions);
+			Array.isArray(transitions) && allTransitions.push(...transitions);
 		});
 
 		return transformTransitionsToEdges(
@@ -455,7 +455,7 @@ export function stateIsSelfConnected({
 	if (!role) {
 		const allTransitions: WorkFlowTransition[] = [];
 
-		roles.forEach(({ transitions = [] }) => allTransitions.push(...transitions));
+		roles.forEach(({ transitions = [] }) => Array.isArray(transitions) && allTransitions.push(...transitions));
 
 		return allTransitions.some(({ stateName, toStateName }) =>
 			[stateName, toStateName].every((el) => el === stateId)

@@ -150,7 +150,7 @@ const WorkflowCreator = () => {
 			const modalOptions = {
 				open: true,
 				title: "Unsaved Changes",
-				okText: "Save",
+				okText: "Discard",
 				closeable: false,
 				type,
 				content: (
@@ -160,13 +160,17 @@ const WorkflowCreator = () => {
 				),
 				// async/await?
 				onOk() {
-					saveProcessHandler()
-						.then(async (success) => {
-							if (!success) throw new Error('Error saving process');
-							const fetchedProcess = await getSessionProcess(sessionId)
-							setActiveProcess(fetchedProcess)
-						})
+					setUnsavedChanges(false);
+					getSessionProcess(sessionId)
+						.then((res) => setActiveProcess(res))
 						.catch((err) => console.error(err))
+					// saveProcessHandler()
+					// 	.then(async (success) => {
+					// 		if (!success) throw new Error('Error saving process');
+					// 		const fetchedProcess = await getSessionProcess(sessionId)
+					// 		setActiveProcess(fetchedProcess)
+					// 	})
+					// 	.catch((err) => console.error(err))
 
 				},
 			};
