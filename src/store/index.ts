@@ -27,7 +27,7 @@ import {
     WorkflowCompany,
     WorkflowSession,
 } from "../types/workflowTypes";
-import { NumberBoolean } from "../types/genericTypes";
+import { Nullable, NumberBoolean } from "../types/genericTypes";
 
 // import mockGetAllSessions from "data/mockGetAllSessions_v2";
 import { nodeByState, roleColor, stateByNode, transformNewConnectionToTransition } from "utils";
@@ -58,7 +58,7 @@ export interface MainActions {
     deleteSession: (sessionId: string) => Promise<void>;
     cloneProcess: (processName: string) => Promise<void>;
     saveProcess: () => Promise<boolean>;
-    publishProcess: () => Promise<void>;
+    publishProcess: () => Promise<boolean>;
     setActiveRole: (role: string) => void;
     addProcess: (processName: string) => void | any;
     updateProcess: (payload: { processIndex: number; process: WorkflowProcess }) => void;
@@ -168,14 +168,14 @@ const useMainStore = create<MainState & MainActions>()(
             },
             publishProcess: async () => {
                 const { activeProcess } = get();
-                if (!activeProcess?.sessionId) return;
-
-                set({ globalLoading: true }, false, "publishProcess");
+                if (!activeProcess?.sessionId) return false;
 
                 const published = await publishProcess(activeProcess);
-                // snackbar?
-                if (published?.sessionId) get().setActiveProcess(published);
-                set({ globalLoading: false }, false, "publishProcess");
+                const success = !!published?.sessionId;
+
+                if (success) get().setActiveProcess(published);
+
+                return success;
             },
             cloneProcess: async (processName: string) => {
                 const { sessions } = get();

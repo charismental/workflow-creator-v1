@@ -1,10 +1,10 @@
 import "reactflow/dist/style.css";
-import "./css/style.css";
+import "../css/style.css";
 import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
 import { Button, Layout, Space, Spin, Typography } from "antd";
 import { blue, grey } from "@ant-design/colors";
-import { SaveTwoTone, SendOutlined } from "@ant-design/icons";
+import { SaveTwoTone, SendOutlined, ShareAltOutlined } from "@ant-design/icons";
 import isEqual from "lodash.isequal";
 
 // store
@@ -20,10 +20,11 @@ import CustomControls from "components/CustomControls/CustomControls";
 import ToggleRoleActiveState from "components/Modals/ToggleRoleActiveState";
 import SelectBox from "components/SelectBox";
 import StateCollapseBox from "components/StateCollapseBox";
-import Sidebar from "./components/Sidebar";
+import Sidebar from "components/Sidebar";
 
 // utils
-import { roleColor } from "utils";
+import { copyToClipboard, roleColor } from "utils";
+import { queryObjectEncryptor } from "utils/queryObjectEncryptor";
 
 // types
 import { Nullable, WorkflowProcess, WorkflowState } from "types";
@@ -246,6 +247,24 @@ const WorkflowCreator = () => {
 		else toggleRoleForProcess(roleName);
 	};
 
+	const shareRoleWorkflow = async () => {
+		const { protocol, host } = window.location;
+		const baseUrl = `${protocol}//${host}/`;
+		const foundRole = activeProcess?.roles?.find(({ roleName }) => roleName === activeRole);
+		const hashedQuery = queryObjectEncryptor({ processId: activeProcess?.processId, role: foundRole, states: activeProcess?.states || [] });
+		
+		const url = `${baseUrl}sharedLink/${encodeURIComponent(hashedQuery)}`;
+        const { success, message } = await copyToClipboard(url);
+        
+        topMessage({
+			type: success ? 'success' : 'error',
+			content: message,
+			duration: 4,
+		})
+
+		console.log('url', url);
+	};
+
 	if (loading) {
 		return (
 			<Spin
@@ -276,6 +295,26 @@ const WorkflowCreator = () => {
 		return success;
 	}
 
+    const publishProcessHandler = async () => {
+		topMessage({
+			type: 'loading',
+			content: 'Publishing process',
+			duration: 4,
+			key: "publishProcess"
+		})
+
+		const success = await publishProcess();
+
+		topMessage({
+			type: success ? 'success' : 'error',
+			content: success ? 'Process published' : 'Error publishing process',
+			duration: 3,
+			key: "publishProcess"
+		});
+
+		return success;
+	}
+
 	return (
 		<Space
 			direction="vertical"
@@ -301,7 +340,8 @@ const WorkflowCreator = () => {
 								hasColorInput={false}
 							/>
 							<Button disabled={!unsavedChanges} onClick={saveProcessHandler} style={{ marginLeft: '4px' }} size="large" type="text" icon={<SaveTwoTone twoToneColor={unsavedChanges ? blue.primary : grey[0]} />} />
-							<Button disabled={!canPublish} onClick={publishProcess} style={{ marginLeft: '2px' }} size="large" type="text" icon={<SendOutlined style={{ color: canPublish ? blue.primary : grey[0] }} />} />
+							<Button disabled={!canPublish} onClick={publishProcessHandler} style={{ marginLeft: '2px' }} size="large" type="text" icon={<SendOutlined style={{ color: canPublish ? blue.primary : grey[0] }} />} />
+							<Button disabled={!roleIsToggled} onClick={shareRoleWorkflow} style={{ marginLeft: '2px' }} size="large" type="text" icon={<ShareAltOutlined style={{ color: roleIsToggled ? blue.primary : grey[0] }} />} />
 						</div>
 						<Title
 							level={2}

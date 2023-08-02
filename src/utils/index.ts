@@ -124,19 +124,19 @@ export function transformTransitionsToEdges(
 
 // might get weird mama
 export function transformNewConnectionToTransition(
-{
-	connection,
-	existingTransitions,
-	allStates,
-	roleId,
-	roleName,
-}: {
-	connection: Connection,
-	existingTransitions: WorkFlowTransition[],
-	allStates: WorkflowState[],
-	roleId: Nullable<number>,
-	roleName: string,
-}
+	{
+		connection,
+		existingTransitions,
+		allStates,
+		roleId,
+		roleName,
+	}: {
+		connection: Connection,
+		existingTransitions: WorkFlowTransition[],
+		allStates: WorkflowState[],
+		roleId: Nullable<number>,
+		roleName: string,
+	}
 ): WorkFlowTransition | null {
 	const { source, target, sourceHandle, targetHandle } = connection;
 
@@ -155,15 +155,15 @@ export function transformNewConnectionToTransition(
 		foundTransition ||
 		(source && target
 			? {
-					stateId: foundFromState?.stateId || null,
-					altStateId: foundToState?.stateId || null,
-					roleId,
-					roleName,
-					internalOnly: false,
-					stateName: source,
-					toStateName: target,
-					properties: { sourceHandle, targetHandle },
-			  }
+				stateId: foundFromState?.stateId || null,
+				altStateId: foundToState?.stateId || null,
+				roleId,
+				roleName,
+				internalOnly: false,
+				stateName: source,
+				toStateName: target,
+				properties: { sourceHandle, targetHandle },
+			}
 			: null)
 	);
 }
@@ -466,4 +466,14 @@ export function stateIsSelfConnected({
 		?.transitions?.find(({ stateName, toStateName }) =>
 			[stateName, toStateName].every((el) => el === stateId)
 		);
+}
+
+export async function copyToClipboard(text: string) {
+	try {
+		await navigator.clipboard.writeText(text);
+		return { message: 'Copied to clipboard', success: true }
+	} catch (err) {
+		console.error('copyToClipboard: ', err);
+		return { message: 'Unable to copy to clipboard', success: false }
+	}
 }
