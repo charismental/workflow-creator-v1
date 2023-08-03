@@ -80,7 +80,7 @@ export interface MainActions {
         stateName: string;
         properties: { x?: number; y?: number; h?: number; w?: number };
     }) => void;
-    setActiveProcess: (process: WorkflowProcess) => void;
+    setActiveProcess: (process: WorkflowProcess, role?: string) => void;
     setColorForActiveRole: (newColor: string) => void;
     setReactFlowInstance: (instance: ReactFlowInstance) => void;
     setShowMinimap: () => void;
@@ -147,7 +147,7 @@ const useMainStore = create<MainState & MainActions>()(
             },
             saveProcess: async () => {
                 // handle for success/failure, return message?
-                const { activeProcess } = get();
+                const { activeProcess, activeRole } = get();
                 if (!activeProcess) return false;
 
                 // not necessary to include globals in payload
@@ -158,7 +158,7 @@ const useMainStore = create<MainState & MainActions>()(
                 const success = !!saved?.sessionId;
 
                 if (success) {
-                    get().setActiveProcess(saved);
+                    get().setActiveProcess(saved, activeRole);
                     setTimeout(() => {
                         set({ unsavedChanges: false }, false, "saveProcess");
                     }, 0)
@@ -167,18 +167,18 @@ const useMainStore = create<MainState & MainActions>()(
                 return success;
             },
             publishProcess: async () => {
-                const { activeProcess } = get();
+                const { activeProcess, activeRole } = get();
                 if (!activeProcess?.sessionId) return false;
 
                 const published = await publishProcess(activeProcess);
                 const success = !!published?.sessionId;
 
-                if (success) get().setActiveProcess(published);
+                if (success) get().setActiveProcess(published, activeRole);
 
                 return success;
             },
             cloneProcess: async (processName: string) => {
-                const { sessions } = get();
+                const { sessions, activeRole } = get();
                 const invalidNames = sessions.map(({ processName }) => processName);
 
                 const nameUpdater = (name: string, invalid: string[] = []): string => {
@@ -215,7 +215,7 @@ const useMainStore = create<MainState & MainActions>()(
                         sessionId,
                     }
 
-                    get().setActiveProcess(cloned);
+                    get().setActiveProcess(cloned, activeRole);
 
                     set(
                         {
@@ -484,31 +484,14 @@ const useMainStore = create<MainState & MainActions>()(
                     );
                 }
             },
-            setActiveProcess: (process: WorkflowProcess) =>
+            setActiveProcess: (process: WorkflowProcess, role) =>
                 set(
                     () => {
                         const { globals } = process;
                         const { states = [], roles = [], companies = [] } = globals || {};
                         const sortRoles = (roles: WorkflowRole[]) => [...roles].sort((a, b) => a.roleName.localeCompare(b.roleName));
                         const { roles: activeProcessRoles = [] } = process;
-                        const activeRole = sortRoles(activeProcessRoles)?.[0]?.roleName || sortRoles(roles)?.[0]?.roleName || "";
-                        // const processToSet = processes.find((p) => p.processName === processName);
-
-                        // const previousProcessIndex = processes.findIndex(
-                        // 	(p) => p.processName === activeProcess?.processName
-                        // );
-
-                        // if (
-                        // 	activeProcess &&
-                        // 	previousProcessIndex !== -1 &&
-                        // 	!isEqual(processes[previousProcessIndex], activeProcess)
-                        // ) {
-                        // 	const updatedProcesses = processes.map((p, i) =>
-                        // 		i !== previousProcessIndex ? { ...p } : { ...activeProcess }
-                        // 	);
-
-                        // 	return { activeProcess: processToSet, processes: updatedProcesses };
-                        // }
+                        const activeRole = role || sortRoles(activeProcessRoles)?.[0]?.roleName || sortRoles(roles)?.[0]?.roleName || "";
 
                         return { activeProcess: process, states, roles: sortRoles(roles), companies, activeRole };
                     },
