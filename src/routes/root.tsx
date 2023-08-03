@@ -315,6 +315,31 @@ const WorkflowCreator = () => {
 		return success;
 	}
 
+	const deleteSessionHandler = async (sessionName: string) => {
+		const type: ModalType = "confirm";
+
+		const modalOptions = {
+			open: true,
+			title: "Delete Session",
+			okText: "Delete",
+			closeable: false,
+			type,
+			content: (
+				<div>
+					This will permanently delete this session. Are you sure you wish to proceed?
+				</div>
+			),
+			onOk() {
+				// need to handle for unsuccessful delete request
+				deleteSession(sessionName)
+					.then(message => topMessage({ type: 'success', content: message, duration: 3 }))
+
+			},
+		};
+		ModalInstance(modalOptions)
+	}
+
+
 	return (
 		<Space
 			direction="vertical"
@@ -331,7 +356,7 @@ const WorkflowCreator = () => {
 								canDelete={() => true}
 								// canDelete={(el) => !publishedSessions.includes(el)}
 								canClone={(el) => publishedSessions.includes(el)}
-								deleteHandler={deleteSession}
+								deleteHandler={deleteSessionHandler}
 								cloneHandler={cloneProcess}
 								type="process"
 								selectValue={activeProcess?.processName}

@@ -55,7 +55,7 @@ export interface MainState {
 export interface MainActions {
     setUnsavedChanges: (status: boolean) => void;
     getAllSessions: (env?: string) => Promise<any>;
-    deleteSession: (sessionId: string) => Promise<void>;
+    deleteSession: (sessionId: string) => Promise<string>;
     cloneProcess: (processName: string) => Promise<void>;
     saveProcess: () => Promise<boolean>;
     publishProcess: () => Promise<boolean>;
@@ -144,6 +144,8 @@ const useMainStore = create<MainState & MainActions>()(
                         "deleteSession",
                     )
                 }
+
+                return successMessage || 'Something went wrong';
             },
             saveProcess: async () => {
                 // handle for success/failure, return message?
@@ -178,7 +180,7 @@ const useMainStore = create<MainState & MainActions>()(
                 return success;
             },
             cloneProcess: async (processName: string) => {
-                const { sessions, activeRole } = get();
+                const { sessions, activeRole, activeProcess } = get();
                 const invalidNames = sessions.map(({ processName }) => processName);
 
                 const nameUpdater = (name: string, invalid: string[] = []): string => {
@@ -214,8 +216,8 @@ const useMainStore = create<MainState & MainActions>()(
                         processName,
                         sessionId,
                     }
-
-                    get().setActiveProcess(cloned, activeRole);
+                    const isSameAsActive = activeProcess?.processName === processName
+                    get().setActiveProcess(cloned, isSameAsActive ? activeRole : undefined);
 
                     set(
                         {
