@@ -17,7 +17,7 @@ export default ({
 	setModalOpen,
 	successMessage,
 }: SetAsInactiveModalProps) => {
-	const type: ModalType = "warning";
+	const type: ModalType = "confirm";
 
 	const modalOptions = {
 		open: modalOpen,
