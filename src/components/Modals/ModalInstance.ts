@@ -1,27 +1,52 @@
-import type { ModalFuncProps } from "antd";
 import { Modal } from "antd";
+import { LegacyButtonType } from "antd/es/button/button";
+import { ReactNode } from "react";
 
-interface ModalProps {
-	modalOptions: ModalFuncProps;
-	modalType: "error" | "confirm" | "warning" | "warn" | "success";
+export type ModalType = "error" | "confirm" | "warning" | "success";
+
+export interface ModalProps {
+	type: ModalType;
+	title: string;
+	closeable?: boolean;
+	open: boolean;
+	content?: ReactNode | string;
+	onCancel?: () => void;
+	okText?: string;
+	onOk?: () => void;
+	cancelText?: string;
 }
 
-export default ({ modalType, modalOptions }: ModalProps) => {
-	switch (modalType) {
-		case "error":
-			Modal.error({ ...modalOptions });
-			break;
-		case "success":
-			Modal.success({ ...modalOptions });
-			break;
-		case "warning":
-			Modal.warning({ ...modalOptions });
-			break;
-		case "warn":
-			Modal.warn({ ...modalOptions });
-			break;
-		default:
-			Modal.confirm({ ...modalOptions });
-			break;
+export default (props: ModalProps) => {
+	const {
+		type,
+		title,
+		open,
+		content,
+		closeable = true,
+		onCancel,
+		okText,
+		onOk,
+		cancelText,
+	} = props;
+	
+	const okType: LegacyButtonType = 'primary';
+	
+	const modalOptions = {
+		closeable,
+		centered: true,
+		mask: true,
+		okType,
+		// okButtonProps: { size: "large", danger: true },
+		// cancelButtonProps: { type: "default", size: "large" },
+		maskClosable: closeable,
+		title,
+		open,
+		...(content && { content }),
+		...(okText && { okText }),
+		...(cancelText && { cancelText }),
+		...(onOk && { onOk }),
+		...(onCancel && { onCancel }),
 	}
+	
+	Modal[type](modalOptions);	
 };

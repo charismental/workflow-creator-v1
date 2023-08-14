@@ -1,4 +1,4 @@
-import { PlusCircleOutlined, PlusCircleTwoTone } from "@ant-design/icons";
+import { PlusCircleOutlined, PlusCircleTwoTone, DeleteTwoTone, CopyTwoTone } from "@ant-design/icons";
 import { Checkbox, Divider, InputRef, Select, Space } from "antd";
 import React, { useRef, useState } from "react";
 import AddNewInput from "./AddNewInput";
@@ -16,6 +16,10 @@ interface SelectBoxProps {
 	placeholder?: string;
 	hasColorInput?: boolean;
 	multiselectHandler?: (el: any) => void;
+	canDelete?: (el: any) => boolean;
+	canClone?: (el: any) => boolean;
+	deleteHandler?: (el: any) => void;
+	cloneHandler?: (el: any) => void;
 }
 
 const SelectBox: React.FC<SelectBoxProps> = ({
@@ -27,6 +31,10 @@ const SelectBox: React.FC<SelectBoxProps> = ({
 	type,
 	placeholder,
 	multiselectHandler,
+	canDelete,
+	canClone,
+	deleteHandler,
+	cloneHandler,
 	isDraggable = false,
 	hasColorInput = false,
 }) => {
@@ -130,18 +138,38 @@ const SelectBox: React.FC<SelectBoxProps> = ({
 						) : (
 							<div
 								style={{ display: "flex", justifyContent: "space-between" }}
-								onClick={() => selectOnChange && selectOnChange(label)}
+								onClick={() => selectValue !== label && selectOnChange && selectOnChange(label)}
 							>
-								<div>{label}</div>
-								{multiselectHandler && typeof item !== "string" && (
-									<Checkbox
-										checked={item.value}
-										onClick={(e: any) => {
-											e.stopPropagation();
-											multiselectHandler(item);
-										}}
-									/>
-								)}
+								<div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
+								<div style={{ display: "flex", justifyContent: "space-between", alignSelf: "center" }}>
+									{canClone?.(item) && cloneHandler && (
+										<CopyTwoTone
+											onClick={(e: any) => {
+												e.stopPropagation();
+												cloneHandler(item);
+											}}
+										/>
+									)}
+									{canDelete?.(item) && deleteHandler && (
+										<DeleteTwoTone
+											twoToneColor="#eb2f96"
+											style={{ marginLeft: "4px" }}
+											onClick={(e: any) => {
+												e.stopPropagation();
+												deleteHandler(item);
+											}}
+										/>
+									)}
+									{multiselectHandler && typeof item !== "string" && (
+										<Checkbox
+											checked={item.value}
+											onClick={(e: any) => {
+												e.stopPropagation();
+												multiselectHandler(item);
+											}}
+										/>
+									)}
+								</div>
 							</div>
 						)}
 					</Option>

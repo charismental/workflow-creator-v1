@@ -35,7 +35,7 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 	// todo: consolidate this with updateStateProperty
 	const updateStateProperties = useMainStore((state) => state.updateStateProperties, shallow);
 
-	const foundState = useMainStore((state) => (state?.activeProcess?.States || []).find(({ StateName }) => StateName === id));
+	const foundState = useMainStore((state) => (state?.activeProcess?.states || []).find(({ stateName }) => stateName === id));
 
 	const onConnect = useMainStore((state) => state.onConnect, shallow);
 
@@ -50,17 +50,17 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 	const selfConnected =
 		useMainStore(
 			(state) =>
-				!!state.activeProcess?.Roles
-					?.find(({ RoleName }) => RoleName === state.activeRole)
-					?.Transitions?.find(({ StateName, ToStateName }) =>
-						[StateName, ToStateName].every((el) => el === id)
+				!!state.activeProcess?.roles
+					?.find(({ roleName }) => roleName === state.activeRole)
+					?.transitions?.find(({ stateName, toStateName }) =>
+						[stateName, toStateName].every((el) => el === id)
 					),
 			shallow
 		) || data?.selfConnected;
 
 	const onResize = (_: any, payload: any) => {
 		const { height: h, width: w, x, y } = payload;
-		updateStateProperties({ StateName: data.label, properties: { x, y, h, w } });
+		updateStateProperties({ stateName: data.label, properties: { x, y, h, w } });
 	};
 
 	const [isMouseOver, setIsMouseOver] = useState(false);
@@ -85,7 +85,7 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 	const targetHandleStyle = { zIndex: isTarget ? 3 : 1 };
 
 	// do something here => initial width: 200, minWidth: 50?
-	const minWidth = 200;
+	const minWidth = 120;
 	const minHeight = 30;
 
 	const handleDisplayOrderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,7 +93,7 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 		const numbersOnlyRegex = /^\d{1,4}$/;
 
 		if (numbersOnlyRegex.test(inputValue) || inputValue === '' || inputValue === '-') {
-			updateStateProperty({ state: id, property: 'DisplayOrder', value: inputValue });
+			updateStateProperty({ state: id, property: 'displayOrder', value: inputValue });
 		}
 	};
 
@@ -104,21 +104,21 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 				<Form.Item label="Display Order">
 					<Input
 						type="number"
-						value={foundState?.DisplayOrder || 0}
+						value={foundState?.displayOrder || 0}
 						onChange={handleDisplayOrderChange}
 						maxLength={4}
 					/>
 				</Form.Item>
 				<Form.Item colon={false} label="Requires Role Assignment">
 					<Checkbox
-						checked={!!foundState?.RequiresRoleAssignment}
-						onChange={() => updateStateProperty({ state: id, property: 'RequiresRoleAssignment', value: !foundState?.RequiresRoleAssignment })}
+						checked={!!foundState?.requiresRoleAssignment}
+						onChange={() => updateStateProperty({ state: id, property: 'requiresRoleAssignment', value: !foundState?.requiresRoleAssignment })}
 					/>
 				</Form.Item>
 				<Form.Item colon={false} label="Requires User Assignment">
 					<Checkbox
-						checked={!!foundState?.RequiresUserAssignment}
-						onChange={() => updateStateProperty({ state: id, property: 'RequiresUserAssignment', value: !foundState?.RequiresUserAssignment })}
+						checked={!!foundState?.requiresUserAssignment}
+						onChange={() => updateStateProperty({ state: id, property: 'requiresUserAssignment', value: !foundState?.requiresUserAssignment })}
 					/>
 				</Form.Item>
 			</Form>
@@ -255,7 +255,31 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 						/>
 					</>
 				)}
-				{data?.label || "Unknown State"}
+				<div
+					style={{
+						whiteSpace: 'nowrap',
+						overflow: 'hidden',
+						textOverflow: 'ellipsis',
+						padding: '0 4px',
+					}}
+				>
+					{data?.label || "Unknown State"}
+				</div>
+				{/* 
+				<Handle
+					className="targetHandle"
+					style={{ zIndex: 2 }}
+					position={Position.Top}
+					type="source"
+					isConnectable={isConnectable}
+				/>
+				<Handle
+					className="targetHandle"
+					style={targetHandleStyle}
+					position={Position.Bottom}
+					type="target"
+					isConnectable={isConnectable}
+				/> */}
 			</div>
 		</Popover>
 	);

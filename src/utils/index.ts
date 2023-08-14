@@ -99,9 +99,9 @@ export function transformTransitionsToEdges(
 	idPrefix: string = ""
 ): Edge[] {
 	const mapper = (transition: WorkFlowTransition): Edge | any => {
-		const { StateName: source, ToStateName: target, properties = {} } = transition;
+		const { stateName: source, toStateName: target, properties = {} } = transition;
 
-		const { sourceHandle = null, targetHandle = null } = properties;
+		const { sourceHandle = null, targetHandle = null } = properties || {};
 
 		return {
 			style: {
@@ -121,33 +121,49 @@ export function transformTransitionsToEdges(
 		};
 	};
 
-	return Transitions.map(mapper);
+	return Array.isArray(Transitions) ? Transitions.map(mapper) : [];
 }
 
 // might get weird mama
 export function transformNewConnectionToTransition(
-	connection: Connection,
-	existingTransitions: WorkFlowTransition[]
+	{
+		connection,
+		existingTransitions,
+		allStates,
+		roleId,
+		roleName,
+	}: {
+		connection: Connection,
+		existingTransitions: WorkFlowTransition[],
+		allStates: WorkflowState[],
+		roleId: Nullable<number>,
+		roleName: string,
+	}
 ): WorkFlowTransition | null {
 	const { source, target, sourceHandle, targetHandle } = connection;
 
 	const foundTransition = existingTransitions.find(
-		({ StateName, ToStateName }) => source === StateName && target === ToStateName
+		({ stateName, toStateName }) => source === stateName && target === toStateName
 	);
+
+	const foundState = (name: string): WorkflowState | undefined => {
+		return allStates.find((s) => s.stateName === name);
+	}
+
+	const foundFromState = foundState(source || '');
+	const foundToState = foundState(target || '');
 
 	return (
 		foundTransition ||
 		(source && target
 			? {
-				StateID: null,
-				ProcessID: null,
-				RoleID: null,
-				RoleName: null,
-				ProcessName: null,
-				InternalOnly: false,
-				StateTransitionID: null,
-				StateName: source,
-				ToStateName: target,
+				stateId: foundFromState?.stateId || null,
+				altStateId: foundToState?.stateId || null,
+				roleId,
+				roleName,
+				internalOnly: false,
+				stateName: source,
+				toStateName: target,
 				properties: { sourceHandle, targetHandle },
 			}
 			: null)
@@ -174,14 +190,14 @@ export function nodeByState({
 	idPrefix?: string;
 	selfConnected?: boolean;
 }): Node {
-	const { StateName, properties = {} } = state;
+	const { stateName, properties = {} } = state;
 	const defaultW = 200;
 	const defaultH = 30;
 	const defaultXPadding = 50;
 	const defaultYPadding = 40;
 	const divisor = 5; // todo: dynamic value based on allNodesLength if provided
 
-	const { x: propX, y: propY, w: propW, h: propH } = properties;
+	const { x: propX, y: propY, w: propW, h: propH } = properties || {};
 
 	const x = typeof propX === "number" ? propX : (index % divisor) * (defaultW + defaultXPadding);
 	const y =
@@ -190,7 +206,7 @@ export function nodeByState({
 	const height = propH || defaultH;
 
 	return {
-		id: idPrefix + StateName,
+		id: idPrefix + stateName,
 		dragHandle: ".drag-handle",
 		type: "custom",
 		position: {
@@ -198,7 +214,7 @@ export function nodeByState({
 			y: y + yOffset,
 		},
 		data: {
-			label: StateName,
+			label: stateName,
 			...(color && { color }),
 			...(selfConnected && { selfConnected }),
 			w: width,
@@ -252,35 +268,35 @@ export function stateByNode({
 	node: Node | any;
 	allStates: WorkflowState[];
 }): WorkflowState {
-	const { id: StateName, positionAbsolute = { x: 1, y: 1 }, width: w = 200, height: h = 30 } = node;
-	const foundState = allStates.find((s) => s?.StateName === StateName) || {};
-	let StateID: Nullable<number> = null;
-	let RequiresRoleAssignment: NumberBoolean | any = 0;
-	let RequiresUserAssignment: NumberBoolean | any = 0;
+	const { id: stateName, positionAbsolute = { x: 1, y: 1 }, width: w = 200, height: h = 30 } = node;
+	const foundState = allStates.find((s) => s?.stateName === stateName) || {};
+	let stateId: Nullable<number> = null;
+	let requiresRoleAssignment: NumberBoolean | any = 0;
+	let requiresUserAssignment: NumberBoolean | any = 0;
 
-	if ("StateID" in foundState && typeof foundState.StateID === "number")
-		StateID = foundState.StateID;
-	if ("RequiresRoleAssignment" in foundState) RequiresRoleAssignment = foundState.RequiresRoleAssignment
-	if ("RequiresUserAssignment" in foundState) RequiresUserAssignment = foundState.RequiresUserAssignment
+	if ("stateId" in foundState && typeof foundState.stateId === "number")
+		stateId = foundState.stateId;
+	if ("requiresRoleAssignment" in foundState) requiresRoleAssignment = foundState.requiresRoleAssignment
+	if ("requiresUserAssignment" in foundState) requiresUserAssignment = foundState.requiresUserAssignment
 
 	const properties = { ...positionAbsolute, h, w };
 
-	return { ...foundState, StateID, StateName, properties, RequiresUserAssignment, RequiresRoleAssignment };
+	return { ...foundState, stateId, stateName, properties, requiresUserAssignment, requiresRoleAssignment };
 }
 
 export function roleColor({
-	RoleName,
+	roleName,
 	allRoles,
 	index,
 }: {
-	RoleName: string;
+	roleName: string;
 	allRoles: WorkflowRole[];
 	index?: any;
 }): string {
 	const availableDefaultColors = defaultColors;
 
 	const roleIndex =
-		typeof index === "number" ? index : allRoles.findIndex((r) => r.RoleName === RoleName);
+		typeof index === "number" ? index : allRoles.findIndex((r) => r.roleName === roleName);
 
 	if (roleIndex !== -1) {
 		return (
@@ -313,8 +329,8 @@ export function computedNodes({
 	showAllConnections: boolean;
 	activeRole: string;
 }): Node[] {
-	const { States = [], Roles = [], ProcessName = "Process Name" } = process || {};
-	const mappedStates = States.map(({ properties }) => properties || {});
+	const { states = [], roles = [], processName = "Process Name" } = process || {};
+	const mappedStates = states.map(({ properties }) => properties || {});
 
 	const startingY = Math.min(...mappedStates.map(({ y = 0 }) => y));
 	const startingX = Math.min(...mappedStates.map(({ x = 0 }) => x));
@@ -336,19 +352,19 @@ export function computedNodes({
 	const nodes: Node[] = [];
 
 	if (showAllRoles) {
-		nodes.push(labelNode({ name: ProcessName, x: startingX, y: startingY - 80, w: totalSetWidth }));
+		nodes.push(labelNode({ name: processName, x: startingX, y: startingY - 80, w: totalSetWidth }));
 
-		Roles.forEach(({ RoleName }, i) => {
+		roles.forEach(({ roleName }, i) => {
 			nodes.push(
-				labelNode({ name: RoleName, x: -360, y: yOffset * i + (totalSetHeight / 2 - 20) })
+				labelNode({ name: roleName, x: -360, y: yOffset * i + (totalSetHeight / 2 - 20) })
 			);
 
-			[...States]
-				.sort((a, b) => a?.DisplayOrder || 1 - (b?.DisplayOrder || 0))
+			[...states]
+				.sort((a, b) => a?.displayOrder || 1 - (b?.displayOrder || 0))
 				.forEach((state, index, arr) => {
 					const selfConnected = stateIsSelfConnected({
-						role: RoleName,
-						StateID: state.StateName,
+						role: roleName,
+						stateId: state.stateName,
 						process,
 					});
 
@@ -360,23 +376,23 @@ export function computedNodes({
 							selfConnected,
 							idPrefix: String(i),
 							yOffset: yOffset * i,
-							color: roleColor({ RoleName: RoleName, allRoles: Roles }),
+							color: roleColor({ roleName, allRoles: roles }),
 						})
 					);
 				});
 		});
 	} else {
-		[...States]
-			.sort((a, b) => a?.DisplayOrder || 1 - (b?.DisplayOrder || 0))
+		[...states]
+			.sort((a, b) => a?.displayOrder || 1 - (b?.displayOrder || 0))
 			.forEach((state, index, arr) =>
 				nodes.push(
 					nodeByState({
 						state,
 						index,
 						allNodesLength: arr.length,
-						color: roleColor({ RoleName: activeRole, allRoles: Roles }),
+						color: roleColor({ roleName: activeRole, allRoles: roles }),
 						...(showAllConnections && {
-							selfConnected: stateIsSelfConnected({ StateID: state.StateName, process }),
+							selfConnected: stateIsSelfConnected({ stateId: state.stateName, process }),
 						}),
 					})
 				)
@@ -400,56 +416,66 @@ export function computedEdges({
 	if (showAllRoles) {
 		const allEdges: Edge[] = [];
 
-		roles.forEach(({ Transitions = [] }, i) => {
-			allEdges.push(...transformTransitionsToEdges(Transitions, String(i)));
+		roles.forEach(({ transitions = [] }, i) => {
+			allEdges.push(...transformTransitionsToEdges(transitions, String(i)));
 		});
 
 		return allEdges;
 	} else if (showAllConnections) {
 		const allTransitions: WorkFlowTransition[] = [];
 
-		roles.forEach(({ Transitions = [] }) => {
-			allTransitions.push(...Transitions);
+		roles.forEach(({ transitions = [] }) => {
+			Array.isArray(transitions) && allTransitions.push(...transitions);
 		});
 
 		return transformTransitionsToEdges(
 			allTransitions.filter(
-				({ StateName, ToStateName }, i) =>
+				({ stateName, toStateName }, i) =>
 					allTransitions.findIndex(
 						(transtion) =>
-							transtion.StateName === StateName && transtion.ToStateName === ToStateName
+							transtion.stateName === stateName && transtion.toStateName === toStateName
 					) === i
 			)
 		);
 	} else {
-		const Transitions = roles?.find((r) => r.RoleName === activeRole)?.Transitions || [];
+		const Transitions = roles?.find((r) => r.roleName === activeRole)?.transitions || [];
 
 		return transformTransitionsToEdges(Transitions);
 	}
 }
 
 export function stateIsSelfConnected({
-	StateID,
+	stateId,
 	role,
 	process,
 }: {
-	StateID: string;
+	stateId: string;
 	role?: string;
 	process: WorkflowProcess | null;
 }): boolean {
-	const { Roles = [] } = process || {};
+	const { roles = [] } = process || {};
 	if (!role) {
 		const allTransitions: WorkFlowTransition[] = [];
 
-		Roles.forEach(({ Transitions = [] }) => allTransitions.push(...Transitions));
+		roles.forEach(({ transitions = [] }) => Array.isArray(transitions) && allTransitions.push(...transitions));
 
-		return allTransitions.some(({ StateName, ToStateName }) =>
-			[StateName, ToStateName].every((el) => el === StateID)
+		return allTransitions.some(({ stateName, toStateName }) =>
+			[stateName, toStateName].every((el) => el === stateId)
 		);
 	}
-	return !!Roles
-		.find(({ RoleName }) => RoleName === role)
-		?.Transitions?.find(({ StateName, ToStateName }) =>
-			[StateName, ToStateName].every((el) => el === StateID)
+	return !!roles
+		.find(({ roleName }) => roleName === role)
+		?.transitions?.find(({ stateName, toStateName }) =>
+			[stateName, toStateName].every((el) => el === stateId)
 		);
+}
+
+export async function copyToClipboard(text: string) {
+	try {
+		await navigator.clipboard.writeText(text);
+		return { message: 'Copied to clipboard', success: true }
+	} catch (err) {
+		console.error('copyToClipboard: ', err);
+		return { message: 'Unable to copy to clipboard', success: false }
+	}
 }

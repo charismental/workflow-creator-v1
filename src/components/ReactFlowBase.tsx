@@ -30,7 +30,7 @@ const selector = (state: MainState & MainActions) => ({
 	onNodesChange: state.onNodesChange,
 	setStatesForActiveProcess: state.setStatesForActiveProcess,
 	onConnect: state.onConnect,
-	activeProcessStates: state.activeProcess?.States || [],
+	activeProcessStates: state.activeProcess?.states || [],
 	reactFlowInstance: state.reactFlowInstance,
 	setReactFlowInstance: state.setReactFlowInstance,
 	showMinimap: state.showMinimap,
@@ -38,6 +38,7 @@ const selector = (state: MainState & MainActions) => ({
 	showAllConnectedStates: state.showAllConnectedStates,
 	setContextMenuNodeId: state.setContextMenuNodeId,
 	contextMenuNodeId: state.contextMenuNodeId,
+	states: state.states,
 });
 
 interface ReactFlowBaseProps {
@@ -65,6 +66,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		showAllConnectedStates,
 		setContextMenuNodeId,
 		contextMenuNodeId,
+		states,
 	} = useMainStore(selector, shallow);
 
 	const { activeRole, activeRoleColor, roleIsToggled } = props;
@@ -74,7 +76,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
 	useEffect(() => {
 		fitView();
-	}, [showAllRoles, showAllConnectedStates]);
+	}, [showAllRoles, showAllConnectedStates, activeProcess?.sessionId]);
 
 	useEffect(() => {
 		fitView(50);
@@ -95,7 +97,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 	}, [contextMenuNodeId, setContextMenuNodeId]);
 
 	const edges = computedEdges({
-		roles: activeProcess?.Roles || [],
+		roles: activeProcess?.roles || [],
 		activeRole,
 		showAllRoles,
 		showAllConnections: showAllConnectedStates,
@@ -146,13 +148,18 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
 			const initialNumberBoolean: NumberBoolean = 0;
 
+			// let displayOrder = 10;
+			// if (activeProcessStates.length) {
+			// 	displayOrder = Math.max(...activeProcessStates.map(({ displayOrder = 0 }) => displayOrder || 0)) + 10
+			// }
+			const foundState = states.find((s) => s.stateName === type);
+
 			const newState = {
-				RequiresRoleAssignment: initialNumberBoolean,
-				RequiresUserAssignment: initialNumberBoolean,
-				StateName: type,
-				StateID: null,
-				DisplayOrder:
-					Math.max(...activeProcessStates.map(({ DisplayOrder }) => DisplayOrder || 0)) + 10,
+				...(foundState && { ...foundState }),
+				requiresRoleAssignment: initialNumberBoolean,
+				requiresUserAssignment: initialNumberBoolean,
+				stateName: type,
+				stateId: foundState?.stateId || null,
 				properties: { ...position },
 			};
 

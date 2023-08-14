@@ -1,11 +1,25 @@
+import "dotenv/config";
 import { createRoot } from "react-dom/client";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./css/styles.css";
-
-import App from "./App";
+import Root from "./routes/root";
+import ErrorPage from "routes/error-page";
+import SharedLink from "routes/sharedLink";
 
 const doc = document.getElementById("root");
 if (!doc) throw new Error("Failed to find root element");
 
-const root = createRoot(doc);
+const router = createBrowserRouter([
+    {
+        path: "/",
+        element: <Root />,
+        errorElement: <ErrorPage />,
+    },
+    {
+        path: "/sharedLink/:id",
+        element: <SharedLink />,
+    },
+]);
 
-root.render(<App />);
+const root = createRoot(doc)
+    .render(<RouterProvider router={router} />);
