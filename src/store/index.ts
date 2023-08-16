@@ -42,6 +42,7 @@ export interface MainState {
     reactFlowInstance: ReactFlowInstance | undefined;
     showMinimap: boolean;
     showAllRoles: boolean;
+    showPortsAndCloseButtons: boolean;
     showAllConnectedStates: boolean;
     edgeType: string;
     contextMenuNodeId: string | undefined;
@@ -86,6 +87,7 @@ export interface MainActions {
     setColorForActiveRole: (newColor: string) => void;
     setReactFlowInstance: (instance: ReactFlowInstance) => void;
     setShowMinimap: () => void;
+    setShowPortsAndCloseButtons: () => void;
     toggleShowAllRoles: () => void;
     setShowAllConnectedStates: () => void;
     setEdgeType: (type: string) => void;
@@ -735,7 +737,11 @@ const useMainStore = create<MainState & MainActions>()(
                 ),
             reactFlowInstance: undefined,
             setReactFlowInstance: (instance: ReactFlowInstance) => set({ reactFlowInstance: instance }),
-            showMinimap: false,
+            showPortsAndCloseButtons: true,
+            setShowPortsAndCloseButtons: () => {
+                set({ showPortsAndCloseButtons: !get().showPortsAndCloseButtons });
+            },
+            showMinimap: true,
             setShowMinimap: () => {
                 set({ showMinimap: !get().showMinimap });
             },

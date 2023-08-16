@@ -10,6 +10,8 @@ import Icon, {
 	SwapOutlined,
 	TableOutlined,
 	UnlockOutlined,
+	EyeOutlined,
+	EyeInvisibleOutlined,
 } from "@ant-design/icons";
 import { Button, Dropdown, MenuProps, Radio, Space, Tooltip } from "antd";
 import { useCallback, useEffect, useState } from "react";
@@ -26,6 +28,7 @@ import useMainStore from "store";
 import { shallow } from "zustand/shallow";
 import { EdgeModal, NodeModal } from "../Modals";
 import { MapSvg, CustomControlButtonWithTooltip, DownloadButton } from "./";
+import { set } from "immer/dist/internal";
 
 interface CustomControlsProps {
 	getCurrentEdges: (() => Edge[]) | undefined;
@@ -50,16 +53,26 @@ const CustomControls = ({
 	const [currentNodes, setCurrentNodes] = useState<Node[]>([]);
 	const [nodeModalOpen, setNodeModalOpen] = useState(false);
 	const setShowMinimap = useMainStore(useCallback((state) => state.setShowMinimap, []));
-	const [showAllRoles, toggleShowAllRoles, setShowAllConnectedStates, setEdgeType, edgeType, saveStateSnapshot, revertToSnapshot] =
+	const [
+		toggleShowAllRoles,
+		setShowAllConnectedStates,
+		setEdgeType,
+		edgeType,
+		saveStateSnapshot,
+		revertToSnapshot,
+		showPortsAndCloseButtons,
+		setShowPortsAndCloseButtons
+	] =
 		useMainStore(
 			(state) => [
-				state.showAllRoles,
 				state.toggleShowAllRoles,
 				state.setShowAllConnectedStates,
 				state.setEdgeType,
 				state.edgeType,
 				state.saveStateSnapshot,
 				state.revertToSnapshot,
+				state.showPortsAndCloseButtons,
+				state.setShowPortsAndCloseButtons,
 			],
 			shallow
 		);
@@ -92,10 +105,6 @@ const CustomControls = ({
 		setNodeModalOpen(true);
 	};
 
-	const setShowAllRoles = () => {
-		toggleShowAllRoles();
-	};
-
 	const setShowAllConnections = () => {
 		onToggleInteractivity(true);
 		setShowAllConnectedStates();
@@ -106,6 +115,7 @@ const CustomControls = ({
 		{ label: "Step", value: "step" },
 		{ label: "Bezier", value: "bezier" },
 	];
+
 	const items: MenuProps["items"] = [
 		{
 			key: "1",
@@ -192,12 +202,17 @@ const CustomControls = ({
 				<CustomControlButtonWithTooltip
 					title={"Show All Roles and Connections"}
 					icon={<TableOutlined />}
-					clickEvent={setShowAllRoles}
+					clickEvent={toggleShowAllRoles}
 				/>
 				<CustomControlButtonWithTooltip
 					title={"Show All Connected States"}
 					icon={<ApartmentOutlined />}
 					clickEvent={setShowAllConnections}
+				/>
+				<CustomControlButtonWithTooltip
+					title={showPortsAndCloseButtons ? "Hide ports and close buttons" : "Show ports and close buttons"}
+					icon={showPortsAndCloseButtons ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+					clickEvent={setShowPortsAndCloseButtons}
 				/>
 				<Dropdown
 					autoFocus

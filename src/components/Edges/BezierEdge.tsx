@@ -24,14 +24,17 @@ const BezierEdge: FunctionComponent<EdgeProps> = ({
 	sourcePosition,
 	targetPosition,
 }) => {
-	const [removeTransition, showAllConnections, setHoveredEdgeNodes] = useMainStore(
+	const [removeTransition, showAllConnections, setHoveredEdgeNodes, showPortsAndCloseButtons] = useMainStore(
 		(state) => [
 			state.removeTransition,
 			state.showAllConnectedStates,
 			state.setHoveredEdgeNodes,
+			state.showPortsAndCloseButtons,
 		],
 		shallow
 	);
+
+	const hideCloseButton = showAllConnections || !showPortsAndCloseButtons;
 
 	const [isHover, setIsHover] = useState<Nullable<boolean>>(null);
 
@@ -76,7 +79,7 @@ const BezierEdge: FunctionComponent<EdgeProps> = ({
 				markerEnd={markerEnd}
 				stroke={isHover ? "#0ff" : "black"}
 			/>
-			{!showAllConnections && (
+			{!hideCloseButton && (
 				<foreignObject
 					onMouseOver={() => hoverEdge(true)}
 					onMouseLeave={() => hoverEdge(false)}

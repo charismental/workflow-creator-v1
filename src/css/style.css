@@ -82,6 +82,29 @@ div.full-handle {
   cursor: grab;
 }
 
+.react-flow__handle {
+  height: 10px;
+  width: 10px;
+  background: white;
+  border: 1px solid black;
+}
+
+.react-flow__handle-top {
+  top: -6px;
+}
+
+.react-flow__handle-right {
+  right: -6px;
+}
+
+.react-flow__handle-bottom {
+  bottom: -6px;
+}
+
+.react-flow__handle-left {
+  left: -6px;
+}
+
 .dndflow .dndnode.input {
   border-color: #0041d0;
 }

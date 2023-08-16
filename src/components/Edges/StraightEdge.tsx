@@ -14,14 +14,17 @@ import { Nullable } from "types";
 const foreignObjectSize = 40;
 
 const StraightEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd }) => {
-	const [removeTransition, showAllConnections, setHoveredEdgeNodes] = useMainStore(
+	const [removeTransition, showAllConnections, setHoveredEdgeNodes, showPortsAndCloseButtons] = useMainStore(
 		(state) => [
 			state.removeTransition,
 			state.showAllConnectedStates,
 			state.setHoveredEdgeNodes,
+			state.showPortsAndCloseButtons,
 		],
 		shallow
 	);
+	
+	const hideCloseButton = showAllConnections || !showPortsAndCloseButtons;
 
 	const [isHover, setIsHover] = useState<Nullable<boolean>>(null);
 
@@ -66,7 +69,7 @@ const StraightEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 				markerEnd={markerEnd}
 				stroke={isHover ? "#0ff" : "black"}
 			/>
-			{!showAllConnections && (
+			{!hideCloseButton && (
 				<foreignObject
 					onMouseOver={() => hoverEdge(true)}
 					onMouseLeave={() => hoverEdge(false)}

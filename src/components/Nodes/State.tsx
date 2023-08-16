@@ -22,21 +22,15 @@ const connectionNodeIdSelector = (state: any) => state.connectionNodeId;
 const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.Element => {
 	const removeState = useMainStore((state) => state.removeState, shallow);
 	const updateStateProperty = useMainStore((state) => state.updateStateProperty);
-
 	const contextMenuNodeId = useMainStore((state) => state.contextMenuNodeId, shallow);
-
 	// todo: consolidate this with updateStateProperty
 	const updateStateProperties = useMainStore((state) => state.updateStateProperties, shallow);
-
 	const foundState = useMainStore((state) => (state?.activeProcess?.states || []).find(({ stateName }) => stateName === id));
-
 	const onConnect = useMainStore((state) => state.onConnect, shallow);
-
 	const removeTransition = useMainStore((state) => state.removeTransition, shallow);
-
 	const isEdgeHovered = useMainStore((state) => state.hoveredEdgeNodes.includes(id))
-
 	const showAllRoles = useMainStore((state) => state.showAllRoles, shallow);
+	const showPortsAndCloseButtons = useMainStore((state) => state.showPortsAndCloseButtons, shallow);
 
 	// todo, use only data.selfConnected
 	// update util to always add selfConnected for stateToNode
@@ -116,10 +110,10 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 		</div>
 	);
 
-	const zIndexByTarget = (isSource = false) => {
-		const zIndex = (isSource && !isTarget) || (!isSource && isTarget) ? 3 : 1;
-
-		return { zIndex } 
+	const styleByTarget = (isSource = false) => {
+		return (isSource && !isTarget) || (!isSource && isTarget) ?
+			{ zIndex: 3, opacity: showPortsAndCloseButtons ? 1 : 0 } :
+			{ zIndex: 1, opacity: 0 };
 	};
 
 	return (
@@ -178,21 +172,21 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 				{/* top source */}
 				<Handle
 					id="t_out_1"
-					style={{ ...zIndexByTarget(true), left: 30, opacity: !isTarget ? 1 : 0 }}
+					style={{ ...styleByTarget(true), left: 30 }}
 					position={Position.Top}
 					type="source"
 					isConnectable={isConnectable}
 				/>
 				<Handle
 					id="t_out_2"
-					style={{ ...zIndexByTarget(true), opacity: !isTarget ? 1 : 0 }}
+					style={{ ...styleByTarget(true) }}
 					position={Position.Top}
 					type="source"
 					isConnectable={isConnectable}
 				/>
 				<Handle
 					id="t_out_3"
-					style={{ ...zIndexByTarget(true), right: 24, left: 'unset', opacity: !isTarget ? 1 : 0 }}
+					style={{ ...styleByTarget(true), right: 24, left: 'unset' }}
 					position={Position.Top}
 					type="source"
 					isConnectable={isConnectable}
@@ -200,7 +194,7 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 				{/* right source */}
 				<Handle
 					id="r_out_1"
-					style={{ ...zIndexByTarget(true), opacity: !isTarget ? 1 : 0 }}
+					style={{ ...styleByTarget(true) }}
 					position={Position.Right}
 					type="source"
 					isConnectable={isConnectable}
@@ -208,21 +202,21 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 				{/* bottom source */}
 				<Handle
 					id="b_out_1"
-					style={{ ...zIndexByTarget(true), left: 30, opacity: !isTarget ? 1 : 0 }}
+					style={{ ...styleByTarget(true), left: 30 }}
 					position={Position.Bottom}
 					type="source"
 					isConnectable={isConnectable}
 				/>
 				<Handle
 					id="b_out_2"
-					style={{ ...zIndexByTarget(true), opacity: !isTarget ? 1 : 0 }}
+					style={{ ...styleByTarget(true) }}
 					position={Position.Bottom}
 					type="source"
 					isConnectable={isConnectable}
 				/>
 				<Handle
 					id="b_out_3"
-					style={{ ...zIndexByTarget(true), right: 24, left: 'unset', opacity: !isTarget ? 1 : 0 }}
+					style={{ ...styleByTarget(true), right: 24, left: 'unset' }}
 					position={Position.Bottom}
 					type="source"
 					isConnectable={isConnectable}
@@ -230,7 +224,7 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 				{/* left source */}
 				<Handle
 					id="l_out_1"
-					style={{ ...zIndexByTarget(true), opacity: !isTarget ? 1 : 0 }}
+					style={{ ...styleByTarget(true) }}
 					position={Position.Left}
 					type="source"
 					isConnectable={isConnectable}
@@ -238,21 +232,21 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 				{/* top target */}
 				<Handle
 					id="t_in_1"
-					style={{ ...zIndexByTarget(), left: 30, opacity: isTarget ? 1 : 0 }}
+					style={{ ...styleByTarget(), left: 30 }}
 					position={Position.Top}
 					type="target"
 					isConnectable={isConnectable}
 				/>
 				<Handle
 					id="t_in_2"
-					style={{ ...zIndexByTarget(), opacity: isTarget ? 1 : 0 }}
+					style={{ ...styleByTarget() }}
 					position={Position.Top}
 					type="target"
 					isConnectable={isConnectable}
 				/>
 				<Handle
 					id="t_in_3"
-					style={{ ...zIndexByTarget(), right: 24, left: 'unset', opacity: isTarget ? 1 : 0 }}
+					style={{ ...styleByTarget(), right: 24, left: 'unset' }}
 					position={Position.Top}
 					type="target"
 					isConnectable={isConnectable}
@@ -260,7 +254,7 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 				{/* right target */}
 				<Handle
 					id="r_in_1"
-					style={{ ...zIndexByTarget(), opacity: isTarget ? 1 : 0 }}
+					style={{ ...styleByTarget() }}
 					position={Position.Right}
 					type="target"
 					isConnectable={isConnectable}
@@ -268,21 +262,21 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 				{/* bottom target */}
 				<Handle
 					id="b_in_1"
-					style={{ ...zIndexByTarget(), left: 30, opacity: isTarget ? 1 : 0 }}
+					style={{ ...styleByTarget(), left: 30 }}
 					position={Position.Bottom}
 					type="target"
 					isConnectable={isConnectable}
 				/>
 				<Handle
 					id="b_in_2"
-					style={{ ...zIndexByTarget(), opacity: isTarget ? 1 : 0 }}
+					style={{ ...styleByTarget() }}
 					position={Position.Bottom}
 					type="target"
 					isConnectable={isConnectable}
 				/>
 				<Handle
 					id="b_in_3"
-					style={{ ...zIndexByTarget(), right: 24, left: 'unset', opacity: isTarget ? 1 : 0 }}
+					style={{ ...styleByTarget(), right: 24, left: 'unset' }}
 					position={Position.Bottom}
 					type="target"
 					isConnectable={isConnectable}
@@ -290,7 +284,7 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 				{/* left target */}
 				<Handle
 					id="l_in_1"
-					style={{ ...zIndexByTarget(), opacity: isTarget ? 1 : 0 }}
+					style={{ ...styleByTarget() }}
 					position={Position.Left}
 					type="target"
 					isConnectable={isConnectable}
