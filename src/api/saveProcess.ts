@@ -1,10 +1,11 @@
-import AxiosDefault from "./AxiosDefault";
-import { WorkflowProcess } from "../types/workflowTypes";
-import endpoints from "./endpointsEnum";
+import { AxiosDefault, endpoints } from "api";
+import { WorkflowProcess } from "types";
 
 
-export default async (process: WorkflowProcess): Promise<WorkflowProcess> => {
+const saveProcess = async (process: WorkflowProcess): Promise<WorkflowProcess> => {
 	const { data = null } = await AxiosDefault.post(endpoints.saveProcess, process)
 
 	return data;
 };
+
+export { saveProcess }

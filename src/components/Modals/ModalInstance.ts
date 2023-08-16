@@ -16,7 +16,7 @@ export interface ModalProps {
 	cancelText?: string;
 }
 
-export default (props: ModalProps) => {
+const ModalInstance = (props: ModalProps) => {
 	const {
 		type,
 		title,
@@ -50,3 +50,5 @@ export default (props: ModalProps) => {
 	
 	Modal[type](modalOptions);	
 };
+
+export { ModalInstance }

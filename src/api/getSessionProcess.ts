@@ -1,9 +1,7 @@
-import AxiosDefault from "./AxiosDefault";
-import { WorkflowProcess } from "../types/workflowTypes";
-import endpoints from "./endpointsEnum";
+import { AxiosDefault, endpoints } from "api";
+import { WorkflowProcess } from "types";
 
-
-export default async (sessionId: string): Promise<WorkflowProcess> => {
+const getSessionProcess = async (sessionId: string): Promise<WorkflowProcess> => {
 	const { data = null } = await AxiosDefault.get(endpoints.getSessionProcess, {
 		params: { sessionId },
 		validateStatus(status) {
@@ -13,3 +11,5 @@ export default async (sessionId: string): Promise<WorkflowProcess> => {
 
 	return data;
 };
+
+export { getSessionProcess }

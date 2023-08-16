@@ -76,7 +76,7 @@ function getEdgePosition(node: any, intersectionPoint: any) {
 
 // returns the parameters (sx, sy, tx, ty, sourcePos, targetPos) you need to create an edge
 export function getEdgeParams({ source, target, sourceHandle, targetHandle }: { source: any; target: any; sourceHandle?: { x: number, y: number }; targetHandle?: { x: number; y: number } }) {
-	console.log('getEdgeParams', sourceHandle, targetHandle)
+	// console.log('getEdgeParams', sourceHandle, targetHandle)
 	
 	const sourceIntersectionPoint = getNodeIntersection(source, target);
 	const targetIntersectionPoint = getNodeIntersection(target, source);
@@ -181,6 +181,7 @@ export function nodeByState({
 	yOffset = 0,
 	idPrefix = "",
 	selfConnected = false,
+	fullHandles = false,
 }: {
 	state: WorkflowState;
 	index: number;
@@ -189,6 +190,7 @@ export function nodeByState({
 	yOffset?: number;
 	idPrefix?: string;
 	selfConnected?: boolean;
+	fullHandles?: boolean;
 }): Node {
 	const { stateName, properties = {} } = state;
 	const defaultW = 200;
@@ -208,7 +210,7 @@ export function nodeByState({
 	return {
 		id: idPrefix + stateName,
 		dragHandle: ".drag-handle",
-		type: "custom",
+		type: fullHandles ? "fullHandles" : "state",
 		position: {
 			x,
 			y: y + yOffset,
@@ -323,11 +325,13 @@ export function computedNodes({
 	showAllRoles,
 	activeRole,
 	showAllConnections,
+	fullHandles,
 }: {
 	process: WorkflowProcess | null;
 	showAllRoles: boolean;
 	showAllConnections: boolean;
 	activeRole: string;
+	fullHandles: boolean;
 }): Node[] {
 	const { states = [], roles = [], processName = "Process Name" } = process || {};
 	const mappedStates = states.map(({ properties }) => properties || {});
@@ -377,6 +381,7 @@ export function computedNodes({
 							idPrefix: String(i),
 							yOffset: yOffset * i,
 							color: roleColor({ roleName, allRoles: roles }),
+							fullHandles,
 						})
 					);
 				});
@@ -391,6 +396,7 @@ export function computedNodes({
 						index,
 						allNodesLength: arr.length,
 						color: roleColor({ roleName: activeRole, allRoles: roles }),
+						fullHandles,
 						...(showAllConnections && {
 							selfConnected: stateIsSelfConnected({ stateId: state.stateName, process }),
 						}),

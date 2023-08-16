@@ -6,7 +6,7 @@ import {
 } from "@ant-design/icons";
 import { Collapse, Divider, InputRef, Space, Input } from "antd";
 import React, { useRef, useState } from "react";
-import AddNewInput from "./AddNewInput";
+import { AddNewInput } from "./Inputs";
 import styles from "./StateCollapseBox.module.css";
 
 const { Panel } = Collapse;

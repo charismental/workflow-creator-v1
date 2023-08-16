@@ -1,5 +1,4 @@
-import { Typography } from "antd";
-import ModalInstance, { ModalType } from "./ModalInstance";
+import { ModalType, ModalInstance } from "./";
 import { MainActions } from "store";
 
 interface SetAsInactiveModalProps {

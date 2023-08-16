@@ -21,12 +21,12 @@ const ToggleEdgeTypes: FC<ToggleEdgeProps> = ({ edgeType, setEdgeType }) => {
 				<Radio.Group
 					onChange={onChange}
 					value={edgeType}
-					defaultValue={"Straight"}
+					defaultValue={"straight"}
 				>
 					<Space direction={"vertical"}>
-						<Radio value={"Straight"}>Straight</Radio>
-						<Radio value={"Bezier"}>Bezier</Radio>
-						<Radio value={"Step"}>Step</Radio>
+						<Radio value={"straight"}>Straight</Radio>
+						<Radio value={"bezier"}>Bezier</Radio>
+						<Radio value={"step"}>Step</Radio>
 					</Space>
 				</Radio.Group>
 			</div>
@@ -34,4 +34,4 @@ const ToggleEdgeTypes: FC<ToggleEdgeProps> = ({ edgeType, setEdgeType }) => {
 	);
 };
 
-export default ToggleEdgeTypes;
+export { ToggleEdgeTypes };

@@ -8,7 +8,7 @@ import {
 	getSmoothStepPath,
 	useStore as useReactFlowStore,
 } from "reactflow";
-import { getEdgeParams } from "../utils";
+import { getEdgeParams } from "../../utils";
 import useMainStore from "store";
 import { shallow } from "zustand/shallow";
 import { Nullable } from "types";
@@ -50,8 +50,10 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 	if (!sourceNode || !targetNode || source === target) {
 		return null;
 	}
-	console.log('edgetype:', edgeType)
-	const { sx, sy, tx, ty, sourcePos, targetPos } = getEdgeParams({ source: sourceNode, target: targetNode, ...(edgeType !== 'straight' && { sourceHandle: { x: sourceX, y: sourceY }, targetHandle: { x: targetX, y: targetY } }) });
+	// console.log('edgetype:', edgeType)
+	const { sx, sy, tx, ty, sourcePos, targetPos } = getEdgeParams({ source: sourceNode, target: targetNode });
+
+	// const { sx, sy, tx, ty, sourcePos, targetPos } = getEdgeParams({ source: sourceNode, target: targetNode, ...(edgeType !== 'straight' && { sourceHandle: { x: sourceX, y: sourceY }, targetHandle: { x: targetX, y: targetY } }) });
 
 	const currentEdgeType = () => {
 		const baseParams = {
@@ -108,4 +110,4 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 	);
 };
 
-export default FloatingEdge;
+export { FloatingEdge };

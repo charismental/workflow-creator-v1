@@ -86,4 +86,4 @@ const AddNewInput: FC<AddNewInputProps> = (props) => {
 	);
 };
 
-export default AddNewInput;
+export { AddNewInput };

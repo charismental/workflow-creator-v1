@@ -2,7 +2,7 @@ import { FunctionComponent } from "react";
 
 import { NodeProps } from "reactflow";
 
-const LabelNode: FunctionComponent<NodeProps> = ({
+const Label: FunctionComponent<NodeProps> = ({
   data,
 }): JSX.Element => {
   const minWidth = 200;
@@ -23,4 +23,4 @@ const LabelNode: FunctionComponent<NodeProps> = ({
   );
 };
 
-export default LabelNode;
+export { Label };

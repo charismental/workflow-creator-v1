@@ -1,4 +1,3 @@
-// doing it this way for now to get around use of hook
 import { defaultColors } from "data";
 import { create } from "zustand";
 // import { persist } from 'zustand/middleware';
@@ -11,13 +10,15 @@ import {
     applyNodeChanges,
 } from "reactflow";
 import { devtools } from "zustand/middleware";
-import getAllSessions from "api/getAllSessions"; // todo: import from index
-import getSessionProcess from "api/getSessionProcess";
-import createProcess from "api/createProcess";
-import deleteSession from "api/deleteSession";
-import cloneProcess from "api/cloneProcess";
-import saveProcess from "api/saveProcess";
-import publishProcess from "api/publishProcess";
+import {
+    getAllSessions,
+    getSessionProcess,
+    createProcess,
+    deleteSession,
+    cloneProcess,
+    saveProcess,
+    publishProcess,
+} from "api";
 
 import {
     WorkFlowTransition,
@@ -26,8 +27,8 @@ import {
     WorkflowState,
     WorkflowCompany,
     WorkflowSession,
-} from "../types/workflowTypes";
-import { Nullable, NumberBoolean } from "../types/genericTypes";
+    NumberBoolean,
+} from "types";
 
 // import mockGetAllSessions from "data/mockGetAllSessions_v2";
 import { nodeByState, roleColor, stateByNode, transformNewConnectionToTransition } from "utils";
@@ -247,7 +248,8 @@ const useMainStore = create<MainState & MainActions>()(
             roles: [],
             companies: [],
             onNodesChange: (changes: NodeChange[] | any[]) => {
-                const { activeProcess, activeRole, showAllRoles } = get();
+                const { activeProcess, activeRole, showAllRoles, edgeType } = get();
+                const isStraightEdge = edgeType === 'straight';
 
                 const removeIndexPrefix = (prefixedString: string): string => {
                     const prefix = !showAllRoles ? "" : prefixedString.match(/\d+/g)?.[0] || "";
@@ -277,6 +279,7 @@ const useMainStore = create<MainState & MainActions>()(
                             index: i,
                             allNodesLength: arr.length,
                             color: nodeColor,
+                            fullHandles: isStraightEdge,
                         })
                     );
 

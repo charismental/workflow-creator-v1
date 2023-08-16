@@ -1,4 +1,4 @@
-export default {
+const endpoints = {
     cloneProcess: "/api/CloneProcess",
     createProcess: "/api/CreateProcess",
     editProcess: "/api/EditProcess",
@@ -8,3 +8,5 @@ export default {
     publishProcess: "/api/PublishProcess",
     deleteSession: "api/DeleteSession",
 }
+
+export { endpoints }
