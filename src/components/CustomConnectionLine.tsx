@@ -7,6 +7,9 @@ const CustomConnectionLine: FunctionComponent<ConnectionLineComponentProps> = ({
 	toX,
 	toY,
 	connectionLineStyle,
+	// fromPosition,
+	// toPosition,
+	// connectionLineType,
 }): JSX.Element => {
 	const [edgePath] = getStraightPath({
 		sourceX: fromX,
@@ -14,9 +17,17 @@ const CustomConnectionLine: FunctionComponent<ConnectionLineComponentProps> = ({
 		targetX: toX,
 		targetY: toY,
 	});
+	// console.log({
+	// 	fromX,
+	// 	fromY,
+	// 	toX,
+	// 	toY,
+	// 	connectionLineStyle,
+	// })
+	// console.log(edgePath)
 
 	return (
-		<g>
+		!false ? <g>
 			<path
 				style={connectionLineStyle}
 				fill="none"
@@ -32,6 +43,17 @@ const CustomConnectionLine: FunctionComponent<ConnectionLineComponentProps> = ({
 				strokeWidth={1}
 			/>
 		</g>
+			:
+			<g>
+				<path
+					fill="none"
+					stroke="#222"
+					strokeWidth={1.5}
+					className="animated"
+					d={`M${fromX},${fromY} C ${fromX} ${toY} ${fromX} ${toY} ${toX},${toY}`}
+				/>
+				<circle cx={toX} cy={toY} fill="#fff" r={3} stroke="#222" strokeWidth={1.5} />
+			</g>
 	);
 };
 

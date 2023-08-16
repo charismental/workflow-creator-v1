@@ -1,5 +1,4 @@
-import { Typography } from "antd";
-import ModalInstance, { ModalType } from "./ModalInstance";
+import { ModalType, ModalInstance } from "./";
 import { MainActions } from "store";
 
 interface SetAsInactiveModalProps {
@@ -10,7 +9,7 @@ interface SetAsInactiveModalProps {
 	successMessage: () => void;
 }
 
-export default ({
+const ToggleRoleActiveState = ({
 	toggleRoleForProcess,
 	roleName,
 	modalOpen,
@@ -39,3 +38,5 @@ export default ({
 
 	return ModalInstance(modalOptions);
 };
+
+export { ToggleRoleActiveState }

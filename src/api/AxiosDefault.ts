@@ -1,5 +1,7 @@
 import axios from "axios";
 
-const headers = {};
+// const headers = {};
 
-export default axios.create({ baseURL: process.env.REACT_APP_BASE_URL });
+const AxiosDefault = axios.create({ baseURL: process.env.REACT_APP_BASE_URL });
+
+export { AxiosDefault };

@@ -1,4 +1,4 @@
-import { WorkflowProcess } from "types/workflowTypes";
+import { WorkflowProcess } from "types";
 
 const process: WorkflowProcess = {
 	processName: 'LADV',

@@ -1,9 +1,8 @@
-import AxiosDefault from "./AxiosDefault";
-import { WorkflowProcess } from "../types/workflowTypes";
-import endpoints from "./endpointsEnum";
+import { AxiosDefault, endpoints } from "api";
+import { WorkflowProcess } from "types";
 
 
-export default async ({ processName, newProcessName }: { processName: string; newProcessName: string }): Promise<WorkflowProcess> => {
+const cloneProcess = async ({ processName, newProcessName }: { processName: string; newProcessName: string }): Promise<WorkflowProcess> => {
 	const { data = null } = await AxiosDefault.post(endpoints.cloneProcess, {
 		processName,
 		newProcessName,
@@ -11,3 +10,5 @@ export default async ({ processName, newProcessName }: { processName: string; ne
 
 	return data;
 };
+
+export { cloneProcess }

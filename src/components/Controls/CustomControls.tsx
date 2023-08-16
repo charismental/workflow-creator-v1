@@ -23,12 +23,9 @@ import {
 	useStoreApi,
 } from "reactflow";
 import useMainStore from "store";
-import DownloadButton from "tools/DownloadImage";
 import { shallow } from "zustand/shallow";
-import EdgeModal from "../Modals/EdgeModal";
-import NodeModal from "../Modals/NodeModal";
-import CustomControlButtonWithTooltip from "./CustomControlButtonWithTooltip";
-import MapSvg from "./MapSvg";
+import { EdgeModal, NodeModal } from "../Modals";
+import { MapSvg, CustomControlButtonWithTooltip, DownloadButton } from "./";
 
 interface CustomControlsProps {
 	getCurrentEdges: (() => Edge[]) | undefined;
@@ -39,7 +36,7 @@ interface CustomControlsProps {
 const isInteractiveSelector = (s: ReactFlowState) =>
 	s.nodesDraggable && s.nodesConnectable && s.elementsSelectable;
 
-export default ({
+const CustomControls = ({
 	getCurrentEdges,
 	getCurrentNodes,
 	onInteractiveChange,
@@ -232,3 +229,5 @@ export default ({
 		</div>
 	);
 };
+
+export { CustomControls };

@@ -1,6 +1,6 @@
 import { Button, Tooltip } from "antd";
 
-export default ({
+const CustomControlButtonWithTooltip = ({
     title,
     icon,
     clickEvent,
@@ -27,3 +27,5 @@ export default ({
         </Tooltip>
     );
 };
+
+export { CustomControlButtonWithTooltip };

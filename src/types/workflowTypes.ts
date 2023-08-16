@@ -1,4 +1,4 @@
-import { Nullable, NumberBoolean } from "./genericTypes";
+import { Nullable, NumberBoolean } from "./";
 
 export interface WorkflowSession {
 	processId: Nullable<number>;

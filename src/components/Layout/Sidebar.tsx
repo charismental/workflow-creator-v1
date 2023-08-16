@@ -49,4 +49,4 @@ const Sidebar: FC<SideBarProps> = (props): JSX.Element => {
 	);
 };
 
-export default Sidebar;
+export { Sidebar };

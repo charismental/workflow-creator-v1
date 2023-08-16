@@ -8,7 +8,7 @@ import {
 	WorkflowProcess,
 	WorkflowRole,
 	WorkflowState,
-} from "../types"
+} from "../types";
 
 interface IntersectionNodeType {
 	width: any;
@@ -75,7 +75,9 @@ function getEdgePosition(node: any, intersectionPoint: any) {
 }
 
 // returns the parameters (sx, sy, tx, ty, sourcePos, targetPos) you need to create an edge
-export function getEdgeParams(source: any, target: any) {
+export function getEdgeParams({ source, target, sourceHandle, targetHandle }: { source: any; target: any; sourceHandle?: { x: number, y: number }; targetHandle?: { x: number; y: number } }) {
+	// console.log('getEdgeParams', sourceHandle, targetHandle)
+	
 	const sourceIntersectionPoint = getNodeIntersection(source, target);
 	const targetIntersectionPoint = getNodeIntersection(target, source);
 
@@ -83,30 +85,43 @@ export function getEdgeParams(source: any, target: any) {
 	const targetPos = getEdgePosition(target, targetIntersectionPoint);
 
 	return {
-		sx: sourceIntersectionPoint.x,
-		sy: sourceIntersectionPoint.y,
-		tx: targetIntersectionPoint.x,
-		ty: targetIntersectionPoint.y,
+		sx: sourceHandle?.x || sourceIntersectionPoint.x,
+		sy: sourceHandle?.y || sourceIntersectionPoint.y,
+		tx: targetHandle?.x || targetIntersectionPoint.x,
+		ty: targetHandle?.y || targetIntersectionPoint.y,
 		sourcePos,
 		targetPos,
 	};
 }
 
-export function transformTransitionsToEdges(
-	Transitions: WorkFlowTransition[],
-	idPrefix: string = ""
-): Edge[] {
+export function transformTransitionsToEdges({
+	transitions,
+	edgeType = 'straight',
+	idPrefix = "",
+}: {
+	transitions: WorkFlowTransition[];
+	edgeType: string;
+	idPrefix?: string;
+}): Edge[] {
 	const mapper = (transition: WorkFlowTransition): Edge | any => {
 		const { stateName: source, toStateName: target, properties = {} } = transition;
 
 		const { sourceHandle = null, targetHandle = null } = properties || {};
+		
+		const edgeTypeMap: any = {
+			straight: 'straightEdge',
+			step: 'stepEdge',
+			bezier: 'bezierEdge',
+		};
 
+		const type = edgeTypeMap[edgeType];
+		
 		return {
 			style: {
 				strokeWidth: 1.5,
 				stroke: "black",
 			},
-			type: "floating",
+			type,
 			markerEnd: {
 				type: "arrowclosed",
 				color: "black",
@@ -115,11 +130,11 @@ export function transformTransitionsToEdges(
 			targetHandle,
 			source: `${idPrefix}${source}`,
 			target: `${idPrefix}${target}`,
-			id: edgeIdByNodes({ source: `${idPrefix}${source}`, target: `${idPrefix}${target}` }),
+			id: edgeIdByNodes({ source: `${idPrefix}${source}`, target: `${idPrefix}${target}`, sourceHandle, targetHandle }),
 		};
 	};
 
-	return Array.isArray(Transitions) ? Transitions.map(mapper) : [];
+	return Array.isArray(transitions) ? transitions.map(mapper) : [];
 }
 
 // might get weird mama
@@ -168,8 +183,8 @@ export function transformNewConnectionToTransition(
 	);
 }
 
-export function edgeIdByNodes({ source, target }: { source: string; target: string }): string {
-	return `reactflow__edge-${source}-${target}`;
+export function edgeIdByNodes({ source, target, sourceHandle, targetHandle }: { source: string; target: string; sourceHandle?: string | null; targetHandle?: string | null }): string {
+	return `reactflow__edge-${source}${sourceHandle || ''}-${target}${targetHandle || ''}`;
 }
 
 export function nodeByState({
@@ -179,6 +194,7 @@ export function nodeByState({
 	yOffset = 0,
 	idPrefix = "",
 	selfConnected = false,
+	fullHandles = false,
 }: {
 	state: WorkflowState;
 	index: number;
@@ -187,6 +203,7 @@ export function nodeByState({
 	yOffset?: number;
 	idPrefix?: string;
 	selfConnected?: boolean;
+	fullHandles?: boolean;
 }): Node {
 	const { stateName, properties = {} } = state;
 	const defaultW = 200;
@@ -206,7 +223,7 @@ export function nodeByState({
 	return {
 		id: idPrefix + stateName,
 		dragHandle: ".drag-handle",
-		type: "custom",
+		type: fullHandles ? "fullHandles" : "state",
 		position: {
 			x,
 			y: y + yOffset,
@@ -321,11 +338,13 @@ export function computedNodes({
 	showAllRoles,
 	activeRole,
 	showAllConnections,
+	fullHandles,
 }: {
 	process: WorkflowProcess | null;
 	showAllRoles: boolean;
 	showAllConnections: boolean;
 	activeRole: string;
+	fullHandles: boolean;
 }): Node[] {
 	const { states = [], roles = [], processName = "Process Name" } = process || {};
 	const mappedStates = states.map(({ properties }) => properties || {});
@@ -375,6 +394,7 @@ export function computedNodes({
 							idPrefix: String(i),
 							yOffset: yOffset * i,
 							color: roleColor({ roleName, allRoles: roles }),
+							fullHandles,
 						})
 					);
 				});
@@ -389,6 +409,7 @@ export function computedNodes({
 						index,
 						allNodesLength: arr.length,
 						color: roleColor({ roleName: activeRole, allRoles: roles }),
+						fullHandles,
 						...(showAllConnections && {
 							selfConnected: stateIsSelfConnected({ stateId: state.stateName, process }),
 						}),
@@ -405,17 +426,19 @@ export function computedEdges({
 	activeRole,
 	showAllRoles,
 	showAllConnections,
+	edgeType = 'straight',
 }: {
 	showAllRoles: boolean;
 	roles: WorkflowRole[];
 	activeRole: string;
 	showAllConnections: boolean;
+	edgeType: string;
 }): Edge[] {
 	if (showAllRoles) {
 		const allEdges: Edge[] = [];
 
 		roles.forEach(({ transitions = [] }, i) => {
-			allEdges.push(...transformTransitionsToEdges(transitions, String(i)));
+			allEdges.push(...transformTransitionsToEdges({ transitions, idPrefix: String(i), edgeType }));
 		});
 
 		return allEdges;
@@ -426,19 +449,19 @@ export function computedEdges({
 			Array.isArray(transitions) && allTransitions.push(...transitions);
 		});
 
-		return transformTransitionsToEdges(
-			allTransitions.filter(
+		return transformTransitionsToEdges({
+			edgeType,
+			transitions: allTransitions.filter(
 				({ stateName, toStateName }, i) =>
 					allTransitions.findIndex(
 						(transtion) =>
 							transtion.stateName === stateName && transtion.toStateName === toStateName
 					) === i
-			)
-		);
+			)});
 	} else {
-		const Transitions = roles?.find((r) => r.roleName === activeRole)?.transitions || [];
+		const transitions = roles?.find((r) => r.roleName === activeRole)?.transitions || [];
 
-		return transformTransitionsToEdges(Transitions);
+		return transformTransitionsToEdges({ transitions, edgeType });
 	}
 }
 

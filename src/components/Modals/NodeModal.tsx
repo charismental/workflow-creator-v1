@@ -9,7 +9,7 @@ interface EdgeModalProps {
 	setNodeModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default ({ allCurrentNodesInCanvas, nodeModalOpen, setNodeModalOpen }: EdgeModalProps) => {
+const NodeModal = ({ allCurrentNodesInCanvas, nodeModalOpen, setNodeModalOpen }: EdgeModalProps) => {
 	return (
 		<Modal
 			bodyStyle={{ padding: "8px", width: "calc(min-content + 20px)" }}
@@ -45,3 +45,5 @@ export default ({ allCurrentNodesInCanvas, nodeModalOpen, setNodeModalOpen }: Ed
 		</Modal>
 	);
 };
+
+export { NodeModal };

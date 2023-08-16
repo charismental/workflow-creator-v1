@@ -1,7 +1,7 @@
 import { PlusCircleOutlined, PlusCircleTwoTone, DeleteTwoTone, CopyTwoTone } from "@ant-design/icons";
 import { Checkbox, Divider, InputRef, Select, Space } from "antd";
 import React, { useRef, useState } from "react";
-import AddNewInput from "./AddNewInput";
+import { AddNewInput } from "./";
 
 const { Option } = Select;
 
@@ -179,4 +179,4 @@ const SelectBox: React.FC<SelectBoxProps> = ({
 	);
 };
 
-export default SelectBox;
+export { SelectBox };

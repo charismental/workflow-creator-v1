@@ -1,19 +1,19 @@
 import "reactflow/dist/style.css";
 import "../css/style.css";
-import { Typography } from "antd";
 import defaultEdgeOptions from "data/defaultEdgeOptions";
-import { FC, useCallback, useEffect, useRef, useState } from "react";
-import ReactFlow, { Background, BackgroundVariant, Edge, MiniMap, NodeTypes } from "reactflow";
+import { FC, useCallback, useEffect, useRef } from "react";
+import ReactFlow, { Background, BackgroundVariant, MiniMap, NodeTypes } from "reactflow";
 import useMainStore, { MainActions, MainState } from "store";
 import { shallow } from "zustand/shallow";
 import CustomConnectionLine from "../components/CustomConnectionLine";
-import FloatingEdge from "../components/FloatingEdge";
-import StateNode from "../components/StateNode";
+import {
+	StraightEdge as straightEdge,
+	StepEdge as stepEdge,
+	BezierEdge as bezierEdge,
+} from "./Edges";
+import { StateWithFullHandles, State, Label } from "./Nodes";
 import { computedEdges, computedNodes } from "utils";
-import LabelNode from "./LabelNode";
-import { NumberBoolean } from "types/genericTypes";
-
-const { Text } = Typography;
+import { NumberBoolean } from "types";
 
 const connectionLineStyle = {
 	strokeWidth: 1.5,
@@ -21,8 +21,9 @@ const connectionLineStyle = {
 };
 
 const nodeTypes: NodeTypes = {
-	custom: StateNode,
-	label: LabelNode,
+	state: State,
+	fullHandles: StateWithFullHandles,
+	label: Label,
 };
 
 const selector = (state: MainState & MainActions) => ({
@@ -39,6 +40,7 @@ const selector = (state: MainState & MainActions) => ({
 	setContextMenuNodeId: state.setContextMenuNodeId,
 	contextMenuNodeId: state.contextMenuNodeId,
 	states: state.states,
+	edgeType: state.edgeType,
 });
 
 interface ReactFlowBaseProps {
@@ -47,7 +49,9 @@ interface ReactFlowBaseProps {
 	roleIsToggled: boolean;
 }
 const edgeTypes: any = {
-	floating: FloatingEdge,
+	straightEdge,
+	stepEdge,
+	bezierEdge,
 };
 
 const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
@@ -67,6 +71,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		setContextMenuNodeId,
 		contextMenuNodeId,
 		states,
+		edgeType,
 	} = useMainStore(selector, shallow);
 
 	const { activeRole, activeRoleColor, roleIsToggled } = props;
@@ -101,13 +106,17 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		activeRole,
 		showAllRoles,
 		showAllConnections: showAllConnectedStates,
+		edgeType,
 	});
+
+	const fullHandles = edgeType === "straight";
 
 	const nodes = computedNodes({
 		process: activeProcess,
 		showAllRoles,
 		activeRole,
 		showAllConnections: showAllConnectedStates,
+		fullHandles,
 	});
 
 	// const openEdgeContextMenu = (e: React.MouseEvent, el: Edge) => {

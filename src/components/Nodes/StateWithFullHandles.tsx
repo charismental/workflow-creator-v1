@@ -2,7 +2,6 @@ import { RollbackOutlined } from "@ant-design/icons";
 import { Checkbox, Form, Input, Popover } from "antd";
 import Title from "antd/es/typography/Title";
 import { CSSProperties, FunctionComponent, useState } from "react";
-
 import { Handle, NodeProps, NodeResizer, Position, useStore as useReactFlowStore } from "reactflow";
 import useMainStore from "store";
 import { shallow } from "zustand/shallow";
@@ -19,11 +18,12 @@ const checkboxStyle: CSSProperties = {
 
 const connectionNodeIdSelector = (state: any) => state.connectionNodeId;
 
-const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.Element => {
+const StateWithFullHandles: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.Element => {
 	const removeState = useMainStore((state) => state.removeState, shallow);
 	const updateStateProperty = useMainStore((state) => state.updateStateProperty);
 
 	const contextMenuNodeId = useMainStore((state) => state.contextMenuNodeId, shallow);
+
 	// todo: consolidate this with updateStateProperty
 	const updateStateProperties = useMainStore((state) => state.updateStateProperties, shallow);
 
@@ -74,7 +74,7 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 		connectionNodeId !== id &&
 		(!showAllRoles || connectionNodeId.charAt(0) === id.charAt(0));
 
-	const targetHandleStyle = { zIndex: isTarget ? 3 : 1 };
+	const isConnecting = !!connectionNodeId;
 
 	// do something here => initial width: 200, minWidth: 50?
 	const minWidth = 120;
@@ -124,6 +124,7 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 			content={popoverContent}
 		>
 			<div
+				key={`state-node-${id}-straight`}
 				className="stateNodeBody"
 				onMouseOver={() => setIsMouseOver(true)}
 				onMouseOut={() => setIsMouseOver(false)}
@@ -169,17 +170,18 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 						/>
 					</>
 				)}
-
+				{!isConnecting && (
+					<Handle
+						className="full-handle"
+						style={{ zIndex: 3 }}
+						position={Position.Top}
+						type="source"
+						isConnectable={isConnectable}
+					/>
+				)}
 				<Handle
-					className="targetHandle"
-					style={{ zIndex: 2 }}
-					position={Position.Top}
-					type="source"
-					isConnectable={isConnectable}
-				/>
-				<Handle
-					className="targetHandle"
-					style={targetHandleStyle}
+					className="full-handle"
+					style={{ zIndex: 1 }}
 					position={Position.Bottom}
 					type="target"
 					isConnectable={isConnectable}
@@ -199,4 +201,4 @@ const StateNode: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): J
 	);
 };
 
-export default StateNode;
+export { StateWithFullHandles };
