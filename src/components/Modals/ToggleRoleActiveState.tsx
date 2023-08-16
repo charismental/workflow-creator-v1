@@ -9,7 +9,7 @@ interface SetAsInactiveModalProps {
 	successMessage: () => void;
 }
 
-export default ({
+const ToggleRoleActiveState = ({
 	toggleRoleForProcess,
 	roleName,
 	modalOpen,
@@ -38,3 +38,5 @@ export default ({
 
 	return ModalInstance(modalOptions);
 };
+
+export { ToggleRoleActiveState }

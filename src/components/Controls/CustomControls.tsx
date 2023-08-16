@@ -23,10 +23,9 @@ import {
 	useStoreApi,
 } from "reactflow";
 import useMainStore from "store";
-import DownloadButton from "tools/DownloadImage";
 import { shallow } from "zustand/shallow";
 import { EdgeModal, NodeModal } from "../Modals";
-import { MapSvg, CustomControlButtonWithTooltip } from "./";
+import { MapSvg, CustomControlButtonWithTooltip, DownloadButton } from "./";
 
 interface CustomControlsProps {
 	getCurrentEdges: (() => Edge[]) | undefined;

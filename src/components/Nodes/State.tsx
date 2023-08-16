@@ -1,5 +1,4 @@
 import { RollbackOutlined } from "@ant-design/icons";
-import { is } from "@babel/types";
 import { Checkbox, Form, Input, Popover } from "antd";
 import Title from "antd/es/typography/Title";
 import { CSSProperties, FunctionComponent, useState } from "react";
@@ -76,8 +75,6 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 		connectionNodeId !== id &&
 		(!showAllRoles || connectionNodeId.charAt(0) === id.charAt(0));
 
-	const targetHandleStyle = { zIndex: isTarget ? 3 : 1 };
-
 	// do something here => initial width: 200, minWidth: 50?
 	const minWidth = 120;
 	const minHeight = 30;
@@ -119,6 +116,12 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 		</div>
 	);
 
+	const zIndexByTarget = (isSource = false) => {
+		const zIndex = (isSource && !isTarget) || (!isSource && isTarget) ? 3 : 1;
+
+		return { zIndex } 
+	};
+
 	return (
 		<Popover
 			destroyTooltipOnHide
@@ -127,7 +130,7 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 		>
 			<div
 				key={`state-node-${id}`}
-				className="stateNodeBody drag-handle"
+				className="stateNodeBody"
 				onMouseOver={() => setIsMouseOver(true)}
 				onMouseOut={() => setIsMouseOver(false)}
 				style={{
@@ -172,65 +175,126 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 						/>
 					</>
 				)}
+				{/* top source */}
 				<Handle
-					id="t_in_1"
-					style={{ zIndex: 3, opacity: !isTarget ? 1 : 0 }}
+					id="t_out_1"
+					style={{ ...zIndexByTarget(true), left: 30, opacity: !isTarget ? 1 : 0 }}
 					position={Position.Top}
 					type="source"
 					isConnectable={isConnectable}
 				/>
 				<Handle
-					id="t_out_1"
-					style={{ zIndex: 1, opacity: isTarget ? 1 : 0 }}
+					id="t_out_2"
+					style={{ ...zIndexByTarget(true), opacity: !isTarget ? 1 : 0 }}
+					position={Position.Top}
+					type="source"
+					isConnectable={isConnectable}
+				/>
+				<Handle
+					id="t_out_3"
+					style={{ ...zIndexByTarget(true), right: 24, left: 'unset', opacity: !isTarget ? 1 : 0 }}
+					position={Position.Top}
+					type="source"
+					isConnectable={isConnectable}
+				/>
+				{/* right source */}
+				<Handle
+					id="r_out_1"
+					style={{ ...zIndexByTarget(true), opacity: !isTarget ? 1 : 0 }}
+					position={Position.Right}
+					type="source"
+					isConnectable={isConnectable}
+				/>
+				{/* bottom source */}
+				<Handle
+					id="b_out_1"
+					style={{ ...zIndexByTarget(true), left: 30, opacity: !isTarget ? 1 : 0 }}
+					position={Position.Bottom}
+					type="source"
+					isConnectable={isConnectable}
+				/>
+				<Handle
+					id="b_out_2"
+					style={{ ...zIndexByTarget(true), opacity: !isTarget ? 1 : 0 }}
+					position={Position.Bottom}
+					type="source"
+					isConnectable={isConnectable}
+				/>
+				<Handle
+					id="b_out_3"
+					style={{ ...zIndexByTarget(true), right: 24, left: 'unset', opacity: !isTarget ? 1 : 0 }}
+					position={Position.Bottom}
+					type="source"
+					isConnectable={isConnectable}
+				/>
+				{/* left source */}
+				<Handle
+					id="l_out_1"
+					style={{ ...zIndexByTarget(true), opacity: !isTarget ? 1 : 0 }}
+					position={Position.Left}
+					type="source"
+					isConnectable={isConnectable}
+				/>
+				{/* top target */}
+				<Handle
+					id="t_in_1"
+					style={{ ...zIndexByTarget(), left: 30, opacity: isTarget ? 1 : 0 }}
+					position={Position.Top}
+					type="target"
+					isConnectable={isConnectable}
+				/>
+				<Handle
+					id="t_in_2"
+					style={{ ...zIndexByTarget(), opacity: isTarget ? 1 : 0 }}
+					position={Position.Top}
+					type="target"
+					isConnectable={isConnectable}
+				/>
+				<Handle
+					id="t_in_3"
+					style={{ ...zIndexByTarget(), right: 24, left: 'unset', opacity: isTarget ? 1 : 0 }}
+					position={Position.Top}
+					type="target"
+					isConnectable={isConnectable}
+				/>
+				{/* right target */}
+				<Handle
+					id="r_in_1"
+					style={{ ...zIndexByTarget(), opacity: isTarget ? 1 : 0 }}
+					position={Position.Right}
+					type="target"
+					isConnectable={isConnectable}
+				/>
+				{/* bottom target */}
+				<Handle
+					id="b_in_1"
+					style={{ ...zIndexByTarget(), left: 30, opacity: isTarget ? 1 : 0 }}
 					position={Position.Bottom}
 					type="target"
 					isConnectable={isConnectable}
 				/>
-
-				{/* <>
-					 	<Handle
-					 		id="t_in_1"
-					 		style={{ ...targetHandleStyle, opacity: !isTarget ? 1 : 0 }}
-					 		position={Position.Top}
-					 		type="source"
-					 		isConnectable={isConnectable}
-					 	/>
-					 	<Handle
-					 		id="t_out_1"
-					 		style={{ ...targetHandleStyle, opacity: isTarget ? 1 : 0 }}
-					 		position={Position.Bottom}
-					 		type="target"
-					 		isConnectable={isConnectable}
-					 	/>
-					 	<Handle
-					 		id="b_in_1"
-					 		style={{ zIndex: 2, left: 15, backgroundColor: 'yellow' }}
-					 		position={Position.Bottom}
-					 		type="source"
-					 		isConnectable={isConnectable}
-					 	/>
-					 	<Handle
-					 		id="b_in_2"
-					 		style={{ zIndex: 2, right: 15, backgroundColor: 'yellow' }}
-					 		position={Position.Bottom}
-					 		type="source"
-					 		isConnectable={isConnectable}
-					 	/>
-					 	<Handle
-					 		id="b_out_1"
-					 		style={{ zIndex: 2, left: 10, backgroundColor: 'green' }}
-					 		position={Position.Bottom}
-					 		type="target"
-					 		isConnectable={isConnectable}
-					 	/>
-					 	<Handle
-					 		id="b_out_2"
-					 		style={{ zIndex: 2, right: 10, backgroundColor: 'green' }}
-					 		position={Position.Bottom}
-					 		type="target"
-					 		isConnectable={isConnectable}
-					 	/>
-					 </> */}
+				<Handle
+					id="b_in_2"
+					style={{ ...zIndexByTarget(), opacity: isTarget ? 1 : 0 }}
+					position={Position.Bottom}
+					type="target"
+					isConnectable={isConnectable}
+				/>
+				<Handle
+					id="b_in_3"
+					style={{ ...zIndexByTarget(), right: 24, left: 'unset', opacity: isTarget ? 1 : 0 }}
+					position={Position.Bottom}
+					type="target"
+					isConnectable={isConnectable}
+				/>
+				{/* left target */}
+				<Handle
+					id="l_in_1"
+					style={{ ...zIndexByTarget(), opacity: isTarget ? 1 : 0 }}
+					position={Position.Left}
+					type="target"
+					isConnectable={isConnectable}
+				/>
 				<div
 					style={{
 						whiteSpace: 'nowrap',
@@ -241,21 +305,6 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 				>
 					{data?.label || "Unknown State"}
 				</div>
-				{/* 
-				<Handle
-					className="targetHandle"
-					style={{ zIndex: 2 }}
-					position={Position.Top}
-					type="source"
-					isConnectable={isConnectable}
-				/>
-				<Handle
-					className="targetHandle"
-					style={targetHandleStyle}
-					position={Position.Bottom}
-					type="target"
-					isConnectable={isConnectable}
-				/> */}
 			</div>
 		</Popover>
 	);

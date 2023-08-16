@@ -14,13 +14,11 @@ import useMainStore from "store";
 
 // components
 import ReactFlowBase from "components/ReactFlowBase";
-import topMessage from "components/TopMessage";
-import ActiveRoleSettings from "components/ActiveRoleSettings";
+import { ActiveRoleSettings, topMessage, StateCollapseBox } from "components/UI";
 import { CustomControls } from "components/Controls/";
-import ToggleRoleActiveState from "components/Modals/ToggleRoleActiveState";
 import { SelectBox } from "components/Inputs";
-import StateCollapseBox from "components/StateCollapseBox";
 import { Sidebar } from "components/Layout";
+import { ModalType, ModalInstance, ToggleRoleActiveState } from "components/Modals";
 
 // utils
 import { copyToClipboard, roleColor } from "utils";
@@ -31,7 +29,6 @@ import { Nullable, WorkflowProcess, WorkflowState } from "types";
 
 // api
 import { getSessionProcess } from "api";
-import { ModalType, ModalInstance } from "components/Modals/ModalInstance";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;

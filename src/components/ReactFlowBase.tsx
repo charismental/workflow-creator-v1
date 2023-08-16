@@ -6,7 +6,11 @@ import ReactFlow, { Background, BackgroundVariant, MiniMap, NodeTypes } from "re
 import useMainStore, { MainActions, MainState } from "store";
 import { shallow } from "zustand/shallow";
 import CustomConnectionLine from "../components/CustomConnectionLine";
-import { FloatingEdge } from "./Edges";
+import {
+	StraightEdge as straightEdge,
+	StepEdge as stepEdge,
+	BezierEdge as bezierEdge,
+} from "./Edges";
 import { StateWithFullHandles, State, Label } from "./Nodes";
 import { computedEdges, computedNodes } from "utils";
 import { NumberBoolean } from "types";
@@ -45,7 +49,9 @@ interface ReactFlowBaseProps {
 	roleIsToggled: boolean;
 }
 const edgeTypes: any = {
-	floating: FloatingEdge,
+	straightEdge,
+	stepEdge,
+	bezierEdge,
 };
 
 const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
@@ -100,6 +106,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		activeRole,
 		showAllRoles,
 		showAllConnections: showAllConnectedStates,
+		edgeType,
 	});
 
 	const fullHandles = edgeType === "straight";

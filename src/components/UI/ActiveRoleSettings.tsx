@@ -65,4 +65,4 @@ const ActiveRoleSettings: React.FC<ActiveRoleSettingsProps> = ({
 	);
 };
 
-export default ActiveRoleSettings;
+export { ActiveRoleSettings };

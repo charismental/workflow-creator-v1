@@ -3,24 +3,31 @@ import { Button } from "antd";
 import { FunctionComponent, useCallback, useState } from "react";
 import {
 	EdgeProps,
-	getStraightPath,
-	getBezierPath,
 	getSmoothStepPath,
 	useStore as useReactFlowStore,
 } from "reactflow";
-import { getEdgeParams } from "../../utils";
 import useMainStore from "store";
 import { shallow } from "zustand/shallow";
 import { Nullable } from "types";
 
 const foreignObjectSize = 40;
 
-const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd, targetX, targetY, sourceX, sourceY }) => {
-	const [removeTransition, showAllConnections, edgeType, setHoveredEdgeNodes] = useMainStore(
+const StepEdge: FunctionComponent<EdgeProps> = ({
+	id,
+	source,
+	target,
+	markerEnd,
+	targetX,
+	targetY,
+	sourceX,
+	sourceY,
+	sourcePosition,
+	targetPosition,
+}) => {
+	const [removeTransition, showAllConnections, setHoveredEdgeNodes] = useMainStore(
 		(state) => [
 			state.removeTransition,
 			state.showAllConnectedStates,
-			state.edgeType,
 			state.setHoveredEdgeNodes,
 		],
 		shallow
@@ -33,7 +40,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 		setIsHover(status);
 	};
 
-	const onEdgeClick = (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+	const handleDeleteClick = (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
 		event.stopPropagation();
 		removeTransition({ source, target });
 		hoverEdge(false);
@@ -47,35 +54,18 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 		useCallback((store: any) => store.nodeInternals.get(target), [target])
 	);
 
-	if (!sourceNode || !targetNode || source === target) {
-		return null;
-	}
-	// console.log('edgetype:', edgeType)
-	const { sx, sy, tx, ty, sourcePos, targetPos } = getEdgeParams({ source: sourceNode, target: targetNode });
+	if (!sourceNode || !targetNode || source === target) return null;
 
-	// const { sx, sy, tx, ty, sourcePos, targetPos } = getEdgeParams({ source: sourceNode, target: targetNode, ...(edgeType !== 'straight' && { sourceHandle: { x: sourceX, y: sourceY }, targetHandle: { x: targetX, y: targetY } }) });
+	const edgeParams = {
+		sourceX,
+		sourceY,
+		targetX,
+		targetY,
+		sourcePosition,
+		targetPosition,
+	};
 
-	const currentEdgeType = () => {
-		const baseParams = {
-			sourceX: sx,
-			sourceY: sy,
-			targetX: tx,
-			targetY: ty,
-			sourcePosition: sourcePos,
-			targetPosition: targetPos,
-		};
-
-		switch (edgeType) {
-			case "step":
-				return getSmoothStepPath(baseParams);
-			case "bezier":
-				return getBezierPath(baseParams);
-			default:
-				return getStraightPath(baseParams);
-		}
-	}
-
-	const [edgePath, labelX, labelY] = currentEdgeType();
+	const [edgePath, labelX, labelY] = getSmoothStepPath(edgeParams);
 
 	return (
 		<>
@@ -100,7 +90,7 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 					<div>
 						<Button
 							className="edgebutton"
-							onClick={onEdgeClick}
+							onClick={handleDeleteClick}
 							icon={<CloseCircleOutlined className="dumb-icon" />}
 						/>
 					</div>
@@ -110,4 +100,4 @@ const FloatingEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 	);
 };
 
-export { FloatingEdge };
+export { StepEdge };

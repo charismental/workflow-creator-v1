@@ -1,1 +1,3 @@
-export * from "./FloatingEdge"
+export * from "./StraightEdge";
+export * from "./StepEdge";
+export * from "./BezierEdge";

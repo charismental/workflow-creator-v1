@@ -1,9 +1,7 @@
 import { RollbackOutlined } from "@ant-design/icons";
-import { is } from "@babel/types";
 import { Checkbox, Form, Input, Popover } from "antd";
 import Title from "antd/es/typography/Title";
 import { CSSProperties, FunctionComponent, useState } from "react";
-
 import { Handle, NodeProps, NodeResizer, Position, useStore as useReactFlowStore } from "reactflow";
 import useMainStore from "store";
 import { shallow } from "zustand/shallow";
@@ -176,7 +174,6 @@ const StateWithFullHandles: FunctionComponent<NodeProps> = ({ id, isConnectable,
 					<Handle
 						className="full-handle"
 						style={{ zIndex: 3 }}
-						// style={{ backgroundColor: 'blue', opacity: .5, zIndex: 5 }}
 						position={Position.Top}
 						type="source"
 						isConnectable={isConnectable}
@@ -184,9 +181,7 @@ const StateWithFullHandles: FunctionComponent<NodeProps> = ({ id, isConnectable,
 				)}
 				<Handle
 					className="full-handle"
-					// style={targetHandleStyle}
 					style={{ zIndex: 1 }}
-					// style={{ backgroundColor: 'green', opacity: .5, zIndex: 3 }}
 					position={Position.Bottom}
 					type="target"
 					isConnectable={isConnectable}

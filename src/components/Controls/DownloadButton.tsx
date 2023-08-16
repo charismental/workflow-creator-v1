@@ -1,10 +1,8 @@
-import React from "react";
 import { toPng } from "html-to-image";
 import { Button } from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
-import useMainStore from "../store";
 
-function downloadImage(dataUrl: any) {
+const downloadAsImage = (dataUrl: any) => {
 	const a = document.createElement("a");
 
 	a.setAttribute("download", "reactflow.png");
@@ -12,15 +10,13 @@ function downloadImage(dataUrl: any) {
 	a.click();
 }
 
-function DownloadButton() {
-	const reactFlowInstance = useMainStore((state) => state.reactFlowInstance);
-
+const DownloadButton = () => {
 	//@ts-ignore
 	const element: HTMLElement = document.querySelector("#download");
+
 	const onClick = () => {
-		reactFlowInstance?.fitView();
 		toPng(element, {
-			backgroundColor: "#d3d3d3",
+			backgroundColor: "#ffffff",
 			filter: (node) => {
 				// we don't want to add the minimap and the controls to the image
 				if (
@@ -32,7 +28,7 @@ function DownloadButton() {
 
 				return true;
 			},
-		}).then(downloadImage);
+		}).then(downloadAsImage);
 	};
 	return (
 		<Button
@@ -42,4 +38,4 @@ function DownloadButton() {
 	);
 }
 
-export default DownloadButton;
+export { DownloadButton };

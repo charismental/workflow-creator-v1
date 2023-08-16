@@ -8,7 +8,7 @@ import {
 	WorkflowProcess,
 	WorkflowRole,
 	WorkflowState,
-} from "../types"
+} from "../types";
 
 interface IntersectionNodeType {
 	width: any;
@@ -94,21 +94,34 @@ export function getEdgeParams({ source, target, sourceHandle, targetHandle }: { 
 	};
 }
 
-export function transformTransitionsToEdges(
-	Transitions: WorkFlowTransition[],
-	idPrefix: string = ""
-): Edge[] {
+export function transformTransitionsToEdges({
+	transitions,
+	edgeType = 'straight',
+	idPrefix = "",
+}: {
+	transitions: WorkFlowTransition[];
+	edgeType: string;
+	idPrefix?: string;
+}): Edge[] {
 	const mapper = (transition: WorkFlowTransition): Edge | any => {
 		const { stateName: source, toStateName: target, properties = {} } = transition;
 
 		const { sourceHandle = null, targetHandle = null } = properties || {};
+		
+		const edgeTypeMap: any = {
+			straight: 'straightEdge',
+			step: 'stepEdge',
+			bezier: 'bezierEdge',
+		};
 
+		const type = edgeTypeMap[edgeType];
+		
 		return {
 			style: {
 				strokeWidth: 1.5,
 				stroke: "black",
 			},
-			type: "floating",
+			type,
 			markerEnd: {
 				type: "arrowclosed",
 				color: "black",
@@ -121,7 +134,7 @@ export function transformTransitionsToEdges(
 		};
 	};
 
-	return Array.isArray(Transitions) ? Transitions.map(mapper) : [];
+	return Array.isArray(transitions) ? transitions.map(mapper) : [];
 }
 
 // might get weird mama
@@ -413,17 +426,19 @@ export function computedEdges({
 	activeRole,
 	showAllRoles,
 	showAllConnections,
+	edgeType = 'straight',
 }: {
 	showAllRoles: boolean;
 	roles: WorkflowRole[];
 	activeRole: string;
 	showAllConnections: boolean;
+	edgeType: string;
 }): Edge[] {
 	if (showAllRoles) {
 		const allEdges: Edge[] = [];
 
 		roles.forEach(({ transitions = [] }, i) => {
-			allEdges.push(...transformTransitionsToEdges(transitions, String(i)));
+			allEdges.push(...transformTransitionsToEdges({ transitions, idPrefix: String(i), edgeType }));
 		});
 
 		return allEdges;
@@ -434,19 +449,19 @@ export function computedEdges({
 			Array.isArray(transitions) && allTransitions.push(...transitions);
 		});
 
-		return transformTransitionsToEdges(
-			allTransitions.filter(
+		return transformTransitionsToEdges({
+			edgeType,
+			transitions: allTransitions.filter(
 				({ stateName, toStateName }, i) =>
 					allTransitions.findIndex(
 						(transtion) =>
 							transtion.stateName === stateName && transtion.toStateName === toStateName
 					) === i
-			)
-		);
+			)});
 	} else {
-		const Transitions = roles?.find((r) => r.roleName === activeRole)?.transitions || [];
+		const transitions = roles?.find((r) => r.roleName === activeRole)?.transitions || [];
 
-		return transformTransitionsToEdges(Transitions);
+		return transformTransitionsToEdges({ transitions, edgeType });
 	}
 }
 

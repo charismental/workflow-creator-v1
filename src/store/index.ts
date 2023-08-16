@@ -1,6 +1,6 @@
 import { defaultColors } from "data";
 import { create } from "zustand";
-// import { persist } from 'zustand/middleware';
+import { devtools } from "zustand/middleware";
 import {
     Connection,
     NodeChange,
@@ -9,7 +9,6 @@ import {
     ReactFlowInstance,
     applyNodeChanges,
 } from "reactflow";
-import { devtools } from "zustand/middleware";
 import {
     getAllSessions,
     getSessionProcess,
@@ -19,7 +18,6 @@ import {
     saveProcess,
     publishProcess,
 } from "api";
-
 import {
     WorkFlowTransition,
     WorkflowProcess,
@@ -29,9 +27,12 @@ import {
     WorkflowSession,
     NumberBoolean,
 } from "types";
-
-// import mockGetAllSessions from "data/mockGetAllSessions_v2";
-import { nodeByState, roleColor, stateByNode, transformNewConnectionToTransition } from "utils";
+import {
+    nodeByState,
+    roleColor,
+    stateByNode,
+    transformNewConnectionToTransition
+} from "utils";
 
 export interface MainState {
     globalLoading: boolean;
@@ -95,7 +96,6 @@ export interface MainActions {
 }
 
 const useMainStore = create<MainState & MainActions>()(
-    // persist(
     devtools(
         (set, get) => ({
             unsavedChanges: false,
