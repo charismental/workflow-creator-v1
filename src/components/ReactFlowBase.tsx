@@ -10,6 +10,7 @@ import {
 	StraightEdge as straightEdge,
 	StepEdge as stepEdge,
 	BezierEdge as bezierEdge,
+	SmartEdge as smartEdge,
 } from "./Edges";
 import { StateWithFullHandles, State, Label } from "./Nodes";
 import { computedEdges, computedNodes } from "utils";
@@ -52,6 +53,7 @@ const edgeTypes: any = {
 	straightEdge,
 	stepEdge,
 	bezierEdge,
+	smartEdge,
 };
 
 const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {

@@ -114,6 +114,7 @@ const CustomControls = ({
 		{ label: "Straight", value: "straight" },
 		{ label: "Step", value: "step" },
 		{ label: "Bezier", value: "bezier" },
+		{ label: "Smart", value: "smart" },
 	];
 
 	const items: MenuProps["items"] = [

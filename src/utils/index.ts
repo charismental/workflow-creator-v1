@@ -112,6 +112,7 @@ export function transformTransitionsToEdges({
 			straight: 'straightEdge',
 			step: 'stepEdge',
 			bezier: 'bezierEdge',
+			smart: 'smartEdge',
 		};
 
 		const type = edgeTypeMap[edgeType];
