@@ -9,7 +9,8 @@
   height: 30px;
 }
 
-.stateNodeBody {
+.state-full-body,
+.state-body {
   height: 100%;
   border: 1px solid black;
   position: relative;
@@ -21,7 +22,8 @@
   color: #fff;
 }
 
-.stateNodeBody.drag-handle:before {
+.state-full-body.drag-handle:before,
+.state-body.drag-handle:before {
   content: "";
   position: absolute;
   height: 100%;

@@ -125,7 +125,7 @@ const StateWithFullHandles: FunctionComponent<NodeProps> = ({ id, isConnectable,
 		>
 			<div
 				key={`state-node-${id}-straight`}
-				className="stateNodeBody"
+				className="state-full-body"
 				onMouseOver={() => setIsMouseOver(true)}
 				onMouseOut={() => setIsMouseOver(false)}
 				style={{

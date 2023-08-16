@@ -235,7 +235,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
 document.addEventListener("keydown", function (e) {
 	if (e.key === "Shift") {
-		const elements = document.querySelectorAll(".stateNodeBody");
+		const elements = document.querySelectorAll(".state-full-body");
 
 		elements.forEach(function (element) {
 			element.classList.add("drag-handle");
@@ -245,7 +245,7 @@ document.addEventListener("keydown", function (e) {
 
 document.addEventListener("keyup", function (e) {
 	if (e.key === "Shift") {
-		const elements = document.querySelectorAll(".stateNodeBody");
+		const elements = document.querySelectorAll(".state-full-body");
 
 		elements.forEach(function (element) {
 			element.classList.remove("drag-handle");

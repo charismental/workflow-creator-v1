@@ -9,7 +9,6 @@ import { shallow } from "zustand/shallow";
 
 const checkboxStyle: CSSProperties = {
 	position: "absolute",
-	zIndex: 100,
 	cursor: "pointer",
 	width: "20px",
 	height: "20px",
@@ -124,7 +123,7 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 		>
 			<div
 				key={`state-node-${id}`}
-				className="stateNodeBody"
+				className="state-body drag-handle"
 				onMouseOver={() => setIsMouseOver(true)}
 				onMouseOut={() => setIsMouseOver(false)}
 				style={{
@@ -157,7 +156,7 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 					handleStyle={{ zIndex: 400 }}
 				/>
 				{!isTarget && isMouseOver && (
-					<>
+					<div style={{ zIndex: 1000 }}>
 						<Checkbox
 							style={checkboxStyle}
 							checked={selfConnected}
@@ -167,7 +166,7 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 							className="state-delete-button"
 							onClick={() => removeState(data.label)}
 						/>
-					</>
+					</div>
 				)}
 				{/* top source */}
 				<Handle
