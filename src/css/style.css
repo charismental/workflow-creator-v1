@@ -88,7 +88,7 @@ div.full-handle {
   height: 10px;
   width: 10px;
   background: white;
-  border: 1px solid black;
+  outline: 1px solid black;
 }
 
 .react-flow__handle-top {
