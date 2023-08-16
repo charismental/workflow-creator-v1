@@ -72,6 +72,13 @@ div.full-handle {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.react-flow__node {
+  cursor: initial;
+}
+
+.react-flow__node .drag-handle {
   cursor: grab;
 }
 
