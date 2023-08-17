@@ -86,7 +86,7 @@ const SmartEdge: FunctionComponent<EdgeProps> = ({
 		<>
 			<path
 				id={id}
-				className="edge_path react-flow__edge-path"
+				className="edge_path"
 				d={svgPathString}
 				markerEnd={markerEnd}
 				markerStart={markerStart}

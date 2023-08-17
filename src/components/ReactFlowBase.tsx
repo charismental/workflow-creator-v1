@@ -2,7 +2,7 @@ import "reactflow/dist/style.css";
 import "../css/style.css";
 import defaultEdgeOptions from "data/defaultEdgeOptions";
 import { FC, useCallback, useEffect, useRef } from "react";
-import ReactFlow, { Background, BackgroundVariant, MiniMap, NodeTypes } from "reactflow";
+import ReactFlow, { Background, BackgroundVariant, ConnectionLineType, MiniMap, NodeTypes } from "reactflow";
 import useMainStore, { MainActions, MainState } from "store";
 import { shallow } from "zustand/shallow";
 import CustomConnectionLine from "../components/CustomConnectionLine";
@@ -121,6 +121,12 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		fullHandles,
 	});
 
+	const customConnectionLineMap: any = {
+		straight: { component: CustomConnectionLine },
+		step: { connectionLineType: ConnectionLineType.SmoothStep },
+		bezier: { connectionLineType: ConnectionLineType.Bezier },
+		smart: { connectionLineType: ConnectionLineType.Straight },
+	};
 	// const openEdgeContextMenu = (e: React.MouseEvent, el: Edge) => {
 	// 	e.preventDefault();
 	// 	return setItems([
@@ -200,7 +206,8 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 					edgeTypes={edgeTypes}
 					proOptions={{ hideAttribution: true }}
 					defaultEdgeOptions={defaultEdgeOptions}
-					connectionLineComponent={CustomConnectionLine}
+					connectionLineComponent={customConnectionLineMap[edgeType]?.component}
+					connectionLineType={customConnectionLineMap[edgeType]?.connectionLineType}
 					connectionLineStyle={connectionLineStyle}
 					onNodeContextMenu={openNodeContextMenu}
 				>
