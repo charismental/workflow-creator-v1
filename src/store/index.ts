@@ -382,6 +382,7 @@ const useMainStore = create<MainState & MainActions>()(
                             target: removeIndexPrefixFromName(roleIndexStr, target || ""),
                         }),
                     };
+
                     const newTransition = transformNewConnectionToTransition({
                         connection: updatedConnection,
                         existingTransitions: transitions,
@@ -390,7 +391,16 @@ const useMainStore = create<MainState & MainActions>()(
                         roleName,
                     });
 
-                    const updatedTransitions = [...transitions, ...(newTransition ? [newTransition] : [])];
+                    const filteredTransitions = transitions.filter(({ stateName, toStateName }) => {
+                        const { stateName: newTranstionSource, toStateName: newTransitionTarget } = newTransition || {};
+
+                        return !newTranstionSource ||
+                            !newTransitionTarget ||
+                            stateName !== newTranstionSource ||
+                            toStateName !== newTransitionTarget;
+                    })
+
+                    const updatedTransitions = [...filteredTransitions, ...(newTransition ? [newTransition] : [])];
 
                     const updatedRoles = roles.map((r, i) =>
                         i === foundRoleIndex ? { ...r, transitions: updatedTransitions } : r

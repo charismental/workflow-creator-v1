@@ -1,7 +1,6 @@
 import "dotenv/config";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import "./css/styles.css";
 import Root from "./routes/root";
 import ErrorPage from "routes/error-page";
 import SharedLink from "routes/sharedLink";

@@ -77,7 +77,7 @@ function getEdgePosition(node: any, intersectionPoint: any) {
 // returns the parameters (sx, sy, tx, ty, sourcePos, targetPos) you need to create an edge
 export function getEdgeParams({ source, target, sourceHandle, targetHandle }: { source: any; target: any; sourceHandle?: { x: number, y: number }; targetHandle?: { x: number; y: number } }) {
 	// console.log('getEdgeParams', sourceHandle, targetHandle)
-	
+
 	const sourceIntersectionPoint = getNodeIntersection(source, target);
 	const targetIntersectionPoint = getNodeIntersection(target, source);
 
@@ -107,7 +107,7 @@ export function transformTransitionsToEdges({
 		const { stateName: source, toStateName: target, properties = {} } = transition;
 
 		const { sourceHandle = null, targetHandle = null } = properties || {};
-		
+
 		const edgeTypeMap: any = {
 			straight: 'straightEdge',
 			step: 'stepEdge',
@@ -116,7 +116,7 @@ export function transformTransitionsToEdges({
 		};
 
 		const type = edgeTypeMap[edgeType];
-		
+
 		return {
 			style: {
 				strokeWidth: 1.5,
@@ -160,6 +160,11 @@ export function transformNewConnectionToTransition(
 		({ stateName, toStateName }) => source === stateName && target === toStateName
 	);
 
+	const { properties = {} } = foundTransition || {};
+	const { sourceHandle: existingSourceHandle, targetHandle: existingTargetHandle } = properties;
+
+	const isNewHandleForExistingConnection = foundTransition && (sourceHandle !== existingSourceHandle || targetHandle !== existingTargetHandle);
+
 	const foundState = (name: string): WorkflowState | undefined => {
 		return allStates.find((s) => s.stateName === name);
 	}
@@ -167,10 +172,10 @@ export function transformNewConnectionToTransition(
 	const foundFromState = foundState(source || '');
 	const foundToState = foundState(target || '');
 
-	return (
-		foundTransition ||
-		(source && target
-			? {
+	return isNewHandleForExistingConnection ?
+		{ ...foundTransition, properties: { sourceHandle, targetHandle } } :
+		source && target ?
+			{
 				stateId: foundFromState?.stateId || null,
 				altStateId: foundToState?.stateId || null,
 				roleId,
@@ -180,8 +185,7 @@ export function transformNewConnectionToTransition(
 				toStateName: target,
 				properties: { sourceHandle, targetHandle },
 			}
-			: null)
-	);
+			: null;
 }
 
 export function edgeIdByNodes({ source, target, sourceHandle, targetHandle }: { source: string; target: string; sourceHandle?: string | null; targetHandle?: string | null }): string {
@@ -458,7 +462,8 @@ export function computedEdges({
 						(transtion) =>
 							transtion.stateName === stateName && transtion.toStateName === toStateName
 					) === i
-			)});
+			)
+		});
 	} else {
 		const transitions = roles?.find((r) => r.roleName === activeRole)?.transitions || [];
 
