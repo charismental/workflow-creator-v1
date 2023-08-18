@@ -28,6 +28,7 @@ import {
     NumberBoolean,
 } from "types";
 import {
+    getHelperLinePositions,
     nodeByState,
     roleColor,
     stateByNode,
@@ -53,6 +54,7 @@ export interface MainState {
     companies: WorkflowCompany[];
     hoveredEdgeNodes: string[];
     unsavedChanges: boolean;
+    helperLines: [number | undefined, number | undefined];
 }
 
 export interface MainActions {
@@ -100,6 +102,7 @@ export interface MainActions {
 const useMainStore = create<MainState & MainActions>()(
     devtools(
         (set, get) => ({
+            helperLines: [undefined, undefined],
             unsavedChanges: false,
             setUnsavedChanges: (status) => set({ unsavedChanges: status }),
             sessions: [],
@@ -259,10 +262,33 @@ const useMainStore = create<MainState & MainActions>()(
                     return prefixedString.slice(prefix.length);
                 };
 
-                const mappedChanges = changes.map((change) => ({
-                    ...change,
-                    id: removeIndexPrefix(change.id),
-                }));
+                const mappedChanges = changes.map((change, i, arr) => {
+                    const { position = {}, id } = change;
+                    
+                    const updated = { ...change, id: removeIndexPrefix(id) };
+
+                    if (arr.length === 1 && arr[0].dragging) {
+                        const { x, y } = position;
+                        const roundToTwo = (n: number) => Math.round(n / 2) * 2
+
+                        Object.assign(updated, {
+                            positionAbsolute: { x: roundToTwo(x), y: roundToTwo(y) },
+                            position: { x: roundToTwo(x), y: roundToTwo(y) },
+                        }); 
+                    }
+
+                    return updated
+                });
+
+                if (changes.length === 1) {
+                    const [selectedNode] = changes;
+
+                    const { id, dragging } = selectedNode;
+
+                    if (dragging) {
+                        set({ helperLines: getHelperLinePositions({ nodeId: id }) });
+                    } else set({ helperLines: [undefined, undefined] })
+                }
 
                 if (activeProcess) {
                     const activeRoleIndex = (activeProcess?.roles || []).findIndex(
@@ -286,6 +312,7 @@ const useMainStore = create<MainState & MainActions>()(
                     );
 
                     const updatedNodes = applyNodeChanges(mappedChanges, nodes);
+
                     const updatedStates = updatedNodes.map((node) =>
                         stateByNode({
                             node: { ...node, data: { ...node.data, color: nodeColor } },

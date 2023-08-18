@@ -8,6 +8,7 @@ const { Text } = Typography;
 
 const sidebar: CSSProperties = {
 	backgroundColor: "white",
+	zIndex: 20,
 };
 const sidebarSpacer: CSSProperties = {
 	display: "flex",

@@ -9,6 +9,7 @@ import {
 	WorkflowRole,
 	WorkflowState,
 } from "../types";
+export * from "./helperLine";
 
 interface IntersectionNodeType {
 	width: any;
@@ -76,8 +77,6 @@ function getEdgePosition(node: any, intersectionPoint: any) {
 
 // returns the parameters (sx, sy, tx, ty, sourcePos, targetPos) you need to create an edge
 export function getEdgeParams({ source, target, sourceHandle, targetHandle }: { source: any; target: any; sourceHandle?: { x: number, y: number }; targetHandle?: { x: number; y: number } }) {
-	// console.log('getEdgeParams', sourceHandle, targetHandle)
-
 	const sourceIntersectionPoint = getNodeIntersection(source, target);
 	const targetIntersectionPoint = getNodeIntersection(target, source);
 
@@ -161,7 +160,7 @@ export function transformNewConnectionToTransition(
 	);
 
 	const { properties = {} } = foundTransition || {};
-	const { sourceHandle: existingSourceHandle, targetHandle: existingTargetHandle } = properties;
+	const { sourceHandle: existingSourceHandle, targetHandle: existingTargetHandle } = properties || {};
 
 	const isNewHandleForExistingConnection = foundTransition && (sourceHandle !== existingSourceHandle || targetHandle !== existingTargetHandle);
 

@@ -2,7 +2,14 @@ import "reactflow/dist/style.css";
 import "../css/style.css";
 import defaultEdgeOptions from "data/defaultEdgeOptions";
 import { FC, useCallback, useEffect, useRef } from "react";
-import ReactFlow, { Background, BackgroundVariant, ConnectionLineType, MiniMap, NodeTypes } from "reactflow";
+import ReactFlow, {
+	Background,
+	BackgroundVariant,
+	ConnectionLineType,
+	MiniMap,
+	NodeTypes,
+	SnapGrid,
+} from "reactflow";
 import useMainStore, { MainActions, MainState } from "store";
 import { shallow } from "zustand/shallow";
 import CustomConnectionLine from "../components/CustomConnectionLine";
@@ -42,6 +49,7 @@ const selector = (state: MainState & MainActions) => ({
 	contextMenuNodeId: state.contextMenuNodeId,
 	states: state.states,
 	edgeType: state.edgeType,
+	helperLines: state.helperLines,
 });
 
 interface ReactFlowBaseProps {
@@ -49,12 +57,15 @@ interface ReactFlowBaseProps {
 	activeRole: any;
 	roleIsToggled: boolean;
 }
+
 const edgeTypes: any = {
 	straightEdge,
 	stepEdge,
 	bezierEdge,
 	smartEdge,
 };
+
+const snapGrid: SnapGrid = [1, 1];
 
 const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 	const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -74,6 +85,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		contextMenuNodeId,
 		states,
 		edgeType,
+		helperLines,
 	} = useMainStore(selector, shallow);
 
 	const { activeRole, activeRoleColor, roleIsToggled } = props;
@@ -192,6 +204,27 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 				id="download"
 				style={!roleIsToggled ? { pointerEvents: "none" } : {}}
 			>
+				{/* horizontal helper line */}
+				{typeof helperLines[1] === 'number' && (
+					<div style={{
+						position: "absolute",
+						zIndex: 5,
+						top: `${helperLines[1]}px`,
+						backgroundColor: "green",
+						width: "100%",
+						height: "2px",
+					}} />
+				)}
+				{/* vertical helper line */}
+					<div style={{
+						position: "absolute",
+						zIndex: 5,
+						left: `${helperLines[0] || 0}px`,
+						backgroundColor: "green",
+						width: "2px",
+						height: "100%",
+						opacity: typeof helperLines[0] === 'number' ? 1 : 0,
+					}} />
 				<ReactFlow
 					nodes={nodes}
 					edges={edges}
@@ -202,6 +235,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 					onDragOver={onDragOver}
 					fitView
 					snapToGrid
+					snapGrid={snapGrid}
 					nodeTypes={nodeTypes}
 					edgeTypes={edgeTypes}
 					proOptions={{ hideAttribution: true }}

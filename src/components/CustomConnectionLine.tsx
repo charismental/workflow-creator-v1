@@ -17,14 +17,6 @@ const CustomConnectionLine: FunctionComponent<ConnectionLineComponentProps> = ({
 		targetX: toX,
 		targetY: toY,
 	});
-	// console.log({
-	// 	fromX,
-	// 	fromY,
-	// 	toX,
-	// 	toY,
-	// 	connectionLineStyle,
-	// })
-	// console.log(edgePath)
 
 	return (
 		!false ? <g>
