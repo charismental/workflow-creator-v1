@@ -20,9 +20,9 @@ export function getHelperLinePositions(payload: { nodeId: string }): [number | u
 
     const { top, bottom, left, right }: { top: number; bottom: number; left: number; right: number } = node?.getBoundingClientRect();
 
-    const x = triggerValues.right.find((v: number) => v === Math.round(right)) || triggerValues.left.find((v: number) => v === Math.round(left));
+    const x = [...triggerValues.right, ...triggerValues.left].find((v: number) => [Math.round(left), Math.round(right)].includes(v));
 
-    const y = triggerValues.top.find((v: number) => v === Math.round(top)) || triggerValues.bottom.find((v: number) => v === Math.round(bottom));
+    const y = [...triggerValues.top, ...triggerValues.bottom].find((v: number) => [Math.round(top), Math.round(bottom)].includes(v));
     
     return [x, y];
 }
