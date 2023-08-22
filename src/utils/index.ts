@@ -10,6 +10,7 @@ import {
 	WorkflowState,
 } from "../types";
 export * from "./helperLine";
+export * from "./simpleSVGPath";
 
 interface IntersectionNodeType {
 	width: any;

@@ -9,6 +9,7 @@ import {
 import useMainStore from "store";
 import { shallow } from "zustand/shallow";
 import { Nullable } from "types";
+// import { simplifySVGPath } from "utils";
 
 const foreignObjectSize = 40;
 
@@ -24,7 +25,12 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 	sourcePosition,
 	targetPosition,
 }) => {
-	const [removeTransition, showAllConnections, setHoveredEdgeNodes, showPortsAndCloseButtons] = useMainStore(
+	const [
+		removeTransition,
+		showAllConnections,
+		setHoveredEdgeNodes,
+		showPortsAndCloseButtons
+	] = useMainStore(
 		(state) => [
 			state.removeTransition,
 			state.showAllConnectedStates,
