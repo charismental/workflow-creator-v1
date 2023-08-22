@@ -358,7 +358,7 @@ const useMainStore = create<MainState & MainActions>()(
                     );
                 }
             },
-            edgeType: "straight",
+            edgeType: "step",
             setEdgeType: (type) => set({ edgeType: type }, false, "setEdgeType"),
             setStatesForActiveProcess: (states: WorkflowState[]) => {
                 const { activeProcess } = get();

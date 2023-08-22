@@ -32,7 +32,7 @@
   "name": "workflow-creator-v1",
   "version": "0.0.256",
   "scripts": {
-    "start": "react-scripts start",
+    "start": "yarn npm18",
     "build": "react-scripts build",
     "npm18": "react-scripts --openssl-legacy-provider start",
     "test": "react-scripts test --env=jsdom",
