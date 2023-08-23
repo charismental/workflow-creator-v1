@@ -121,10 +121,11 @@ const useMainStore = create<MainState & MainActions>()(
                         return stateName === source && toStateName === target;
                     });
 
-                    if (path && foundTransitionIndex !== -1) {
-                        const points = simplifySVGPath(path, true);
+                    if (foundTransitionIndex !== -1) {
                         const existingTransition = transitions[foundTransitionIndex];
-                        const updatedTransition = { ...existingTransition, properties: { ...existingTransition?.properties || {}, points } };
+                        const points = path ? simplifySVGPath(path, true) : '';
+                        if (!points) delete existingTransition.properties?.points;
+                        const updatedTransition = { ...existingTransition, properties: { ...existingTransition?.properties || {}, ...(points && { points }) } };
 
                         const updatedTransitions = transitions.map((t, i) => {
                             return i === foundTransitionIndex ? updatedTransition : t;

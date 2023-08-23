@@ -1,6 +1,6 @@
 import { CloseCircleOutlined } from "@ant-design/icons";
 import { Button } from "antd";
-import { FunctionComponent, useCallback, useEffect, useState } from "react";
+import { FunctionComponent, useCallback, useEffect, useMemo, useState } from "react";
 import {
 	EdgeProps,
 	getSmoothStepPath,
@@ -9,7 +9,7 @@ import {
 import useMainStore from "store";
 import { shallow } from "zustand/shallow";
 import { Nullable } from "types";
-import { simplifySVGPath } from "utils";
+import { simplifySVGPath, testPathForPoint } from "utils";
 
 const foreignObjectSize = 40;
 
@@ -78,13 +78,15 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 	};
 
 	const [edgePath, labelX, labelY] = getSmoothStepPath(edgeParams);
-
-	const svgPath = path || selected ? simplifySVGPath(edgePath) : edgePath;
+	const isValidPath = testPathForPoint(path, { x: sourceX, y: sourceY }, true) && testPathForPoint(path, { x: targetX, y: targetY }, false);
+	const svgPath = path && isValidPath ? path : selected ? simplifySVGPath(edgePath) : edgePath;
 
 	useEffect(() => {
-		if (setPath && selected && !path) setPath({ source, target, path: simplifySVGPath(edgePath), role })
+		const updatedPath = simplifySVGPath(edgePath);
+		if (setPath && selected && !path) setPath({ source, target, path: updatedPath, role })
+		// if (setPath && selected && path !== updatedPath) setPath({ source, target, path: updatedPath, role })
 	}, [setPath, selected, path, edgePath, source, target, role])
-
+	
 	return (
 		<>
 			<path
