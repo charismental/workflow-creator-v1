@@ -1,4 +1,4 @@
-export function simplifySVGPath(pathData: string): string {
+export function simplifySVGPath(pathData: string, returnCoordinatesArray = false): string {
     const commands = pathData.split(/(?=L|Q)/);
     if (!commands) pathData;
 
@@ -6,8 +6,7 @@ export function simplifySVGPath(pathData: string): string {
 
     for (const cmd of commands) {
         const coordinatesFromString = (str: string) => {
-            const [x, y] = str.split(/[,\s+]/).map(parseFloat);
-            console.log(str, x, y)
+            const [x, y] = str.split(/[,\s+]/).map(el => Math.round(parseFloat(el)));
             return { x, y };
         }
 
@@ -41,6 +40,8 @@ export function simplifySVGPath(pathData: string): string {
 
         return acc;
     }, [])
+
+    if (returnCoordinatesArray) return simplifiedCoordinates.map(({ x, y }) => `${x},${y}`).join(';') + ';';
 
     const simplifiedPath = simplifiedCoordinates.reduce((acc, { x, y }, i) => {
         if (i === 0) acc += `M${x},${y}`;

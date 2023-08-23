@@ -26,16 +26,19 @@ import {
     WorkflowCompany,
     WorkflowSession,
     NumberBoolean,
+    Nullable,
 } from "types";
 import {
     getHelperLinePositions,
     nodeByState,
     roleColor,
     stateByNode,
-    transformNewConnectionToTransition
+    transformNewConnectionToTransition,
+    simplifySVGPath,
 } from "utils";
 
 export interface MainState {
+    selectedEdge: Nullable<{ source: string; target: string; role: string; }>;
     globalLoading: boolean;
     activeRole: string;
     _hasHydrated: boolean;
@@ -58,6 +61,7 @@ export interface MainState {
 }
 
 export interface MainActions {
+    setSelectedEdge: (payload: Nullable<{ target: string; source: string; role?: string }>) => void;
     setUnsavedChanges: (status: boolean) => void;
     getAllSessions: (env?: string) => Promise<any>;
     deleteSession: (sessionId: string) => Promise<string>;
@@ -97,11 +101,63 @@ export interface MainActions {
     saveStateSnapshot: () => void;
     revertToSnapshot: () => void;
     setHoveredEdgeNodes: (nodes: string[]) => void;
+    setPathForEdge: (payload: { path: string; role: string; source: string; target: string }) => void;
 }
 
 const useMainStore = create<MainState & MainActions>()(
     devtools(
         (set, get) => ({
+            selectedEdge: null,
+            setPathForEdge: ({ path, role, source, target }) => {
+                const { activeProcess, selectedEdge } = get();
+                const { source: selectedSource, target: selectedTarget, role: selectedRole } = selectedEdge || {};
+                if (activeProcess && selectedSource === source && selectedTarget === target && selectedRole === role) {
+                    const { roles = [] } = activeProcess;
+
+                    const foundRoleIndex = roles.findIndex(({ roleName }) => roleName === role);
+                    const { transitions = [] } = roles[foundRoleIndex] || {};
+
+                    const foundTransitionIndex = transitions.findIndex(({ stateName, toStateName }) => {
+                        return stateName === source && toStateName === target;
+                    });
+
+                    if (path && foundTransitionIndex !== -1) {
+                        const points = simplifySVGPath(path, true);
+                        const existingTransition = transitions[foundTransitionIndex];
+                        const updatedTransition = { ...existingTransition, properties: { ...existingTransition?.properties || {}, points } };
+
+                        const updatedTransitions = transitions.map((t, i) => {
+                            return i === foundTransitionIndex ? updatedTransition : t;
+                        });
+
+                        const updatedRoles = roles.map((r, i) => {
+                            return i === foundRoleIndex ? { ...r, transitions: updatedTransitions } : r;
+                        });
+
+                        set(
+                            {
+                                activeProcess: {
+                                    ...activeProcess,
+                                    roles: updatedRoles,
+                                },
+                            },
+                            false,
+                            "setPathForEdge"
+                        );
+                    }
+                }
+            },
+            setSelectedEdge: (payload) => {
+                let selectedEdge = null;
+
+                if (payload) {
+                    const { activeRole } = get();
+                    const { source, target, role } = payload;
+                    const selectedEdgeRole = role || activeRole;
+                    selectedEdge = { source, target, role: selectedEdgeRole };
+                }
+                set({ selectedEdge });
+            },
             helperLines: [undefined, undefined],
             unsavedChanges: false,
             setUnsavedChanges: (status) => set({ unsavedChanges: status }),
@@ -264,7 +320,7 @@ const useMainStore = create<MainState & MainActions>()(
 
                 const mappedChanges = changes.map((change, i, arr) => {
                     const { position = {}, id } = change;
-                    
+
                     const updated = { ...change, id: removeIndexPrefix(id) };
 
                     if (arr.length === 1 && arr[0].dragging) {
@@ -274,7 +330,7 @@ const useMainStore = create<MainState & MainActions>()(
                         Object.assign(updated, {
                             positionAbsolute: { x: roundToTwo(x), y: roundToTwo(y) },
                             position: { x: roundToTwo(x), y: roundToTwo(y) },
-                        }); 
+                        });
                     }
 
                     return updated
@@ -374,9 +430,9 @@ const useMainStore = create<MainState & MainActions>()(
                 }
             },
             onConnect: (connection: Connection) => {
-                const { activeRole, activeProcess, showAllRoles, states } = get();
+                const { activeRole, activeProcess, showAllRoles, states, setSelectedEdge } = get();
                 const { source, target } = connection;
-
+                let roleForSelectedEdge = activeRole;
                 const { roles = [] } = activeProcess || {};
                 let roleIndexStr = "";
 
@@ -390,7 +446,7 @@ const useMainStore = create<MainState & MainActions>()(
                 const foundRoleIndex = roles.findIndex(({ roleName }, i) => {
                     if (showAllRoles) {
                         roleIndexStr = (source || "").match(/\d+/g)?.[0] || "";
-
+                        roleForSelectedEdge = roleName;
                         return Number(roleIndexStr) === i;
                     }
 
@@ -432,7 +488,7 @@ const useMainStore = create<MainState & MainActions>()(
                     const updatedRoles = roles.map((r, i) =>
                         i === foundRoleIndex ? { ...r, transitions: updatedTransitions } : r
                     );
-
+                    source && target && setSelectedEdge({ source, target, role: roleForSelectedEdge })
                     set(
                         {
                             activeProcess: { ...activeProcess, roles: updatedRoles },

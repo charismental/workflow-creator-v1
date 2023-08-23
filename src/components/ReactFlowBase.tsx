@@ -50,6 +50,9 @@ const selector = (state: MainState & MainActions) => ({
 	states: state.states,
 	edgeType: state.edgeType,
 	helperLines: state.helperLines,
+	selectedEdge: state.selectedEdge,
+	setSelectedEdge: state.setSelectedEdge,
+	setPathForEdge: state.setPathForEdge,
 });
 
 interface ReactFlowBaseProps {
@@ -86,6 +89,9 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		states,
 		edgeType,
 		helperLines,
+		selectedEdge,
+		setSelectedEdge,
+		setPathForEdge,
 	} = useMainStore(selector, shallow);
 
 	const { activeRole, activeRoleColor, roleIsToggled } = props;
@@ -121,6 +127,8 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		showAllRoles,
 		showAllConnections: showAllConnectedStates,
 		edgeType,
+		selectedEdge,
+		setPathForEdge,
 	});
 
 	const fullHandles = edgeType === "straight";
@@ -235,6 +243,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 					onDragOver={onDragOver}
 					fitView
 					snapToGrid
+					onEdgeClick={(_, {source, target, data}) => setSelectedEdge({source, target, ...(data?.role && { role: data.role })})}
 					snapGrid={snapGrid}
 					nodeTypes={nodeTypes}
 					edgeTypes={edgeTypes}

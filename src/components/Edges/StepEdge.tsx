@@ -1,6 +1,6 @@
 import { CloseCircleOutlined } from "@ant-design/icons";
 import { Button } from "antd";
-import { FunctionComponent, useCallback, useState } from "react";
+import { FunctionComponent, useCallback, useEffect, useState } from "react";
 import {
 	EdgeProps,
 	getSmoothStepPath,
@@ -9,7 +9,7 @@ import {
 import useMainStore from "store";
 import { shallow } from "zustand/shallow";
 import { Nullable } from "types";
-// import { simplifySVGPath } from "utils";
+import { simplifySVGPath } from "utils";
 
 const foreignObjectSize = 40;
 
@@ -24,6 +24,8 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 	sourceY,
 	sourcePosition,
 	targetPosition,
+	selected,
+	data,
 }) => {
 	const [
 		removeTransition,
@@ -39,8 +41,9 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 		],
 		shallow
 	);
+	const { role = '', path = '', setPath } = data || {};
 
-	const hideCloseButton = showAllConnections || !showPortsAndCloseButtons;
+	const hideCloseButton = !selected || showAllConnections || !showPortsAndCloseButtons;
 
 	const [isHover, setIsHover] = useState<Nullable<boolean>>(null);
 
@@ -76,12 +79,18 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 
 	const [edgePath, labelX, labelY] = getSmoothStepPath(edgeParams);
 
+	const svgPath = path || selected ? simplifySVGPath(edgePath) : edgePath;
+
+	useEffect(() => {
+		if (setPath && selected && !path) setPath({ source, target, path: simplifySVGPath(edgePath), role })
+	}, [setPath, selected, path, edgePath, source, target, role])
+
 	return (
 		<>
 			<path
 				id={id}
 				className="edge_path"
-				d={edgePath}
+				d={svgPath}
 				markerEnd={markerEnd}
 				stroke={isHover ? "#0ff" : "black"}
 			/>

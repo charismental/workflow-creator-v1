@@ -8,10 +8,10 @@ html, body, #root {
 }
 
 .edge_path {
-  /* stroke: green; */
   stroke-width: 1.5;
   fill: none;
 }
+
 .form-control {
   margin-top: 20px;
   width: 100%;
