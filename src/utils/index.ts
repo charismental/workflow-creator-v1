@@ -13,6 +13,7 @@ import { pathFromPoints } from "./pointsHelpers";
 export * from "./helperLine";
 export * from "./simpleSVGPath";
 export * from "./pointsHelpers";
+export * from "./editEdgeHelpers";
 
 interface IntersectionNodeType {
 	width: any;

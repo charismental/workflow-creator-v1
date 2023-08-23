@@ -509,7 +509,7 @@ const useMainStore = create<MainState & MainActions>()(
                     showAllRoles: false,
                 })),
             removeTransition: ({ source, target }: { source: string; target: string }) => {
-                const { activeRole, activeProcess, showAllRoles } = get();
+                const { activeRole, activeProcess, showAllRoles, setSelectedEdge } = get();
 
                 const { roles = [] } = activeProcess || {};
                 let roleIndexStr = "";
@@ -532,6 +532,7 @@ const useMainStore = create<MainState & MainActions>()(
                 });
 
                 if (foundRoleIndex !== -1 && activeProcess) {
+                    setSelectedEdge(null);
                     const { transitions = [] } = roles[foundRoleIndex];
 
                     const updatedTransitions = transitions.filter(({ stateName, toStateName }) => {

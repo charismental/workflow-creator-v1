@@ -82,11 +82,11 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 	const svgPath = path && isValidPath ? path : selected ? simplifySVGPath(edgePath) : edgePath;
 
 	useEffect(() => {
-		const updatedPath = simplifySVGPath(edgePath);
-		if (setPath && selected && !path) setPath({ source, target, path: updatedPath, role })
+		// const updatedPath = simplifySVGPath(edgePath);
+		// if (setPath && selected && !path) setPath({ source, target, path: updatedPath, role })
 		// if (setPath && selected && path !== updatedPath) setPath({ source, target, path: updatedPath, role })
 	}, [setPath, selected, path, edgePath, source, target, role])
-	
+
 	return (
 		<>
 			<path
@@ -95,6 +95,13 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 				d={svgPath}
 				markerEnd={markerEnd}
 				stroke={isHover ? "#0ff" : "black"}
+			/>
+			<path
+				d={svgPath}
+				fill="none"
+				strokeOpacity={0}
+				strokeWidth={20}
+				className="react-flow__edge-interaction"
 			/>
 			{!hideCloseButton && (
 				<foreignObject
