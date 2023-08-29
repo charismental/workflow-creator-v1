@@ -7,6 +7,7 @@ export function pathIsEditable(points: string): boolean {
 }
 
 export function handleEdgeChanges(points: string, xDelta: number, yDelta: number): string {
+
     const lineDirection = (p1: { x: number; y: number }, p2: { x: number; y: number }): Nullable<string> => {
         if (p1.x === p2.x) return 'vertical';
         if (p1.y === p2.y) return 'horizontal';

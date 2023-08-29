@@ -6,8 +6,9 @@ import {
 	getSmoothStepPath,
 	useStore as useReactFlowStore,
 } from "reactflow";
-import useMainStore from "store";
 import { shallow } from "zustand/shallow";
+import debounce from "lodash.debounce";
+import useMainStore from "store";
 import { Nullable } from "types";
 import { simplifySVGPath, testPathForPoint, pathIsEditable, handleEdgeChanges } from "utils";
 
@@ -43,24 +44,42 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 	);
 	const { role = '', path = '', setPath, points } = data || {};
 
-	const hideCloseButton = !selected || showAllConnections || !showPortsAndCloseButtons;
-
 	const [isHover, setIsHover] = useState<Nullable<boolean>>(null);
 	const [isDragging, setIsDragging] = useState<Nullable<boolean>>(false);
 	const [startX, setStartX] = useState(0);
 	const [startY, setStartY] = useState(0);
+	const [localPath, setLocalPath] = useState(path);
 	const [currentMouseMovement, setCurrentMouseMovement] = useState({ x: 0, y: 0 })
 	const pathRef = useRef<Nullable<SVGPathElement>>(null);
 
+	const rounded = (num: number) => Math.round(num);
+	const updateEdge = useCallback(debounce((path) => {
+		console.log('updateEdge', path)
+		setPath({ source, target, path, role })
+	}, 10), [])
+
+	const hideCloseButton = !selected || showAllConnections || !showPortsAndCloseButtons || isDragging;
+
+	const setStartCoordinates = useCallback((x: number, y: number) => {
+		if (pathRef?.current) {
+			const { left, top } = pathRef.current.getBoundingClientRect();
+			console.log(left, top)
+			setStartX(x - left);
+			setStartY(y - top);
+		}
+	}, [pathRef])
+
 	const handleMouseDown = (e: any) => {
 		if (selected) {
-
 			setIsDragging(true);
-			if (pathRef?.current) {
-				const { left, top } = pathRef.current.getBoundingClientRect();
-				setStartX(e.clientX - left);
-				setStartY(e.clientY - top);
-			}
+			// console.log('handleMouseDown', e.clientX, e.clientY)
+			setStartCoordinates(e.clientX, e.clientY);
+			// if (pathRef?.current) {
+			// 	const { left, top } = pathRef.current.getBoundingClientRect();
+			// 	console.log('handleMouseDown', e.clientX, e.clientY, left, top)
+			// 	setStartX(e.clientX - left);
+			// 	setStartY(e.clientY - top);
+			// }
 		}
 	};
 
@@ -69,8 +88,10 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 			const { left, top } = pathRef.current.getBoundingClientRect();
 			const newX = e.clientX - left - startX;
 			const newY = e.clientY - top - startY;
-
+			// console.log('handleMouseMove', newX, newY)
+			console.log('handleMouseMove', e.clientX, e.clientY)
 			setCurrentMouseMovement({ x: newX, y: newY });
+			setStartCoordinates(e.clientX, e.clientY);
 		}
 	};
 
@@ -81,6 +102,7 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 	useEffect(() => {
 		!selected && setIsDragging(false)
 	}, [setIsDragging, selected])
+
 	// todo: hover method via data, no store access for components
 	const hoverEdge = (status: boolean) => {
 		setHoveredEdgeNodes(status ? [source, target] : [])
@@ -104,33 +126,40 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 	if (!sourceNode || !targetNode || source === target) return null;
 
 	const edgeParams = {
-		sourceX,
-		sourceY,
-		targetX,
-		targetY,
+		sourceX: rounded(sourceX),
+		sourceY: rounded(sourceY),
+		targetX: rounded(targetX),
+		targetY: rounded(targetY),
 		sourcePosition,
 		targetPosition,
 	};
 
 	const [edgePath, labelX, labelY] = getSmoothStepPath(edgeParams);
-	const isValidPath = testPathForPoint(path, { x: sourceX, y: sourceY }, true) && testPathForPoint(path, { x: targetX, y: targetY }, false);
-	const svgPath = path && isValidPath ? path : selected ? simplifySVGPath(edgePath) : edgePath;
+	const isValidPath = testPathForPoint(path, { x: rounded(sourceX), y: rounded(sourceY) }, true) && testPathForPoint(path, { x: rounded(targetX), y: rounded(targetY) }, false);
+
+	// const svgPath = path && isValidPath ? path : selected ? simplifySVGPath(edgePath) : edgePath;
+	// const svgPath = path
 	const canEdit = selected && points && pathIsEditable(points);
 
 	useEffect(() => {
 		const updatedPath = simplifySVGPath(edgePath);
-		// if (setPath && selected && !path) setPath({ source, target, path: updatedPath, role })
-		if (setPath && selected && path !== updatedPath) setPath({ source, target, path: updatedPath, role })
-	}, [setPath, selected, path, edgePath, source, target, role]);
+		if ((setPath && selected && !path) || !isValidPath) {
+			setPath({ source, target, path: updatedPath, role })
+			setLocalPath(updatedPath);
+		}
+		// if (setPath && selected && path !== updatedPath) setPath({ source, target, path: updatedPath, role })
+	}, [setPath, selected, path, edgePath, source, target, role, isValidPath]);
 
 	useEffect(() => {
 		const { x, y } = currentMouseMovement;
-		if (canEdit && isDragging && x && y) {
+		// console.log(x, y)
+		if (canEdit && isDragging && (x || y)) {
+			// console.log('handleEdgeChanges', x, y)
 			const newPath = handleEdgeChanges(points, x, y);
-			console.log('newPath', newPath);
-			console.log('x', x, 'y', y);
 			// setPath({ source, target, path: newPath, role });
+			setLocalPath(newPath);
 			setCurrentMouseMovement({ x: 0, y: 0 });
+			updateEdge(newPath);
 		}
 	}, [currentMouseMovement, canEdit, isDragging, points]);
 
@@ -139,15 +168,16 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 			<path
 				id={id}
 				className="edge_path"
-				d={svgPath}
+				d={localPath}
 				markerEnd={markerEnd}
 				stroke={isHover ? "#0ff" : "black"}
 			/>
 			<path
 				ref={pathRef}
-				d={svgPath}
+				d={localPath}
 				fill="none"
 				strokeOpacity={0}
+				// stroke={isDragging ? "#0ff" : "black"}
 				strokeWidth={20}
 				className="react-flow__edge-interaction"
 				onMouseDown={handleMouseDown}

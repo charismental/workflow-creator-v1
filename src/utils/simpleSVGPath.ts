@@ -2,6 +2,8 @@ export function simplifySVGPath(pathData: string, returnCoordinatesArray = false
     const commands = pathData.split(/(?=L|Q)/);
     if (!commands) pathData;
 
+    const rounded = (num: number) => Math.round(num);
+
     const coordinates = [];
 
     for (const cmd of commands) {
@@ -25,16 +27,16 @@ export function simplifySVGPath(pathData: string, returnCoordinatesArray = false
     const simplifiedCoordinates = coordinates.reduce((acc: { x: number, y: number }[], { x, y }, i) => {
         const prevIndex = acc.length - 1;
 
-        if (i === 0) return [{ x, y }];
+        if (i === 0) return [{ x: rounded(x), y: rounded(y) }];
         if (i === 1) {
             prevDirection = acc[prevIndex]?.x === x ? 'y' : 'x';
-            acc.push({ x, y });
+            acc.push({ x: rounded(x), y: rounded(y) });
         } else if (acc[prevIndex]?.x === x && prevDirection === 'y') {
-            acc[prevIndex] = { ...acc[prevIndex], y };
+            acc[prevIndex] = { ...acc[prevIndex], y: rounded(y) };
         } else if (acc[prevIndex - 1]?.y === y && prevDirection === 'x') {
-            acc[prevIndex] = { ...acc[prevIndex], x };
+            acc[prevIndex] = { ...acc[prevIndex], x: rounded(x) };
         } else {
-            acc.push({ x, y });
+            acc.push({ x: rounded(x), y: rounded(y) });
             prevDirection = prevDirection === 'x' ? 'y' : 'x';
         }
 
