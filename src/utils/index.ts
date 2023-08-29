@@ -144,7 +144,7 @@ export function transformTransitionsToEdges({
 			targetHandle,
 			source: `${idPrefix}${source}`,
 			target: `${idPrefix}${target}`,
-			data: { ...(roleName && { role: roleName }), path, setPath: setPathForEdge },
+			data: { ...(roleName && { role: roleName }), path, setPath: setPathForEdge, ...(points && { points }) },
 			id: edgeIdByNodes({ source: `${idPrefix}${source}`, target: `${idPrefix}${target}`, sourceHandle, targetHandle }),
 		};
 	};

@@ -204,6 +204,10 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		[reactFlowInstance, setStatesForActiveProcess, activeRole, nodes]
 	);
 
+	const handleBaseClick = (e: any) => {
+		if (!e?.target?.classList?.contains("react-flow__edge-interaction")) setSelectedEdge(null);
+	};
+
 	return (
 		<>
 			<div
@@ -224,15 +228,15 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 					}} />
 				)}
 				{/* vertical helper line */}
-					<div style={{
-						position: "absolute",
-						zIndex: 5,
-						left: `${helperLines[0] || 0}px`,
-						backgroundColor: "green",
-						width: "2px",
-						height: "100%",
-						opacity: typeof helperLines[0] === 'number' ? 1 : 0,
-					}} />
+				<div style={{
+					position: "absolute",
+					zIndex: 5,
+					left: `${helperLines[0] || 0}px`,
+					backgroundColor: "green",
+					width: "2px",
+					height: "100%",
+					opacity: typeof helperLines[0] === 'number' ? 1 : 0,
+				}} />
 				<ReactFlow
 					nodes={nodes}
 					edges={edges}
@@ -243,7 +247,8 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 					onDragOver={onDragOver}
 					fitView
 					snapToGrid
-					onEdgeClick={(_, {source, target, data}) => setSelectedEdge({source, target, ...(data?.role && { role: data.role })})}
+					onClick={handleBaseClick}
+					onEdgeClick={(_, { source, target, data }) => setSelectedEdge({ source, target, ...(data?.role && { role: data.role }) })}
 					snapGrid={snapGrid}
 					nodeTypes={nodeTypes}
 					edgeTypes={edgeTypes}

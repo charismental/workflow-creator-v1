@@ -489,7 +489,7 @@ const useMainStore = create<MainState & MainActions>()(
                     const updatedRoles = roles.map((r, i) =>
                         i === foundRoleIndex ? { ...r, transitions: updatedTransitions } : r
                     );
-                    source && target && setSelectedEdge({ source, target, role: roleForSelectedEdge })
+                    source && target && setTimeout(() => setSelectedEdge({ source, target, role: roleForSelectedEdge }), 10)
                     set(
                         {
                             activeProcess: { ...activeProcess, roles: updatedRoles },

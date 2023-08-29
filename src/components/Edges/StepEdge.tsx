@@ -1,6 +1,6 @@
 import { CloseCircleOutlined } from "@ant-design/icons";
 import { Button } from "antd";
-import { FunctionComponent, useCallback, useEffect, useMemo, useState } from "react";
+import { FunctionComponent, useCallback, useEffect, useRef, useState } from "react";
 import {
 	EdgeProps,
 	getSmoothStepPath,
@@ -9,7 +9,7 @@ import {
 import useMainStore from "store";
 import { shallow } from "zustand/shallow";
 import { Nullable } from "types";
-import { simplifySVGPath, testPathForPoint } from "utils";
+import { simplifySVGPath, testPathForPoint, pathIsEditable, handleEdgeChanges } from "utils";
 
 const foreignObjectSize = 40;
 
@@ -41,12 +41,47 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 		],
 		shallow
 	);
-	const { role = '', path = '', setPath } = data || {};
+	const { role = '', path = '', setPath, points } = data || {};
 
 	const hideCloseButton = !selected || showAllConnections || !showPortsAndCloseButtons;
 
 	const [isHover, setIsHover] = useState<Nullable<boolean>>(null);
+	const [isDragging, setIsDragging] = useState<Nullable<boolean>>(false);
+	const [startX, setStartX] = useState(0);
+	const [startY, setStartY] = useState(0);
+	const [currentMouseMovement, setCurrentMouseMovement] = useState({ x: 0, y: 0 })
+	const pathRef = useRef<Nullable<SVGPathElement>>(null);
 
+	const handleMouseDown = (e: any) => {
+		if (selected) {
+
+			setIsDragging(true);
+			if (pathRef?.current) {
+				const { left, top } = pathRef.current.getBoundingClientRect();
+				setStartX(e.clientX - left);
+				setStartY(e.clientY - top);
+			}
+		}
+	};
+
+	const handleMouseMove = (e: any) => {
+		if (selected && isDragging && pathRef?.current) {
+			const { left, top } = pathRef.current.getBoundingClientRect();
+			const newX = e.clientX - left - startX;
+			const newY = e.clientY - top - startY;
+
+			setCurrentMouseMovement({ x: newX, y: newY });
+		}
+	};
+
+	const handleMouseUp = () => {
+		setIsDragging(false);
+	};
+
+	useEffect(() => {
+		!selected && setIsDragging(false)
+	}, [setIsDragging, selected])
+	// todo: hover method via data, no store access for components
 	const hoverEdge = (status: boolean) => {
 		setHoveredEdgeNodes(status ? [source, target] : [])
 		setIsHover(status);
@@ -80,12 +115,24 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 	const [edgePath, labelX, labelY] = getSmoothStepPath(edgeParams);
 	const isValidPath = testPathForPoint(path, { x: sourceX, y: sourceY }, true) && testPathForPoint(path, { x: targetX, y: targetY }, false);
 	const svgPath = path && isValidPath ? path : selected ? simplifySVGPath(edgePath) : edgePath;
+	const canEdit = selected && points && pathIsEditable(points);
 
 	useEffect(() => {
-		// const updatedPath = simplifySVGPath(edgePath);
+		const updatedPath = simplifySVGPath(edgePath);
 		// if (setPath && selected && !path) setPath({ source, target, path: updatedPath, role })
-		// if (setPath && selected && path !== updatedPath) setPath({ source, target, path: updatedPath, role })
-	}, [setPath, selected, path, edgePath, source, target, role])
+		if (setPath && selected && path !== updatedPath) setPath({ source, target, path: updatedPath, role })
+	}, [setPath, selected, path, edgePath, source, target, role]);
+
+	useEffect(() => {
+		const { x, y } = currentMouseMovement;
+		if (canEdit && isDragging && x && y) {
+			const newPath = handleEdgeChanges(points, x, y);
+			console.log('newPath', newPath);
+			console.log('x', x, 'y', y);
+			// setPath({ source, target, path: newPath, role });
+			setCurrentMouseMovement({ x: 0, y: 0 });
+		}
+	}, [currentMouseMovement, canEdit, isDragging, points]);
 
 	return (
 		<>
@@ -97,11 +144,15 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 				stroke={isHover ? "#0ff" : "black"}
 			/>
 			<path
+				ref={pathRef}
 				d={svgPath}
 				fill="none"
 				strokeOpacity={0}
 				strokeWidth={20}
 				className="react-flow__edge-interaction"
+				onMouseDown={handleMouseDown}
+				onMouseMove={handleMouseMove}
+				onMouseUp={handleMouseUp}
 			/>
 			{!hideCloseButton && (
 				<foreignObject
