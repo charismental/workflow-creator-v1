@@ -143,7 +143,8 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
 	const customConnectionLineMap: any = {
 		straight: { component: CustomConnectionLine },
-		step: { connectionLineType: ConnectionLineType.SmoothStep },
+		// step: { connectionLineType: ConnectionLineType.SmoothStep },
+		step: { component: CustomConnectionLine },
 		bezier: { connectionLineType: ConnectionLineType.Bezier },
 		smart: { connectionLineType: ConnectionLineType.Straight },
 	};

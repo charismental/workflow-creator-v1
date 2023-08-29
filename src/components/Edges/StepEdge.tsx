@@ -91,7 +91,7 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 			// console.log('handleMouseMove', newX, newY)
 			console.log('handleMouseMove', e.clientX, e.clientY)
 			setCurrentMouseMovement({ x: newX, y: newY });
-			setStartCoordinates(e.clientX, e.clientY);
+			// setStartCoordinates(e.clientX, e.clientY);
 		}
 	};
 
