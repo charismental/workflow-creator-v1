@@ -53,6 +53,7 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 	const pathRef = useRef<Nullable<SVGPathElement>>(null);
 
 	const rounded = (num: number) => Math.round(num);
+
 	const updateEdge = useCallback(debounce((path) => {
 		console.log('updateEdge', path)
 		setPath({ source, target, path, role })
@@ -143,7 +144,7 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 
 	useEffect(() => {
 		const updatedPath = simplifySVGPath(edgePath);
-		if ((setPath && selected && !path) || !isValidPath) {
+		if (!showAllConnections && ((setPath && selected && !path) || !isValidPath)) {
 			setPath({ source, target, path: updatedPath, role })
 			setLocalPath(updatedPath);
 		}
