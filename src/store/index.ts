@@ -411,8 +411,8 @@ const useMainStore = create<MainState & MainActions>()(
 
                             const updatedSelectedNode = {
                                 ...selectedNode,
-                                position: { ...mappedChanges[0].position, y: updatedY },
-                                positionAbsolute: { ...mappedChanges[0].position, y: updatedY },
+                                position: { x: xNode ? mappedChanges[0]?.position?.x || x : x, y: updatedY },
+                                positionAbsolute: { x: xNode ? mappedChanges[0]?.position?.x || x : x, y: updatedY },
                             };
 
                             Object.assign(mappedChanges[0], updatedSelectedNode);

@@ -225,7 +225,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 						top: `${helperLines[1]}px`,
 						backgroundColor: "green",
 						width: "100%",
-						height: "2px",
+						height: "2.5px",
 					}} />
 				)}
 				{/* vertical helper line */}
@@ -234,7 +234,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 					zIndex: 5,
 					left: `${helperLines[0] || 0}px`,
 					backgroundColor: "green",
-					width: "2px",
+					width: "2.5px",
 					height: "100%",
 					opacity: typeof helperLines[0] === 'number' ? 1 : 0,
 				}} />
