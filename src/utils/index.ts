@@ -358,14 +358,12 @@ export function computedNodes({
 	activeRole,
 	showAllConnections,
 	fullHandles,
-	displayHelperLines = true
 }: {
 	process: WorkflowProcess | null;
 	showAllRoles: boolean;
 	showAllConnections: boolean;
 	activeRole: string;
 	fullHandles: boolean;
-	displayHelperLines?: boolean;
 }): Node[] {
 	const { states = [], roles = [], processName = "Process Name" } = process || {};
 	const mappedStates = states.map(({ properties }) => properties || {});
@@ -388,32 +386,6 @@ export function computedNodes({
 	const yOffset = totalSetHeight + 40;
 
 	const nodes: Node[] = [];
-
-	const helperLinesNode = {
-		id: 'helperLines',
-		draggable: false,
-		selectable: false,
-		type: "helperLines",
-		data: {},
-		position: { x: 100, y: 100 },
-		positionAbsolute: { x: 100, y: 100 },
-		// height: `100px`,
-		// width: `100px`,
-	}
-	// id: idPrefix + stateName,
-	// data: {
-	// 	label: stateName,
-	// 	...(color && { color }),
-	// 	...(selfConnected && { selfConnected }),
-	// 	w: width,
-	// 	h: height,
-	// },
-	// positionAbsolute: {
-	// 	x,
-	// 	y: y + yOffset,
-	// },
-	// width,
-	// height,
 
 	if (showAllRoles) {
 		nodes.push(labelNode({ name: processName, x: startingX, y: startingY - 80, w: totalSetWidth }));
@@ -463,8 +435,6 @@ export function computedNodes({
 					})
 				)
 			);
-		displayHelperLines && nodes.push({ ...helperLinesNode });
-		// ...(nodes.length && { position: { x: nodes[0].position.x, y: nodes[0].position.y }, positionAbsolute: { x: nodes[0].position.x, y: nodes[0].position.y } })
 	}
 
 	return nodes;

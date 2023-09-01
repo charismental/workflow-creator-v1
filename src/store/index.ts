@@ -57,7 +57,16 @@ export interface MainState {
     companies: WorkflowCompany[];
     hoveredEdgeNodes: string[];
     unsavedChanges: boolean;
-    helperLines: [number | undefined, number | undefined];
+    helperLines: [
+        number | undefined,
+        number | undefined,
+        string | undefined,
+        string | undefined,
+        string | undefined,
+        string | undefined,
+        string | undefined,
+        string | undefined,
+    ];
 }
 
 export interface MainActions {
@@ -159,7 +168,7 @@ const useMainStore = create<MainState & MainActions>()(
                 }
                 set({ selectedEdge });
             },
-            helperLines: [undefined, undefined],
+            helperLines: [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined],
             unsavedChanges: false,
             setUnsavedChanges: (status) => set({ unsavedChanges: status }),
             sessions: [],
@@ -310,7 +319,13 @@ const useMainStore = create<MainState & MainActions>()(
             roles: [],
             companies: [],
             onNodesChange: (changes: NodeChange[] | any[]) => {
-                const { activeProcess, activeRole, showAllRoles, edgeType } = get();
+                const {
+                    activeProcess,
+                    activeRole,
+                    showAllRoles,
+                    edgeType,
+                    helperLines,
+                } = get();
                 const isStraightEdge = edgeType === 'straight';
 
                 const removeIndexPrefix = (prefixedString: string): string => {
@@ -319,6 +334,10 @@ const useMainStore = create<MainState & MainActions>()(
                     return prefixedString.slice(prefix.length);
                 };
 
+                const { states = [] } = activeProcess || {};
+
+                // todo: forEach instead of map, handle additional position changes
+                // via nodeShouldSnapTo
                 const mappedChanges = changes.map((change, i, arr) => {
                     const { position = {}, id } = change;
 
@@ -340,11 +359,67 @@ const useMainStore = create<MainState & MainActions>()(
                 if (changes.length === 1) {
                     const [selectedNode] = changes;
 
-                    const { id, dragging } = selectedNode;
+                    const { id, dragging, type } = selectedNode;
 
                     if (dragging) {
-                        set({ helperLines: getHelperLinePositions({ nodeId: id }) });
-                    } else set({ helperLines: [undefined, undefined] })
+                        const helperLines = getHelperLinePositions({ nodeId: id });
+
+                        set({ helperLines });
+                    } else if (type === 'position') {
+                        const [xNode, yNode, xTargetSide, yTargetSide, xSourceSide, ySourceSide] = helperLines.slice(2, 8);
+                        const foundSourceState = states.find(({ stateName }) => stateName === id);
+                        const { properties }: any = foundSourceState || {};
+                        const { x, w, y, h } = properties;
+
+                        if (xNode && xTargetSide && xSourceSide) {
+                            const foundXNode = states.find(({ stateName }) => stateName === xNode);
+                            const { properties }: any = foundXNode || {};
+                            const { x: xNodeX, w: xNodeW } = properties;
+
+                            let updatedX = x;
+                            switch (xTargetSide) {
+                                case 'left':
+                                    updatedX = xSourceSide === 'left' ? xNodeX : xNodeX - w;
+                                    break;
+                                case 'right':
+                                    updatedX = xSourceSide === 'left' ? xNodeX + xNodeW : xNodeX + xNodeW - w;
+                                    break;
+                            }
+
+                            const updatedSelectedNode = {
+                                ...selectedNode,
+                                position: { y, x: updatedX },
+                                positionAbsolute: { y, x: updatedX },
+                            };
+
+                            Object.assign(mappedChanges[0], updatedSelectedNode);
+                        }
+                        if (yNode && yTargetSide && ySourceSide) {
+                            const foundYNode = states.find(({ stateName }) => stateName === yNode);
+                            const { properties }: any = foundYNode || {};
+                            const { y: yNodeY, h: yNodeH } = properties;
+
+                            let updatedY = y;
+                            switch (yTargetSide) {
+                                case 'top':
+                                    updatedY = ySourceSide === 'top' ? yNodeY : yNodeY - h;
+                                    break;
+                                case 'bottom':
+                                    updatedY = ySourceSide === 'top' ? yNodeY + yNodeH : yNodeY + yNodeH - h;
+                                    break;
+                            }
+
+                            const updatedSelectedNode = {
+                                ...selectedNode,
+                                position: { x, y: updatedY },
+                                positionAbsolute: { x, y: updatedY },
+                            };
+
+                            Object.assign(mappedChanges[0], updatedSelectedNode);
+                        }
+
+                        set({ helperLines: [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined] })
+                    }
                 }
 
                 if (activeProcess) {
