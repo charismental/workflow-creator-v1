@@ -20,7 +20,7 @@ export function getHelperLinePositions(payload: { nodeId: string }): [number | u
     const xConnection = { value: undefined, key: undefined, targetSide: undefined, sourceSide: undefined };
     const yConnection = { value: undefined, key: undefined, targetSide: undefined, sourceSide: undefined };
     const { top, bottom, left, right }: { top: number; bottom: number; left: number; right: number } = node.getBoundingClientRect();
-    const snapGap = 4;
+    const snapGap = 5;
 
     Object.entries({ top, bottom, left, right }).forEach(([sourceSide, value]: [string, number]) => {
         switch (sourceSide) {
