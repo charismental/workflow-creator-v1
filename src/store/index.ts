@@ -304,8 +304,21 @@ const useMainStore = create<MainState & MainActions>()(
             getAllSessions: async () => {
                 set({ globalLoading: true }, false, "globalLoading");
                 const sessions: WorkflowSession[] = await getAllSessions();
-                set({ sessions, globalLoading: false }, false, "getAllSessions");
+                const mapped: WorkflowSession[] = [];
+
+                sessions.forEach((session, i, arr) => {
+                    if (arr.some(({ processName, sessionId }) => sessionId !== session.sessionId &&
+                    processName === session.processName)) {
+                        session.processName += ` (${i + 1})`;
+                    }
+
+                    mapped.push(session);
+                });
+
+                set({ sessions: mapped, globalLoading: false }, false, "getAllSessions");
+                
                 const { sessionId = '' } = sessions?.[0] || {};
+
                 if (sessionId) {
                     const sessionProcess = await getSessionProcess(sessionId);
 
