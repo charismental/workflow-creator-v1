@@ -26,16 +26,19 @@ import {
     WorkflowCompany,
     WorkflowSession,
     NumberBoolean,
+    Nullable,
 } from "types";
 import {
     getHelperLinePositions,
     nodeByState,
     roleColor,
     stateByNode,
-    transformNewConnectionToTransition
+    transformNewConnectionToTransition,
+    simplifySVGPath,
 } from "utils";
 
 export interface MainState {
+    selectedEdge: Nullable<{ source: string; target: string; role: string; }>;
     globalLoading: boolean;
     activeRole: string;
     _hasHydrated: boolean;
@@ -54,10 +57,20 @@ export interface MainState {
     companies: WorkflowCompany[];
     hoveredEdgeNodes: string[];
     unsavedChanges: boolean;
-    helperLines: [number | undefined, number | undefined];
+    helperLines: [
+        number | undefined,
+        number | undefined,
+        string | undefined,
+        string | undefined,
+        string | undefined,
+        string | undefined,
+        string | undefined,
+        string | undefined,
+    ];
 }
 
 export interface MainActions {
+    setSelectedEdge: (payload: Nullable<{ target: string; source: string; role?: string }>) => void;
     setUnsavedChanges: (status: boolean) => void;
     getAllSessions: (env?: string) => Promise<any>;
     deleteSession: (sessionId: string) => Promise<string>;
@@ -97,12 +110,65 @@ export interface MainActions {
     saveStateSnapshot: () => void;
     revertToSnapshot: () => void;
     setHoveredEdgeNodes: (nodes: string[]) => void;
+    setPathForEdge: (payload: { path: string; role: string; source: string; target: string }) => void;
 }
 
 const useMainStore = create<MainState & MainActions>()(
     devtools(
         (set, get) => ({
-            helperLines: [undefined, undefined],
+            selectedEdge: null,
+            setPathForEdge: ({ path, role, source, target }) => {
+                const { activeProcess, selectedEdge } = get();
+                const { source: selectedSource, target: selectedTarget, role: selectedRole } = selectedEdge || {};
+                if (activeProcess && selectedSource === source && selectedTarget === target && selectedRole === role) {
+                    const { roles = [] } = activeProcess;
+
+                    const foundRoleIndex = roles.findIndex(({ roleName }) => roleName === role);
+                    const { transitions = [] } = roles[foundRoleIndex] || {};
+
+                    const foundTransitionIndex = transitions.findIndex(({ stateName, toStateName }) => {
+                        return stateName === source && toStateName === target;
+                    });
+
+                    if (foundTransitionIndex !== -1) {
+                        const existingTransition = transitions[foundTransitionIndex];
+                        const points = path ? simplifySVGPath(path, true) : '';
+                        if (!points) delete existingTransition.properties?.points;
+                        const updatedTransition = { ...existingTransition, properties: { ...existingTransition?.properties || {}, ...(points && { points }) } };
+
+                        const updatedTransitions = transitions.map((t, i) => {
+                            return i === foundTransitionIndex ? updatedTransition : t;
+                        });
+
+                        const updatedRoles = roles.map((r, i) => {
+                            return i === foundRoleIndex ? { ...r, transitions: updatedTransitions } : r;
+                        });
+
+                        set(
+                            {
+                                activeProcess: {
+                                    ...activeProcess,
+                                    roles: updatedRoles,
+                                },
+                            },
+                            false,
+                            "setPathForEdge"
+                        );
+                    }
+                }
+            },
+            setSelectedEdge: (payload) => {
+                let selectedEdge = null;
+
+                if (payload) {
+                    const { activeRole } = get();
+                    const { source, target, role } = payload;
+                    const selectedEdgeRole = role || activeRole;
+                    selectedEdge = { source, target, role: selectedEdgeRole };
+                }
+                set({ selectedEdge });
+            },
+            helperLines: [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined],
             unsavedChanges: false,
             setUnsavedChanges: (status) => set({ unsavedChanges: status }),
             sessions: [],
@@ -253,7 +319,13 @@ const useMainStore = create<MainState & MainActions>()(
             roles: [],
             companies: [],
             onNodesChange: (changes: NodeChange[] | any[]) => {
-                const { activeProcess, activeRole, showAllRoles, edgeType } = get();
+                const {
+                    activeProcess,
+                    activeRole,
+                    showAllRoles,
+                    edgeType,
+                    helperLines,
+                } = get();
                 const isStraightEdge = edgeType === 'straight';
 
                 const removeIndexPrefix = (prefixedString: string): string => {
@@ -262,9 +334,13 @@ const useMainStore = create<MainState & MainActions>()(
                     return prefixedString.slice(prefix.length);
                 };
 
+                const { states = [] } = activeProcess || {};
+
+                // todo: forEach instead of map, handle additional position changes
+                // via nodeShouldSnapTo
                 const mappedChanges = changes.map((change, i, arr) => {
                     const { position = {}, id } = change;
-                    
+
                     const updated = { ...change, id: removeIndexPrefix(id) };
 
                     if (arr.length === 1 && arr[0].dragging) {
@@ -274,7 +350,7 @@ const useMainStore = create<MainState & MainActions>()(
                         Object.assign(updated, {
                             positionAbsolute: { x: roundToTwo(x), y: roundToTwo(y) },
                             position: { x: roundToTwo(x), y: roundToTwo(y) },
-                        }); 
+                        });
                     }
 
                     return updated
@@ -283,11 +359,67 @@ const useMainStore = create<MainState & MainActions>()(
                 if (changes.length === 1) {
                     const [selectedNode] = changes;
 
-                    const { id, dragging } = selectedNode;
+                    const { id, dragging, type } = selectedNode;
 
                     if (dragging) {
-                        set({ helperLines: getHelperLinePositions({ nodeId: id }) });
-                    } else set({ helperLines: [undefined, undefined] })
+                        const helperLines = getHelperLinePositions({ nodeId: id });
+
+                        set({ helperLines });
+                    } else if (type === 'position') {
+                        const [xNode, yNode, xTargetSide, yTargetSide, xSourceSide, ySourceSide] = helperLines.slice(2, 8);
+                        const foundSourceState = states.find(({ stateName }) => stateName === id);
+                        const { properties }: any = foundSourceState || {};
+                        const { x, w, y, h } = properties;
+
+                        if (xNode && xTargetSide && xSourceSide) {
+                            const foundXNode = states.find(({ stateName }) => stateName === xNode);
+                            const { properties }: any = foundXNode || {};
+                            const { x: xNodeX, w: xNodeW } = properties;
+
+                            let updatedX = x;
+                            switch (xTargetSide) {
+                                case 'left':
+                                    updatedX = xSourceSide === 'left' ? xNodeX : xNodeX - w;
+                                    break;
+                                case 'right':
+                                    updatedX = xSourceSide === 'left' ? xNodeX + xNodeW : xNodeX + xNodeW - w;
+                                    break;
+                            }
+
+                            const updatedSelectedNode = {
+                                ...selectedNode,
+                                position: { y, x: updatedX },
+                                positionAbsolute: { y, x: updatedX },
+                            };
+
+                            Object.assign(mappedChanges[0], updatedSelectedNode);
+                        }
+                        if (yNode && yTargetSide && ySourceSide) {
+                            const foundYNode = states.find(({ stateName }) => stateName === yNode);
+                            const { properties }: any = foundYNode || {};
+                            const { y: yNodeY, h: yNodeH } = properties;
+
+                            let updatedY = y;
+                            switch (yTargetSide) {
+                                case 'top':
+                                    updatedY = ySourceSide === 'top' ? yNodeY : yNodeY - h;
+                                    break;
+                                case 'bottom':
+                                    updatedY = ySourceSide === 'top' ? yNodeY + yNodeH : yNodeY + yNodeH - h;
+                                    break;
+                            }
+
+                            const updatedSelectedNode = {
+                                ...selectedNode,
+                                position: { x: xNode ? mappedChanges[0]?.position?.x || x : x, y: updatedY },
+                                positionAbsolute: { x: xNode ? mappedChanges[0]?.position?.x || x : x, y: updatedY },
+                            };
+
+                            Object.assign(mappedChanges[0], updatedSelectedNode);
+                        }
+
+                        set({ helperLines: [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined] })
+                    }
                 }
 
                 if (activeProcess) {
@@ -374,9 +506,9 @@ const useMainStore = create<MainState & MainActions>()(
                 }
             },
             onConnect: (connection: Connection) => {
-                const { activeRole, activeProcess, showAllRoles, states } = get();
+                const { activeRole, activeProcess, showAllRoles, states, setSelectedEdge } = get();
                 const { source, target } = connection;
-
+                let roleForSelectedEdge = activeRole;
                 const { roles = [] } = activeProcess || {};
                 let roleIndexStr = "";
 
@@ -390,7 +522,7 @@ const useMainStore = create<MainState & MainActions>()(
                 const foundRoleIndex = roles.findIndex(({ roleName }, i) => {
                     if (showAllRoles) {
                         roleIndexStr = (source || "").match(/\d+/g)?.[0] || "";
-
+                        roleForSelectedEdge = roleName;
                         return Number(roleIndexStr) === i;
                     }
 
@@ -432,7 +564,7 @@ const useMainStore = create<MainState & MainActions>()(
                     const updatedRoles = roles.map((r, i) =>
                         i === foundRoleIndex ? { ...r, transitions: updatedTransitions } : r
                     );
-
+                    source && target && setTimeout(() => setSelectedEdge({ source, target, role: roleForSelectedEdge }), 10)
                     set(
                         {
                             activeProcess: { ...activeProcess, roles: updatedRoles },
@@ -452,7 +584,7 @@ const useMainStore = create<MainState & MainActions>()(
                     showAllRoles: false,
                 })),
             removeTransition: ({ source, target }: { source: string; target: string }) => {
-                const { activeRole, activeProcess, showAllRoles } = get();
+                const { activeRole, activeProcess, showAllRoles, setSelectedEdge } = get();
 
                 const { roles = [] } = activeProcess || {};
                 let roleIndexStr = "";
@@ -475,6 +607,7 @@ const useMainStore = create<MainState & MainActions>()(
                 });
 
                 if (foundRoleIndex !== -1 && activeProcess) {
+                    setSelectedEdge(null);
                     const { transitions = [] } = roles[foundRoleIndex];
 
                     const updatedTransitions = transitions.filter(({ stateName, toStateName }) => {

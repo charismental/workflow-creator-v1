@@ -50,6 +50,9 @@ const selector = (state: MainState & MainActions) => ({
 	states: state.states,
 	edgeType: state.edgeType,
 	helperLines: state.helperLines,
+	selectedEdge: state.selectedEdge,
+	setSelectedEdge: state.setSelectedEdge,
+	setPathForEdge: state.setPathForEdge,
 });
 
 interface ReactFlowBaseProps {
@@ -86,6 +89,9 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		states,
 		edgeType,
 		helperLines,
+		selectedEdge,
+		setSelectedEdge,
+		setPathForEdge,
 	} = useMainStore(selector, shallow);
 
 	const { activeRole, activeRoleColor, roleIsToggled } = props;
@@ -121,6 +127,8 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		showAllRoles,
 		showAllConnections: showAllConnectedStates,
 		edgeType,
+		selectedEdge,
+		setPathForEdge,
 	});
 
 	const fullHandles = edgeType === "straight";
@@ -135,7 +143,8 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
 	const customConnectionLineMap: any = {
 		straight: { component: CustomConnectionLine },
-		step: { connectionLineType: ConnectionLineType.SmoothStep },
+		// step: { connectionLineType: ConnectionLineType.SmoothStep },
+		step: { component: CustomConnectionLine },
 		bezier: { connectionLineType: ConnectionLineType.Bezier },
 		smart: { connectionLineType: ConnectionLineType.Straight },
 	};
@@ -196,6 +205,10 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		[reactFlowInstance, setStatesForActiveProcess, activeRole, nodes]
 	);
 
+	const handleBaseClick = (e: any) => {
+		if (!e?.target?.classList?.contains("react-flow__edge-interaction")) setSelectedEdge(null);
+	};
+
 	return (
 		<>
 			<div
@@ -212,19 +225,19 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 						top: `${helperLines[1]}px`,
 						backgroundColor: "green",
 						width: "100%",
-						height: "2px",
+						height: "2.5px",
 					}} />
 				)}
 				{/* vertical helper line */}
-					<div style={{
-						position: "absolute",
-						zIndex: 5,
-						left: `${helperLines[0] || 0}px`,
-						backgroundColor: "green",
-						width: "2px",
-						height: "100%",
-						opacity: typeof helperLines[0] === 'number' ? 1 : 0,
-					}} />
+				<div style={{
+					position: "absolute",
+					zIndex: 5,
+					left: `${helperLines[0] || 0}px`,
+					backgroundColor: "green",
+					width: "2.5px",
+					height: "100%",
+					opacity: typeof helperLines[0] === 'number' ? 1 : 0,
+				}} />
 				<ReactFlow
 					nodes={nodes}
 					edges={edges}
@@ -235,6 +248,8 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 					onDragOver={onDragOver}
 					fitView
 					snapToGrid
+					onClick={handleBaseClick}
+					onEdgeClick={(_, { source, target, data }) => setSelectedEdge({ source, target, ...(data?.role && { role: data.role }) })}
 					snapGrid={snapGrid}
 					nodeTypes={nodeTypes}
 					edgeTypes={edgeTypes}

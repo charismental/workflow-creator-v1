@@ -9,7 +9,11 @@ import {
 	WorkflowRole,
 	WorkflowState,
 } from "../types";
+import { pathFromPoints } from "./pointsHelpers";
 export * from "./helperLine";
+export * from "./simpleSVGPath";
+export * from "./pointsHelpers";
+export * from "./editEdgeHelpers";
 
 interface IntersectionNodeType {
 	width: any;
@@ -95,17 +99,24 @@ export function getEdgeParams({ source, target, sourceHandle, targetHandle }: { 
 
 export function transformTransitionsToEdges({
 	transitions,
+	roleName,
 	edgeType = 'straight',
 	idPrefix = "",
+	selectedEdge = null,
+	setPathForEdge,
 }: {
+	// todo
+	setPathForEdge?: (payload: any) => void;
 	transitions: WorkFlowTransition[];
+	roleName?: string;
 	edgeType: string;
 	idPrefix?: string;
+	selectedEdge?: Nullable<{ source: string; target: string; role: string }>;
 }): Edge[] {
 	const mapper = (transition: WorkFlowTransition): Edge | any => {
 		const { stateName: source, toStateName: target, properties = {} } = transition;
 
-		const { sourceHandle = null, targetHandle = null } = properties || {};
+		const { sourceHandle = null, targetHandle = null, points = null } = properties || {};
 
 		const edgeTypeMap: any = {
 			straight: 'straightEdge',
@@ -113,6 +124,8 @@ export function transformTransitionsToEdges({
 			bezier: 'bezierEdge',
 			smart: 'smartEdge',
 		};
+
+		const path = points ? pathFromPoints(points) : '';
 
 		const type = edgeTypeMap[edgeType];
 
@@ -126,10 +139,12 @@ export function transformTransitionsToEdges({
 				type: "arrowclosed",
 				color: "black",
 			},
+			selected: selectedEdge?.source === source && selectedEdge?.target === target,
 			sourceHandle,
 			targetHandle,
 			source: `${idPrefix}${source}`,
 			target: `${idPrefix}${target}`,
+			data: { ...(roleName && { role: roleName }), path, setPath: setPathForEdge, ...(points && { points }) },
 			id: edgeIdByNodes({ source: `${idPrefix}${source}`, target: `${idPrefix}${target}`, sourceHandle, targetHandle }),
 		};
 	};
@@ -431,18 +446,24 @@ export function computedEdges({
 	showAllRoles,
 	showAllConnections,
 	edgeType = 'straight',
+	selectedEdge,
+	setPathForEdge,
 }: {
+	// todo
+	setPathForEdge: (payload: any) => void;
 	showAllRoles: boolean;
 	roles: WorkflowRole[];
 	activeRole: string;
 	showAllConnections: boolean;
 	edgeType: string;
+	selectedEdge: Nullable<{ source: string; target: string; role: string }>;
 }): Edge[] {
 	if (showAllRoles) {
 		const allEdges: Edge[] = [];
 
-		roles.forEach(({ transitions = [] }, i) => {
-			allEdges.push(...transformTransitionsToEdges({ transitions, idPrefix: String(i), edgeType }));
+		// selectedEdge logic in transformTransitionsToEdges
+		roles.forEach(({ transitions = [], roleName }, i) => {
+			allEdges.push(...transformTransitionsToEdges({ transitions, idPrefix: String(i), edgeType, roleName, selectedEdge: selectedEdge?.role === roleName ? selectedEdge : null, setPathForEdge }));
 		});
 
 		return allEdges;
@@ -455,6 +476,7 @@ export function computedEdges({
 
 		return transformTransitionsToEdges({
 			edgeType,
+			selectedEdge,
 			transitions: allTransitions.filter(
 				({ stateName, toStateName }, i) =>
 					allTransitions.findIndex(
@@ -466,7 +488,7 @@ export function computedEdges({
 	} else {
 		const transitions = roles?.find((r) => r.roleName === activeRole)?.transitions || [];
 
-		return transformTransitionsToEdges({ transitions, edgeType });
+		return transformTransitionsToEdges({ transitions, edgeType, roleName: activeRole, selectedEdge: selectedEdge?.role === activeRole ? selectedEdge : null, setPathForEdge });
 	}
 }
 

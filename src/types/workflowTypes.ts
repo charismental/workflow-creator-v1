@@ -31,8 +31,9 @@ export interface WorkFlowTransition {
 	toStateName: string;
 	internalOnly: boolean;
 	properties?: {
-		sourceHandle?: string | null;
-		targetHandle?: string | null;
+		sourceHandle?: Nullable<string>;
+		targetHandle?: Nullable<string>;
+		points?: Nullable<string>;
 	};
 }
 
