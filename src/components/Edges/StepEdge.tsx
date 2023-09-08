@@ -42,7 +42,7 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 		],
 		shallow
 	);
-	const { role = '', path = '', setPath, points } = data || {};
+	const { role = '', path = '', setPath, points, disabled = false } = data || {};
 
 	const [isHover, setIsHover] = useState<Nullable<boolean>>(null);
 	const [isDragging, setIsDragging] = useState<Nullable<boolean>>(false);
@@ -55,7 +55,7 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 	const rounded = (num: number) => Math.round(num);
 
 	const updateEdge = useCallback(debounce((path) => {
-		console.log('updateEdge', path)
+		// console.log('updateEdge', path)
 		setPath({ source, target, path, role })
 	}, 10), [])
 
@@ -64,7 +64,7 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 	const setStartCoordinates = useCallback((x: number, y: number) => {
 		if (pathRef?.current) {
 			const { left, top } = pathRef.current.getBoundingClientRect();
-			console.log(left, top)
+			// console.log('startX', left, top)
 			setStartX(x - left);
 			setStartY(y - top);
 		}
@@ -89,10 +89,9 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 			const { left, top } = pathRef.current.getBoundingClientRect();
 			const newX = e.clientX - left - startX;
 			const newY = e.clientY - top - startY;
-			// console.log('handleMouseMove', newX, newY)
-			console.log('handleMouseMove', e.clientX, e.clientY)
+			// console.log('handleMouseMove', 'top', top, 'startY', startY, 'e.clientY', e.clientY, 'newY', newY)
+			// console.log('handleMouseMove', e.clientX, e.clientY)
 			setCurrentMouseMovement({ x: newX, y: newY });
-			// setStartCoordinates(e.clientX, e.clientY);
 		}
 	};
 
@@ -144,7 +143,7 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 
 	useEffect(() => {
 		const updatedPath = simplifySVGPath(edgePath);
-		if (!showAllConnections && ((setPath && selected && !path) || !isValidPath)) {
+		if (!disabled && !showAllConnections && ((setPath && selected && !path) || !isValidPath)) {
 			setPath({ source, target, path: updatedPath, role })
 			setLocalPath(updatedPath);
 		}
@@ -154,7 +153,7 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 	useEffect(() => {
 		const { x, y } = currentMouseMovement;
 		// console.log(x, y)
-		if (canEdit && isDragging && (x || y)) {
+		if (!disabled && canEdit && isDragging && (x || y)) {
 			// console.log('handleEdgeChanges', x, y)
 			const newPath = handleEdgeChanges(points, x, y);
 			// setPath({ source, target, path: newPath, role });
@@ -169,13 +168,13 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 			<path
 				id={id}
 				className="edge_path"
-				d={localPath}
+				d={disabled ? edgePath : localPath}
 				markerEnd={markerEnd}
 				stroke={isHover ? "#0ff" : "black"}
 			/>
 			<path
 				ref={pathRef}
-				d={localPath}
+				d={disabled ? edgePath : localPath}
 				fill="none"
 				strokeOpacity={0}
 				// stroke={isDragging ? "#0ff" : "black"}
