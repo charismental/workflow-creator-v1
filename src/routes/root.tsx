@@ -336,7 +336,11 @@ const WorkflowCreator = () => {
 				</div>
 			),
 			onOk() {
-				cloneProcess(processName, newSessionName).then(() => newSessionName = '')
+				cloneProcess(processName, newSessionName)
+					.then((success) => {
+						if (!success) topMessage({ type: 'error', content: 'Error cloning process', duration: 3 })
+						else (newSessionName = '')
+					})
 			},
 			onCancel() {
 				newSessionName = '';

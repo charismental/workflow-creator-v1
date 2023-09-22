@@ -74,7 +74,7 @@ export interface MainActions {
     setUnsavedChanges: (status: boolean) => void;
     getAllSessions: (env?: string) => Promise<any>;
     deleteSession: (sessionId: string) => Promise<string>;
-    cloneProcess: (processName: string, newName?: string) => Promise<void>;
+    cloneProcess: (processName: string, newName?: string) => Promise<boolean>;
     saveProcess: () => Promise<boolean>;
     publishProcess: () => Promise<boolean>;
     setActiveRole: (role: string) => void;
@@ -270,8 +270,10 @@ const useMainStore = create<MainState & MainActions>()(
                 }
 
                 const cloned = await cloneProcess({ processName, newProcessName: newName && !invalidNames.includes(newName) ? newName : nameUpdater(newName || processName, invalidNames) });
-
-                if (cloned?.sessionId) {
+                
+                const success = !!cloned?.sessionId;
+                
+                if (success) {
                     const {
                         dateCreated = null,
                         datePublished = null,
@@ -301,6 +303,8 @@ const useMainStore = create<MainState & MainActions>()(
                         "cloneProcess"
                     );
                 }
+
+                return success;
             },
             getAllSessions: async () => {
                 set({ globalLoading: true }, false, "globalLoading");
