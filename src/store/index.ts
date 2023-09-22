@@ -74,7 +74,7 @@ export interface MainActions {
     setUnsavedChanges: (status: boolean) => void;
     getAllSessions: (env?: string) => Promise<any>;
     deleteSession: (sessionId: string) => Promise<string>;
-    cloneProcess: (processName: string) => Promise<void>;
+    cloneProcess: (processName: string, newName?: string) => Promise<void>;
     saveProcess: () => Promise<boolean>;
     publishProcess: () => Promise<boolean>;
     setActiveRole: (role: string) => void;
@@ -202,6 +202,7 @@ const useMainStore = create<MainState & MainActions>()(
             },
             activeProcess: null,
             deleteSession: async (processName: string) => {
+                // TODO: should select new active process if deleted process is active
                 const { sessions } = get();
                 const { sessionId = '' } = sessions.find(({ processName: name }) => name === processName) || {};
                 const successMessage = await deleteSession(sessionId);
@@ -251,7 +252,7 @@ const useMainStore = create<MainState & MainActions>()(
 
                 return success;
             },
-            cloneProcess: async (processName: string) => {
+            cloneProcess: async (processName: string, newName?: string) => {
                 const { sessions, activeRole, activeProcess } = get();
                 const invalidNames = sessions.map(({ processName }) => processName);
 
@@ -268,7 +269,7 @@ const useMainStore = create<MainState & MainActions>()(
                         updatedName;
                 }
 
-                const cloned = await cloneProcess({ processName, newProcessName: nameUpdater(processName, invalidNames) });
+                const cloned = await cloneProcess({ processName, newProcessName: newName && !invalidNames.includes(newName) ? newName : nameUpdater(newName || processName, invalidNames) });
 
                 if (cloned?.sessionId) {
                     const {

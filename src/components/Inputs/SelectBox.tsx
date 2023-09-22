@@ -16,10 +16,7 @@ interface SelectBoxProps {
 	placeholder?: string;
 	hasColorInput?: boolean;
 	multiselectHandler?: (el: any) => void;
-	canDelete?: (el: any) => boolean;
-	canClone?: (el: any) => boolean;
-	deleteHandler?: (el: any) => void;
-	cloneHandler?: (el: any) => void;
+	iconComponents?: (el: string) => React.FC<any>[]
 }
 
 const SelectBox: React.FC<SelectBoxProps> = ({
@@ -31,10 +28,7 @@ const SelectBox: React.FC<SelectBoxProps> = ({
 	type,
 	placeholder,
 	multiselectHandler,
-	canDelete,
-	canClone,
-	deleteHandler,
-	cloneHandler,
+	iconComponents,
 	isDraggable = false,
 	hasColorInput = false,
 }) => {
@@ -113,7 +107,7 @@ const SelectBox: React.FC<SelectBoxProps> = ({
 		>
 			{items.map((item) => {
 				const label = typeof item === "string" ? item : item?.label;
-
+				
 				return (
 					<Option
 						key={label}
@@ -142,24 +136,7 @@ const SelectBox: React.FC<SelectBoxProps> = ({
 							>
 								<div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
 								<div style={{ display: "flex", justifyContent: "space-between", alignSelf: "center" }}>
-									{canClone?.(item) && cloneHandler && (
-										<CopyTwoTone
-											onClick={(e: any) => {
-												e.stopPropagation();
-												cloneHandler(item);
-											}}
-										/>
-									)}
-									{canDelete?.(item) && deleteHandler && (
-										<DeleteTwoTone
-											twoToneColor="#eb2f96"
-											style={{ marginLeft: "4px" }}
-											onClick={(e: any) => {
-												e.stopPropagation();
-												deleteHandler(item);
-											}}
-										/>
-									)}
+									{typeof item === 'string' && iconComponents && iconComponents(item).map((IconComponent, i) => <IconComponent key={i} item={item} />)}
 									{multiselectHandler && typeof item !== "string" && (
 										<Checkbox
 											checked={item.value}

@@ -2,7 +2,7 @@ import "reactflow/dist/style.css";
 import "../css/style.css";
 import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
-import { Button, Layout, Space, Spin, Typography } from "antd";
+import { Button, Input, Layout, Space, Spin, Typography } from "antd";
 import { blue, grey } from "@ant-design/colors";
 import { SaveTwoTone, SendOutlined, ShareAltOutlined } from "@ant-design/icons";
 import isEqual from "lodash.isequal";
@@ -29,6 +29,8 @@ import { Nullable, WorkflowProcess, WorkflowState } from "types";
 
 // api
 import { getSessionProcess } from "api";
+import { CloneProcessComponent } from "components/Inputs/CloneProcessComponent";
+import { DeleteProcessComponent } from "components/Inputs/DeleteProcessComponent";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -111,6 +113,7 @@ const WorkflowCreator = () => {
 		publishProcess,
 	} = useMainStore(storeSelector, shallow);
 	const [toggleInactiveModal, setToggleInactiveModal] = useState(false);
+
 	const filteredStates = useMainStore(
 		useCallback((state) => state.filteredStates, [currentStates])
 	);
@@ -249,11 +252,11 @@ const WorkflowCreator = () => {
 		const baseUrl = `${protocol}//${host}/`;
 		const foundRole = activeProcess?.roles?.find(({ roleName }) => roleName === activeRole);
 		const hashedQuery = queryObjectEncryptor({ processId: activeProcess?.processId, role: foundRole, states: activeProcess?.states || [] });
-		
+
 		const url = `${baseUrl}sharedLink/${encodeURIComponent(hashedQuery)}`;
-        const { success, message } = await copyToClipboard(url);
-        
-        topMessage({
+		const { success, message } = await copyToClipboard(url);
+
+		topMessage({
 			type: success ? 'success' : 'error',
 			content: message,
 			duration: 4,
@@ -292,7 +295,7 @@ const WorkflowCreator = () => {
 		return success;
 	}
 
-    const publishProcessHandler = async () => {
+	const publishProcessHandler = async () => {
 		topMessage({
 			type: 'loading',
 			content: 'Publishing process',
@@ -312,6 +315,36 @@ const WorkflowCreator = () => {
 		return success;
 	}
 
+	const cloneProcessHandler = async (processName: string) => {
+		const type: ModalType = "confirm";
+		let newSessionName = '';
+
+		const modalOptions = {
+			open: true,
+			title: "Clone Process",
+			okText: "Clone",
+			closeable: true,
+			type,
+			content: (
+				<div>
+					This will clone {processName}. Proceed?
+					<Input
+						style={{ marginTop: '10px', marginBottom: '10px' }}
+						placeholder="Enter new process name"
+						onChange={(e: any) => newSessionName = e.target.value}
+					/>
+				</div>
+			),
+			onOk() {
+				cloneProcess(processName, newSessionName).then(() => newSessionName = '')
+			},
+			onCancel() {
+				newSessionName = '';
+			}
+		};
+		ModalInstance(modalOptions)
+	}
+
 	const deleteSessionHandler = async (sessionName: string) => {
 		const type: ModalType = "confirm";
 
@@ -323,7 +356,7 @@ const WorkflowCreator = () => {
 			type,
 			content: (
 				<div>
-					This will permanently delete this session. Are you sure you wish to proceed?
+					This will permanently delete {sessionName}. Are you sure you wish to proceed?
 				</div>
 			),
 			onOk() {
@@ -336,6 +369,10 @@ const WorkflowCreator = () => {
 		ModalInstance(modalOptions)
 	}
 
+	const iconComponents = (el: string) => [
+		CloneProcessComponent({ item: el, handler: cloneProcessHandler, validProcesses: publishedSessions }),
+		DeleteProcessComponent({ item: el, handler: deleteSessionHandler }),
+	]
 
 	return (
 		<Space
@@ -350,16 +387,12 @@ const WorkflowCreator = () => {
 								useStyle={{ maxWidth: "360px", minWidth: "300px" }}
 								selectOnChange={findProcessAndSetActive}
 								addNew={addNewProcessAndSelect}
-								canDelete={() => true}
-								// canDelete={(el) => !publishedSessions.includes(el)}
-								canClone={(el) => publishedSessions.includes(el)}
-								deleteHandler={deleteSessionHandler}
-								cloneHandler={cloneProcess}
 								type="process"
 								selectValue={activeProcess?.processName}
 								items={availableSessions}
 								placeholder="Select Process"
 								hasColorInput={false}
+								iconComponents={iconComponents}
 							/>
 							<Button disabled={!unsavedChanges} onClick={saveProcessHandler} style={{ marginLeft: '4px' }} size="large" type="text" icon={<SaveTwoTone twoToneColor={unsavedChanges ? blue.primary : grey[0]} />} />
 							<Button disabled={!canPublish} onClick={publishProcessHandler} style={{ marginLeft: '2px' }} size="large" type="text" icon={<SendOutlined style={{ color: canPublish ? blue.primary : grey[0] }} />} />
