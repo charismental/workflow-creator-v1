@@ -7,8 +7,6 @@ import {
 	useNodes,
 } from "reactflow";
 import { getSmartEdge, svgDrawStraightLinePath } from "@tisoap/react-flow-smart-edge";
-import useMainStore from "store";
-import { shallow } from "zustand/shallow";
 import { Nullable } from "types";
 
 const foreignObjectSize = 40;
@@ -25,16 +23,9 @@ const SmartEdge: FunctionComponent<EdgeProps> = ({
 	sourceY,
 	sourcePosition,
 	targetPosition,
+	data,
 }) => {
-	const [removeTransition, showAllConnections, setHoveredEdgeNodes, showPortsAndCloseButtons] = useMainStore(
-		(state) => [
-			state.removeTransition,
-			state.showAllConnectedStates,
-			state.setHoveredEdgeNodes,
-			state.showPortsAndCloseButtons,
-		],
-		shallow
-	);
+	const { showAllConnections, setHoveredEdgeNodes, showPortsAndCloseButtons, removeTransition } = data;
 
 	const hideCloseButton = showAllConnections || !showPortsAndCloseButtons;
 

@@ -22,6 +22,7 @@ import {
 import { StateWithFullHandles, State, Label } from "./Nodes";
 import { computedEdges, computedNodes } from "utils";
 import { MainStore, NumberBoolean } from "types";
+import { HelperLines } from "./HelperLines";
 
 const connectionLineStyle = {
 	strokeWidth: 1.5,
@@ -36,23 +37,26 @@ const nodeTypes: NodeTypes = {
 
 const selector = (state: MainStore) => ({
 	activeProcess: state.activeProcess,
-	onNodesChange: state.onNodesChange,
-	setStatesForActiveProcess: state.setStatesForActiveProcess,
-	onConnect: state.onConnect,
 	activeProcessStates: state.activeProcess?.states || [],
 	reactFlowInstance: state.reactFlowInstance,
-	setReactFlowInstance: state.setReactFlowInstance,
 	showMinimap: state.showMinimap,
 	showAllRoles: state.showAllRoles,
 	showAllConnectedStates: state.showAllConnectedStates,
-	setContextMenuNodeId: state.setContextMenuNodeId,
+	showPortsAndCloseButtons: state.showPortsAndCloseButtons,
 	contextMenuNodeId: state.contextMenuNodeId,
 	states: state.states,
 	edgeType: state.edgeType,
 	helperLines: state.helperLines,
 	selectedEdge: state.selectedEdge,
+	onConnect: state.onConnect,
+	onNodesChange: state.onNodesChange,
+	setStatesForActiveProcess: state.setStatesForActiveProcess,
+	setReactFlowInstance: state.setReactFlowInstance,
+	setContextMenuNodeId: state.setContextMenuNodeId,
 	setSelectedEdge: state.setSelectedEdge,
 	setPathForEdge: state.setPathForEdge,
+	setHoveredEdgeNodes: state.setHoveredEdgeNodes,
+	removeTransition: state.removeTransition,
 });
 
 interface ReactFlowBaseProps {
@@ -92,6 +96,9 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		selectedEdge,
 		setSelectedEdge,
 		setPathForEdge,
+		removeTransition,
+		setHoveredEdgeNodes,
+		showPortsAndCloseButtons,
 	} = useMainStore(selector, shallow);
 
 	const { activeRole, activeRoleColor, roleIsToggled } = props;
@@ -129,6 +136,9 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 		edgeType,
 		selectedEdge,
 		setPathForEdge,
+		removeTransition,
+		setHoveredEdgeNodes,
+		showPortsAndCloseButtons
 	});
 
 	const fullHandles = edgeType === "straight";
@@ -143,18 +153,10 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 
 	const customConnectionLineMap: any = {
 		straight: { component: CustomConnectionLine },
-		// step: { connectionLineType: ConnectionLineType.SmoothStep },
 		step: { component: CustomConnectionLine },
 		bezier: { connectionLineType: ConnectionLineType.Bezier },
 		smart: { connectionLineType: ConnectionLineType.Straight },
 	};
-	// const openEdgeContextMenu = (e: React.MouseEvent, el: Edge) => {
-	// 	e.preventDefault();
-	// 	return setItems([
-	// 		getItem(<Text style={{ fontSize: "18px" }}>Source: {el.source}</Text>, 1, null),
-	// 		getItem(<Text style={{ fontSize: "18px" }}>Target: {el.target}</Text>, 2, null),
-	// 	]);
-	// };
 
 	const openNodeContextMenu = (e: React.MouseEvent, node: Node | any) => {
 		e.preventDefault();
@@ -217,28 +219,10 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 				id="download"
 				style={!roleIsToggled ? { pointerEvents: "none" } : {}}
 			>
-				{/* horizontal helper line */}
-				{typeof helperLines[1] === 'number' && (
-					<div style={{
-						position: "absolute",
-						zIndex: 5,
-						top: `${helperLines[1]}px`,
-						backgroundColor: "green",
-						width: "100%",
-						height: "2.5px",
-					}} />
-				)}
-				{/* vertical helper line */}
-				<div style={{
-					position: "absolute",
-					zIndex: 5,
-					left: `${helperLines[0] || 0}px`,
-					backgroundColor: "green",
-					width: "2.5px",
-					height: "100%",
-					opacity: typeof helperLines[0] === 'number' ? 1 : 0,
-				}} />
+				<HelperLines color="green" top={helperLines[1]} left={helperLines[0]} />
 				<ReactFlow
+					fitView
+					snapToGrid
 					nodes={nodes}
 					edges={edges}
 					onNodesChange={onNodesChange}
@@ -246,8 +230,6 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 					onInit={setReactFlowInstance}
 					onDrop={onDrop}
 					onDragOver={onDragOver}
-					fitView
-					snapToGrid
 					onClick={handleBaseClick}
 					onEdgeClick={(_, { source, target, data }) => setSelectedEdge({ source, target, ...(data?.role && { role: data.role }) })}
 					snapGrid={snapGrid}

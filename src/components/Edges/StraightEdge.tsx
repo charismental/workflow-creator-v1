@@ -7,23 +7,13 @@ import {
 	useStore as useReactFlowStore,
 } from "reactflow";
 import { getEdgeParams } from "../../utils";
-import useMainStore from "store";
-import { shallow } from "zustand/shallow";
 import { Nullable } from "types";
 
 const foreignObjectSize = 40;
 
-const StraightEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd }) => {
-	const [removeTransition, showAllConnections, setHoveredEdgeNodes, showPortsAndCloseButtons] = useMainStore(
-		(state) => [
-			state.removeTransition,
-			state.showAllConnectedStates,
-			state.setHoveredEdgeNodes,
-			state.showPortsAndCloseButtons,
-		],
-		shallow
-	);
-	
+const StraightEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd, data }) => {	
+	const { showAllConnections, setHoveredEdgeNodes, showPortsAndCloseButtons, removeTransition } = data;
+
 	const hideCloseButton = showAllConnections || !showPortsAndCloseButtons;
 
 	const [isHover, setIsHover] = useState<Nullable<boolean>>(null);

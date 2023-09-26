@@ -104,7 +104,12 @@ export function transformTransitionsToEdges({
 	idPrefix = "",
 	selectedEdge = null,
 	setPathForEdge,
+	showAllConnections = false,
+	removeTransition,
+	setHoveredEdgeNodes,
+	showPortsAndCloseButtons,
 }: {
+	showAllConnections?: boolean;
 	// todo
 	setPathForEdge?: (payload: any) => void;
 	transitions: WorkFlowTransition[];
@@ -112,6 +117,9 @@ export function transformTransitionsToEdges({
 	edgeType: string;
 	idPrefix?: string;
 	selectedEdge?: Nullable<{ source: string; target: string; role: string }>;
+	removeTransition: any;
+	setHoveredEdgeNodes: any;
+	showPortsAndCloseButtons: boolean;
 }): Edge[] {
 	const mapper = (transition: WorkFlowTransition): Edge | any => {
 		const { stateName: source, toStateName: target, properties = {} } = transition;
@@ -144,7 +152,17 @@ export function transformTransitionsToEdges({
 			targetHandle,
 			source: `${idPrefix}${source}`,
 			target: `${idPrefix}${target}`,
-			data: { ...(roleName && { role: roleName }), path, setPath: setPathForEdge, ...(points && { points }) },
+			data: {
+				path,
+				setPath: setPathForEdge,
+				showAllConnections,
+				setHoveredEdgeNodes,
+				showPortsAndCloseButtons,
+				removeTransition,
+				...(roleName && { role: roleName }),
+				...(points && { points }),
+
+			},
 			id: edgeIdByNodes({ source: `${idPrefix}${source}`, target: `${idPrefix}${target}`, sourceHandle, targetHandle }),
 		};
 	};
@@ -448,6 +466,9 @@ export function computedEdges({
 	edgeType = 'straight',
 	selectedEdge,
 	setPathForEdge,
+	removeTransition,
+	setHoveredEdgeNodes,
+	showPortsAndCloseButtons = true
 }: {
 	// todo
 	setPathForEdge: (payload: any) => void;
@@ -457,13 +478,26 @@ export function computedEdges({
 	showAllConnections: boolean;
 	edgeType: string;
 	selectedEdge: Nullable<{ source: string; target: string; role: string }>;
+	removeTransition: any,
+	setHoveredEdgeNodes: any,
+	showPortsAndCloseButtons?: boolean;
 }): Edge[] {
 	if (showAllRoles) {
 		const allEdges: Edge[] = [];
 
 		// selectedEdge logic in transformTransitionsToEdges
 		roles.forEach(({ transitions = [], roleName }, i) => {
-			allEdges.push(...transformTransitionsToEdges({ transitions, idPrefix: String(i), edgeType, roleName, selectedEdge: selectedEdge?.role === roleName ? selectedEdge : null, setPathForEdge }));
+			allEdges.push(...transformTransitionsToEdges({
+				transitions,
+				idPrefix: String(i),
+				edgeType,
+				roleName,
+				selectedEdge: selectedEdge?.role === roleName ? selectedEdge : null,
+				setPathForEdge,
+				removeTransition,
+				setHoveredEdgeNodes,
+				showPortsAndCloseButtons,
+			}));
 		});
 
 		return allEdges;
@@ -477,18 +511,31 @@ export function computedEdges({
 		return transformTransitionsToEdges({
 			edgeType,
 			selectedEdge,
+			showAllConnections,
 			transitions: allTransitions.filter(
 				({ stateName, toStateName }, i) =>
 					allTransitions.findIndex(
 						(transtion) =>
 							transtion.stateName === stateName && transtion.toStateName === toStateName
 					) === i
-			)
+			),
+			removeTransition,
+			setHoveredEdgeNodes,
+			showPortsAndCloseButtons,
 		});
 	} else {
 		const transitions = roles?.find((r) => r.roleName === activeRole)?.transitions || [];
 
-		return transformTransitionsToEdges({ transitions, edgeType, roleName: activeRole, selectedEdge: selectedEdge?.role === activeRole ? selectedEdge : null, setPathForEdge });
+		return transformTransitionsToEdges({
+			transitions,
+			edgeType,
+			roleName: activeRole,
+			selectedEdge: selectedEdge?.role === activeRole ? selectedEdge : null,
+			setPathForEdge,
+			removeTransition,
+			setHoveredEdgeNodes,
+			showPortsAndCloseButtons,
+		});
 	}
 }
 

@@ -1,5 +1,5 @@
 import { OnNodesChange, OnConnect, ReactFlowInstance } from "reactflow";
-import { MainState, Nullable, WorkflowProcess, WorkflowState } from "./";
+import { MainState, Nullable, WorkflowProcess, WorkflowState } from ".";
 
 export interface EdgeActions {
     setPathForEdge: (payload: { path: string; role: string; source: string; target: string }) => void;

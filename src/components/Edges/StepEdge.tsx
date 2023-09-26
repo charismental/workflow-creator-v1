@@ -6,9 +6,7 @@ import {
 	getSmoothStepPath,
 	useStore as useReactFlowStore,
 } from "reactflow";
-import { shallow } from "zustand/shallow";
 import debounce from "lodash.debounce";
-import useMainStore from "store";
 import { Nullable } from "types";
 import { simplifySVGPath, testPathForPoint, pathIsEditable, handleEdgeChanges } from "utils";
 
@@ -28,21 +26,17 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 	selected,
 	data,
 }) => {
-	const [
-		removeTransition,
+	const {
+		role = '',
+		path = '',
+		setPath,
+		points,
+		disabled = false,
 		showAllConnections,
+		removeTransition,
 		setHoveredEdgeNodes,
-		showPortsAndCloseButtons
-	] = useMainStore(
-		(state) => [
-			state.removeTransition,
-			state.showAllConnectedStates,
-			state.setHoveredEdgeNodes,
-			state.showPortsAndCloseButtons,
-		],
-		shallow
-	);
-	const { role = '', path = '', setPath, points, disabled = false } = data || {};
+		showPortsAndCloseButtons,
+	} = data || {};
 
 	const [isHover, setIsHover] = useState<Nullable<boolean>>(null);
 	const [isDragging, setIsDragging] = useState<Nullable<boolean>>(false);
