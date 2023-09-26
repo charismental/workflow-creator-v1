@@ -1,11 +1,10 @@
 import { ModalType, ModalInstance } from "./";
-import { MainActions } from "store";
 
 interface SetAsInactiveModalProps {
 	modalOpen: boolean;
 	setModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	roleName: string;
-	toggleRoleForProcess: MainActions["toggleRoleForProcess"];
+	toggleRoleForProcess: (role: string, color?: string) => void;
 	successMessage: () => void;
 }
 

@@ -9,7 +9,6 @@ import isEqual from "lodash.isequal";
 
 // store
 import { shallow } from "zustand/shallow";
-import type { MainActions, MainState } from "store";
 import useMainStore from "store";
 
 // components
@@ -25,7 +24,7 @@ import { copyToClipboard, roleColor } from "utils";
 import { queryObjectEncryptor } from "utils/queryObjectEncryptor";
 
 // types
-import { Nullable, WorkflowProcess, WorkflowState } from "types";
+import { MainStore, Nullable, WorkflowProcess, WorkflowState } from "types";
 
 // api
 import { getSessionProcess } from "api";
@@ -56,7 +55,7 @@ const activeRoleTitleStyle: CSSProperties = {
 
 const layoutContainer: CSSProperties = { width: "100%", height: "100vh" };
 
-const storeSelector = (state: MainActions & MainState) => ({
+const storeSelector = (state: MainStore) => ({
 	unsavedChanges: state.unsavedChanges,
 	setUnsavedChanges: state.setUnsavedChanges,
 	sessions: state.sessions,

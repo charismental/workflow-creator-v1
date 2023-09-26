@@ -10,7 +10,7 @@ import ReactFlow, {
 	NodeTypes,
 	SnapGrid,
 } from "reactflow";
-import useMainStore, { MainActions, MainState } from "store";
+import useMainStore from "store";
 import { shallow } from "zustand/shallow";
 import CustomConnectionLine from "../components/CustomConnectionLine";
 import {
@@ -21,7 +21,7 @@ import {
 } from "./Edges";
 import { StateWithFullHandles, State, Label } from "./Nodes";
 import { computedEdges, computedNodes } from "utils";
-import { NumberBoolean } from "types";
+import { MainStore, NumberBoolean } from "types";
 
 const connectionLineStyle = {
 	strokeWidth: 1.5,
@@ -34,7 +34,7 @@ const nodeTypes: NodeTypes = {
 	label: Label,
 };
 
-const selector = (state: MainState & MainActions) => ({
+const selector = (state: MainStore) => ({
 	activeProcess: state.activeProcess,
 	onNodesChange: state.onNodesChange,
 	setStatesForActiveProcess: state.setStatesForActiveProcess,
