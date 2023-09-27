@@ -232,6 +232,16 @@ export function nodeByState({
 	idPrefix = "",
 	selfConnected = false,
 	fullHandles = false,
+	contextMenuNodeId,
+	details,
+	isEdgeHovered = false,
+	showAllRoles = false,
+	showPortsAndCloseButtons = false,
+	updateStateProperties,
+	removeState,
+	updateStateProperty,
+	removeTransition,
+	onConnect,
 }: {
 	state: WorkflowState;
 	index: number;
@@ -241,6 +251,20 @@ export function nodeByState({
 	idPrefix?: string;
 	selfConnected?: boolean;
 	fullHandles?: boolean;
+	contextMenuNodeId?: string;
+	details?: {
+		displayOrder: number;
+		requiresRoleAssignment: NumberBoolean;
+		requiresUserAssignment: NumberBoolean;
+	};
+	isEdgeHovered?: boolean;
+	showAllRoles?: boolean;
+	showPortsAndCloseButtons?: boolean;
+	updateStateProperties?: any;
+	removeState?: any;
+	updateStateProperty?: any;
+	removeTransition?: any;
+	onConnect?: any;
 }): Node {
 	const { stateName, properties = {} } = state;
 	const defaultW = 200;
@@ -267,10 +291,20 @@ export function nodeByState({
 		},
 		data: {
 			label: stateName,
-			...(color && { color }),
-			...(selfConnected && { selfConnected }),
 			w: width,
 			h: height,
+			contextMenuNodeId,
+			details,
+			isEdgeHovered,
+			showAllRoles,
+			showPortsAndCloseButtons,
+			selfConnected,
+			color,
+			updateStateProperties,
+			removeState,
+			updateStateProperty,
+			removeTransition,
+			onConnect,
 		},
 		positionAbsolute: {
 			x,
@@ -374,14 +408,28 @@ export function computedNodes({
 	process,
 	showAllRoles,
 	activeRole,
-	showAllConnections,
 	fullHandles,
+	contextMenuNodeId,
+	hoveredEdgeNodes,
+	showPortsAndCloseButtons,
+	updateStateProperties,
+	removeState,
+	updateStateProperty,
+	removeTransition,
+	onConnect,
 }: {
 	process: WorkflowProcess | null;
 	showAllRoles: boolean;
-	showAllConnections: boolean;
 	activeRole: string;
 	fullHandles: boolean;
+	contextMenuNodeId?: string;
+	hoveredEdgeNodes?: string[];
+	showPortsAndCloseButtons: boolean;
+	updateStateProperties?: any;
+	removeState?: any;
+	updateStateProperty?: any;
+	removeTransition?: any;
+	onConnect?: any;
 }): Node[] {
 	const { states = [], roles = [], processName = "Process Name" } = process || {};
 	const mappedStates = states.map(({ properties }) => properties || {});
@@ -432,6 +480,20 @@ export function computedNodes({
 							yOffset: yOffset * i,
 							color: roleColor({ roleName, allRoles: roles }),
 							fullHandles,
+							contextMenuNodeId,
+							isEdgeHovered: (hoveredEdgeNodes || [])?.includes(state.stateName),
+							showAllRoles,
+							showPortsAndCloseButtons,
+							details: {
+								displayOrder: state.displayOrder || 0,
+								requiresRoleAssignment: state.requiresRoleAssignment || 0,
+								requiresUserAssignment: state.requiresUserAssignment || 0,
+							},
+							updateStateProperties,
+							removeState,
+							updateStateProperty,
+							removeTransition,
+							onConnect,
 						})
 					);
 				});
@@ -447,9 +509,21 @@ export function computedNodes({
 						allNodesLength: arr.length,
 						color: roleColor({ roleName: activeRole, allRoles: roles }),
 						fullHandles,
-						...(showAllConnections && {
-							selfConnected: stateIsSelfConnected({ stateId: state.stateName, process }),
-						}),
+						selfConnected: stateIsSelfConnected({ stateId: state.stateName, process, role: activeRole }),
+						contextMenuNodeId,
+						isEdgeHovered: (hoveredEdgeNodes || [])?.includes(state.stateName),
+						showAllRoles,
+						showPortsAndCloseButtons,
+						details: {
+							displayOrder: state.displayOrder || 0,
+							requiresRoleAssignment: state.requiresRoleAssignment || 0,
+							requiresUserAssignment: state.requiresUserAssignment || 0,
+						},
+						updateStateProperties,
+						removeState,
+						updateStateProperty,
+						removeTransition,
+						onConnect,
 					})
 				)
 			);
@@ -549,6 +623,7 @@ export function stateIsSelfConnected({
 	process: WorkflowProcess | null;
 }): boolean {
 	const { roles = [] } = process || {};
+
 	if (!role) {
 		const allTransitions: WorkFlowTransition[] = [];
 

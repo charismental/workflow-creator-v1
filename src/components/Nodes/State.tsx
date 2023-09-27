@@ -4,8 +4,6 @@ import Title from "antd/es/typography/Title";
 import { CSSProperties, FunctionComponent, useState } from "react";
 
 import { Handle, NodeProps, NodeResizer, Position, useStore as useReactFlowStore } from "reactflow";
-import useMainStore from "store";
-import { shallow } from "zustand/shallow";
 
 const checkboxStyle: CSSProperties = {
 	position: "absolute",
@@ -19,34 +17,27 @@ const checkboxStyle: CSSProperties = {
 const connectionNodeIdSelector = (state: any) => state.connectionNodeId;
 
 const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.Element => {
-	const removeState = useMainStore((state) => state.removeState, shallow);
-	const updateStateProperty = useMainStore((state) => state.updateStateProperty);
-	const contextMenuNodeId = useMainStore((state) => state.contextMenuNodeId, shallow);
-	// todo: consolidate this with updateStateProperty
-	const updateStateProperties = useMainStore((state) => state.updateStateProperties, shallow);
-	const foundState = useMainStore((state) => (state?.activeProcess?.states || []).find(({ stateName }) => stateName === id));
-	const onConnect = useMainStore((state) => state.onConnect, shallow);
-	const removeTransition = useMainStore((state) => state.removeTransition, shallow);
-	const isEdgeHovered = useMainStore((state) => state.hoveredEdgeNodes.includes(id))
-	const showAllRoles = useMainStore((state) => state.showAllRoles, shallow);
-	const showPortsAndCloseButtons = useMainStore((state) => state.showPortsAndCloseButtons, shallow);
-
-	// todo, use only data.selfConnected
-	// update util to always add selfConnected for stateToNode
-	const selfConnected =
-		useMainStore(
-			(state) =>
-				!!state.activeProcess?.roles
-					?.find(({ roleName }) => roleName === state.activeRole)
-					?.transitions?.find(({ stateName, toStateName }) =>
-						[stateName, toStateName].every((el) => el === id)
-					),
-			shallow
-		) || data?.selfConnected;
+	const {
+		label,
+		selfConnected,
+		color = "#ccd9f6",
+		w,
+		h,
+		contextMenuNodeId,
+		details,
+		isEdgeHovered,
+		showAllRoles,
+		showPortsAndCloseButtons,
+		updateStateProperties,
+		removeState,
+		updateStateProperty,
+		removeTransition,
+		onConnect,
+	} = data;
 
 	const onResize = (_: any, payload: any) => {
 		const { height: h, width: w, x, y } = payload;
-		updateStateProperties({ stateName: data.label, properties: { x, y, h, w } });
+		updateStateProperties({ stateName: label, properties: { x, y, h, w } });
 	};
 
 	const [isMouseOver, setIsMouseOver] = useState(false);
@@ -88,21 +79,21 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 				<Form.Item label="Display Order">
 					<Input
 						type="number"
-						value={foundState?.displayOrder || 0}
+						value={details?.displayOrder || 0}
 						onChange={handleDisplayOrderChange}
 						maxLength={4}
 					/>
 				</Form.Item>
 				<Form.Item colon={false} label="Requires Role Assignment">
 					<Checkbox
-						checked={!!foundState?.requiresRoleAssignment}
-						onChange={() => updateStateProperty({ state: id, property: 'requiresRoleAssignment', value: !foundState?.requiresRoleAssignment })}
+						checked={!!details?.requiresRoleAssignment}
+						onChange={() => updateStateProperty({ state: id, property: 'requiresRoleAssignment', value: !details?.requiresRoleAssignment })}
 					/>
 				</Form.Item>
 				<Form.Item colon={false} label="Requires User Assignment">
 					<Checkbox
-						checked={!!foundState?.requiresUserAssignment}
-						onChange={() => updateStateProperty({ state: id, property: 'requiresUserAssignment', value: !foundState?.requiresUserAssignment })}
+						checked={!!details?.requiresUserAssignment}
+						onChange={() => updateStateProperty({ state: id, property: 'requiresUserAssignment', value: !details?.requiresUserAssignment })}
 					/>
 				</Form.Item>
 			</Form>
@@ -138,10 +129,10 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 					minHeight,
 					minWidth,
 					borderStyle: isTarget ? "dashed" : "solid",
-					backgroundColor: isTarget ? "#ffcce3" : data?.color || "#ccd9f6",
+					backgroundColor: isTarget ? "#ffcce3" : color,
 					...(isEdgeHovered && { boxShadow: '0 0 4px 4px #0ff' }),
-					...(data?.w && { width: data.w }),
-					...(data?.h && { height: data.h }),
+					...(w && { width: w }),
+					...(h && { height: h }),
 				}}
 			>
 				{selfConnected && (
@@ -172,7 +163,7 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 						/>
 						<div
 							className="state-delete-button"
-							onClick={() => removeState(data.label)}
+							onClick={() => removeState(label)}
 						/>
 					</div>
 				)}
@@ -304,7 +295,7 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 						padding: '0 4px',
 					}}
 				>
-					{data?.label || "Unknown State"}
+					{label || "Unknown State"}
 				</div>
 			</div>
 		</Popover>

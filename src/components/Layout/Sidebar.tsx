@@ -1,10 +1,5 @@
-import { Layout, Space, Radio, Typography } from "antd";
-import type { RadioChangeEvent } from "antd";
+import { Layout, Space } from "antd";
 import { CSSProperties, FC } from "react";
-import useMainStore from "store";
-import { shallow } from "zustand/shallow";
-
-const { Text } = Typography;
 
 const sidebar: CSSProperties = {
 	backgroundColor: "white",

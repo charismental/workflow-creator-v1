@@ -57,59 +57,77 @@ const layoutContainer: CSSProperties = { width: "100%", height: "100vh" };
 
 const storeSelector = (state: MainStore) => ({
 	unsavedChanges: state.unsavedChanges,
-	setUnsavedChanges: state.setUnsavedChanges,
 	sessions: state.sessions,
+	activeProcess: state.activeProcess,
+	activeRole: state.activeRole,
+	roles: state.roles,
+	currentStates: state.states,
+	loading: state.globalLoading,
+	reactFlowInstance: state.reactFlowInstance,
+	companies: state.companies,
+	edgeType: state.edgeType,
+	showPortsAndCloseButtons: state.showPortsAndCloseButtons,
+	setEdgeType: state.setEdgeType,
+	setShowAllConnectedStates: state.setShowAllConnectedStates,
+	toggleShowAllRoles: state.toggleShowAllRoles,
+	setUnsavedChanges: state.setUnsavedChanges,
 	addProcess: state.addProcess,
 	deleteSession: state.deleteSession,
 	toggleRoleForProcess: state.toggleRoleForProcess,
-	activeProcess: state.activeProcess,
 	setActiveProcess: state.setActiveProcess,
-	activeRole: state.activeRole,
 	setActiveRole: state.setActiveRole,
-	roles: state.roles,
 	setColorForActiveRole: state.setColorForActiveRole,
-	currentStates: state.states,
 	addNewState: state.addNewState,
 	addNewRole: state.addNewRole,
 	getAllSessions: state.getAllSessions,
-	loading: state.globalLoading,
-	reactFlowInstance: state.reactFlowInstance,
 	updateRoleProperty: state.updateRoleProperty,
-	Companies: state.companies,
 	toggleCompanyForProcess: state.toggleCompanyForProcess,
 	addNewCompany: state.addNewCompany,
 	cloneProcess: state.cloneProcess,
 	saveProcess: state.saveProcess,
 	publishProcess: state.publishProcess,
+	saveStateSnapshot: state.saveStateSnapshot,
+	revertToSnapshot: state.revertToSnapshot,
+	setShowPortsAndCloseButtons: state.setShowPortsAndCloseButtons,
+	setShowMinimap: state.setShowMinimap,
 });
 
 const WorkflowCreator = () => {
 	const {
 		unsavedChanges,
-		setUnsavedChanges,
 		sessions,
+		activeProcess,
+		activeRole,
+		roles,
+		currentStates,
+		loading,
+		reactFlowInstance,
+		companies,
+		edgeType,
+		showPortsAndCloseButtons,
+		setShowMinimap,
+		setShowPortsAndCloseButtons,
+		setEdgeType,
+		setShowAllConnectedStates,
+		toggleShowAllRoles,
+		setUnsavedChanges,
 		addProcess,
 		toggleRoleForProcess,
-		activeProcess,
 		setActiveProcess,
-		activeRole,
 		setActiveRole,
-		roles,
 		setColorForActiveRole,
-		currentStates,
 		addNewState,
 		updateRoleProperty,
 		addNewRole,
 		getAllSessions,
-		loading,
-		reactFlowInstance,
-		Companies,
 		toggleCompanyForProcess,
 		addNewCompany,
 		deleteSession,
 		cloneProcess,
 		saveProcess,
 		publishProcess,
+		saveStateSnapshot,
+		revertToSnapshot,
 	} = useMainStore(storeSelector, shallow);
 	const [toggleInactiveModal, setToggleInactiveModal] = useState(false);
 
@@ -201,7 +219,7 @@ const WorkflowCreator = () => {
 		};
 	})
 
-	const companyList = Companies.map(({ companyName }) => {
+	const companyList = companies.map(({ companyName }) => {
 		return {
 			label: companyName,
 			value: activeProcess?.companies?.some((c) => c.companyName === companyName) || false,
@@ -432,6 +450,15 @@ const WorkflowCreator = () => {
 							/>
 						</Content>
 						<CustomControls
+							toggleShowAllRoles={toggleShowAllRoles}
+							setShowAllConnectedStates={setShowAllConnectedStates}
+							setEdgeType={setEdgeType}
+							edgeType={edgeType}
+							saveStateSnapshot={saveStateSnapshot}
+							revertToSnapshot={revertToSnapshot}
+							showPortsAndCloseButtons={showPortsAndCloseButtons}
+							setShowPortsAndCloseButtons={setShowPortsAndCloseButtons}
+							setShowMinimap={setShowMinimap}
 							roleIsToggled={roleIsToggled}
 							getCurrentEdges={reactFlowInstance?.getEdges}
 							getCurrentNodes={reactFlowInstance?.getNodes}

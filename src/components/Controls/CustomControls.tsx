@@ -14,7 +14,7 @@ import Icon, {
 	EyeInvisibleOutlined,
 } from "@ant-design/icons";
 import { Button, Dropdown, MenuProps, Radio, Space, Tooltip } from "antd";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	ControlProps,
 	Edge,
@@ -24,16 +24,22 @@ import {
 	useStore,
 	useStoreApi,
 } from "reactflow";
-import useMainStore from "store";
-import { shallow } from "zustand/shallow";
 import { EdgeModal, NodeModal } from "../Modals";
 import { MapSvg, CustomControlButtonWithTooltip, DownloadButton } from "./";
-import { set } from "immer/dist/internal";
 
 interface CustomControlsProps {
 	getCurrentEdges: (() => Edge[]) | undefined;
 	getCurrentNodes: (() => Node[]) | undefined;
 	roleIsToggled: boolean;
+	toggleShowAllRoles: any,
+	setShowAllConnectedStates: any,
+	setEdgeType: any,
+	edgeType: string,
+	saveStateSnapshot: any,
+	revertToSnapshot: any,
+	setShowPortsAndCloseButtons: any,
+	showPortsAndCloseButtons: boolean,
+	setShowMinimap: any,
 }
 
 const isInteractiveSelector = (s: ReactFlowState) =>
@@ -44,6 +50,15 @@ const CustomControls = ({
 	getCurrentNodes,
 	onInteractiveChange,
 	roleIsToggled,
+	toggleShowAllRoles,
+	setShowAllConnectedStates,
+	setEdgeType,
+	edgeType,
+	saveStateSnapshot,
+	revertToSnapshot,
+	showPortsAndCloseButtons,
+	setShowPortsAndCloseButtons,
+	setShowMinimap,
 }: CustomControlsProps & ControlProps) => {
 	const store = useStoreApi();
 	const isInteractive = useStore(isInteractiveSelector);
@@ -52,30 +67,6 @@ const CustomControls = ({
 	const [currentEdges, setCurrentEdges] = useState<Edge[]>([]);
 	const [currentNodes, setCurrentNodes] = useState<Node[]>([]);
 	const [nodeModalOpen, setNodeModalOpen] = useState(false);
-	const setShowMinimap = useMainStore(useCallback((state) => state.setShowMinimap, []));
-	const [
-		toggleShowAllRoles,
-		setShowAllConnectedStates,
-		setEdgeType,
-		edgeType,
-		saveStateSnapshot,
-		revertToSnapshot,
-		showPortsAndCloseButtons,
-		setShowPortsAndCloseButtons
-	] =
-		useMainStore(
-			(state) => [
-				state.toggleShowAllRoles,
-				state.setShowAllConnectedStates,
-				state.setEdgeType,
-				state.edgeType,
-				state.saveStateSnapshot,
-				state.revertToSnapshot,
-				state.showPortsAndCloseButtons,
-				state.setShowPortsAndCloseButtons,
-			],
-			shallow
-		);
 
 	const onToggleInteractivity = (status = !isInteractive) => {
 		store.setState({
