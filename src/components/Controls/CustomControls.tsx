@@ -31,15 +31,15 @@ interface CustomControlsProps {
 	getCurrentEdges: (() => Edge[]) | undefined;
 	getCurrentNodes: (() => Node[]) | undefined;
 	roleIsToggled: boolean;
-	toggleShowAllRoles: any,
-	setShowAllConnectedStates: any,
-	setEdgeType: any,
-	edgeType: string,
-	saveStateSnapshot: any,
-	revertToSnapshot: any,
-	setShowPortsAndCloseButtons: any,
-	showPortsAndCloseButtons: boolean,
-	setShowMinimap: any,
+	toggleShowAllRoles: any;
+	setShowAllConnectedStates: any;
+	setEdgeType: any;
+	edgeType: string;
+	saveStateSnapshot: any;
+	revertToSnapshot: any;
+	setShowPortsAndCloseButtons: any;
+	showPortsAndCloseButtons: boolean;
+	setShowMinimap: any;
 }
 
 const isInteractiveSelector = (s: ReactFlowState) =>

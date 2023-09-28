@@ -67,6 +67,7 @@ interface ReactFlowBaseProps {
 	activeRoleColor?: string;
 	activeRole: any;
 	roleIsToggled: boolean;
+	displayBackground?: boolean;
 }
 
 const edgeTypes: any = {
@@ -250,6 +251,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 					snapGrid={snapGrid}
 					nodeTypes={nodeTypes}
 					edgeTypes={edgeTypes}
+					minZoom={0.2}
 					proOptions={{ hideAttribution: true }}
 					defaultEdgeOptions={defaultEdgeOptions}
 					connectionLineComponent={customConnectionLineMap[edgeType]?.component}
