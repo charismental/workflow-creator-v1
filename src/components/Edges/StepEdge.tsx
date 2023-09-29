@@ -162,13 +162,13 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 			<path
 				id={id}
 				className="edge_path"
-				d={disabled ? edgePath : localPath}
+				d={disabled || showAllConnections ? edgePath : localPath}
 				markerEnd={markerEnd}
 				stroke={isHover ? "#0ff" : "black"}
 			/>
 			<path
 				ref={pathRef}
-				d={disabled ? edgePath : localPath}
+				d={disabled || showAllConnections ? edgePath : localPath}
 				fill="none"
 				strokeOpacity={0}
 				// stroke={isDragging ? "#0ff" : "black"}
