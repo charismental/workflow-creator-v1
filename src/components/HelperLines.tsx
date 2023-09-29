@@ -18,7 +18,7 @@ const HelperLines: React.FC<HelperLinesProps> = ({
 				position: "absolute",
 				zIndex: 5,
 				top: `${top}px`,
-				backgroundColor: color,
+				borderTop: `2.5px dashed ${color}`,
 				width: "100%",
 				height: "2.5px",
 			}} />
@@ -28,7 +28,7 @@ const HelperLines: React.FC<HelperLinesProps> = ({
 			position: "absolute",
 			zIndex: 5,
 			left: `${left || 0}px`,
-			backgroundColor: color,
+			borderLeft: `2.5px dashed ${color}`,
 			width: "2.5px",
 			height: "100%",
 			opacity: typeof left === 'number' ? 1 : 0,

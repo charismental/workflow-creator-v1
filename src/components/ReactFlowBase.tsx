@@ -235,7 +235,7 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 				id="download"
 				style={!roleIsToggled ? { pointerEvents: "none" } : {}}
 			>
-				<HelperLines color="green" top={helperLines[1]} left={helperLines[0]} />
+				<HelperLines color="darkGrey" top={helperLines[1]} left={helperLines[0]} />
 				<ReactFlow
 					fitView
 					snapToGrid
