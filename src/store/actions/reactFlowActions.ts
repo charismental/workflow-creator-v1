@@ -9,7 +9,6 @@ export const reactFlowActions = (set: any, get: () => MainStore): ReactFlowActio
         localStorage.setItem('state-snapshot', JSON.stringify(snapShot));
     },
     revertToSnapshot: () => {
-        // TODO: try/catch
         const foundSnapshot = localStorage.getItem('state-snapshot');
 
         if (foundSnapshot) {

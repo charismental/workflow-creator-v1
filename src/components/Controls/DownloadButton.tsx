@@ -1,5 +1,5 @@
 import { toSvg } from "html-to-image";
-import { Button } from "antd";
+import { Button, Tooltip } from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
 import { topMessage } from "components/UI";
 
@@ -42,10 +42,17 @@ const DownloadButton = () => {
 		}, 350)
 	};
 	return (
-		<Button
-			icon={<DownloadOutlined />}
-			onClick={onClick}
-		/>
+		<>
+			<Tooltip
+				title={"Download Workflow as Image"}
+				placement={"top"}
+			>
+				<Button
+					icon={<DownloadOutlined />}
+					onClick={onClick}
+				/>
+			</Tooltip>
+		</>
 	);
 }
 

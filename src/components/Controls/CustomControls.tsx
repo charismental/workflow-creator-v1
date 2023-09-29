@@ -1,6 +1,5 @@
 import Icon, {
 	ApartmentOutlined,
-	DeleteOutlined,
 	ExpandOutlined,
 	LockFilled,
 	MinusOutlined,
@@ -160,20 +159,20 @@ const CustomControls = ({
 					isDisabled={!roleIsToggled}
 				/>
 				<CustomControlButtonWithTooltip
-					title={"Save Progress"}
+					title={"Save Progress to Local Storage"}
 					icon={<SaveOutlined />}
 					clickEvent={saveStateSnapshot}
 				/>
 				<CustomControlButtonWithTooltip
-					title={"Revert To Last Save Point"}
+					title={"Restore State from Local Storage"}
 					icon={<ReloadOutlined />}
 					clickEvent={revertToSnapshot}
 				/>
-				<CustomControlButtonWithTooltip
+				{/* <CustomControlButtonWithTooltip
 					title={"Delete Progress"}
 					icon={<DeleteOutlined />}
 					clickEvent={() => console.log("you deleted a thing!")}
-				/>
+				/> */}
 				<CustomControlButtonWithTooltip
 					title={"Toggle Minimap"}
 					icon={
@@ -185,12 +184,7 @@ const CustomControls = ({
 					}
 					clickEvent={setShowMinimap}
 				/>
-				<Tooltip
-					title={"Download Workflow as Image"}
-					placement={"top"}
-				>
-					<DownloadButton />
-				</Tooltip>
+				<DownloadButton />
 				<CustomControlButtonWithTooltip
 					title={"Show All Roles and Connections"}
 					icon={<TableOutlined />}
@@ -202,7 +196,7 @@ const CustomControls = ({
 					clickEvent={setShowAllConnections}
 				/>
 				<CustomControlButtonWithTooltip
-					title={showPortsAndCloseButtons ? "Hide ports and close buttons" : "Show ports and close buttons"}
+					title={showPortsAndCloseButtons ? "Hide ports" : "Show ports"}
 					icon={showPortsAndCloseButtons ? <EyeOutlined /> : <EyeInvisibleOutlined />}
 					clickEvent={setShowPortsAndCloseButtons}
 				/>
