@@ -87,6 +87,8 @@ div.full-handle {
 
 .react-flow__node {
   cursor: initial;
+  z-index: -1 !important;
+
 }
 
 .react-flow__node .drag-handle {

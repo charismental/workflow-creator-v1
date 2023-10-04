@@ -70,6 +70,15 @@ const BezierEdge: FunctionComponent<EdgeProps> = ({
 				markerEnd={markerEnd}
 				stroke={isHover ? "#0ff" : "black"}
 			/>
+			<path
+				d={edgePath}
+				fill="none"
+				strokeOpacity={0}
+				strokeWidth={20}
+				className="react-flow__edge-interaction"
+				onMouseOver={() => hoverEdge(true)}
+				onMouseLeave={() => hoverEdge(false)}
+			/>
 			{!hideCloseButton && (
 				<foreignObject
 					onMouseOver={() => hoverEdge(true)}

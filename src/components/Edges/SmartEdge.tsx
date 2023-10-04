@@ -51,7 +51,7 @@ const SmartEdge: FunctionComponent<EdgeProps> = ({
 	);
 
 	if (!sourceNode || !targetNode || source === target) return null;
-	
+
 	const nodes = useNodes();
 
 	const edgeParams = {
@@ -82,6 +82,15 @@ const SmartEdge: FunctionComponent<EdgeProps> = ({
 				markerEnd={markerEnd}
 				markerStart={markerStart}
 				stroke={isHover ? "#0ff" : "black"}
+			/>
+			<path
+				d={svgPathString}
+				fill="none"
+				strokeOpacity={0}
+				strokeWidth={20}
+				className="react-flow__edge-interaction"
+				onMouseOver={() => hoverEdge(true)}
+				onMouseLeave={() => hoverEdge(false)}
 			/>
 			{!hideCloseButton && (
 				<foreignObject

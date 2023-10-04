@@ -177,6 +177,8 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 				onMouseDown={handleMouseDown}
 				onMouseMove={handleMouseMove}
 				onMouseUp={handleMouseUp}
+				onMouseOver={() => hoverEdge(true)}
+				onMouseLeave={() => hoverEdge(false)}
 			/>
 			{!hideCloseButton && (
 				<foreignObject

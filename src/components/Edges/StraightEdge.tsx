@@ -11,7 +11,7 @@ import { Nullable } from "types";
 
 const foreignObjectSize = 40;
 
-const StraightEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd, data }) => {	
+const StraightEdge: FunctionComponent<EdgeProps> = ({ id, source, target, markerEnd, data }) => {
 	const { showAllConnections, setHoveredEdgeNodes, showPortsAndCloseButtons, removeTransition } = data;
 
 	const hideCloseButton = showAllConnections || !showPortsAndCloseButtons;
@@ -58,6 +58,15 @@ const StraightEdge: FunctionComponent<EdgeProps> = ({ id, source, target, marker
 				d={edgePath}
 				markerEnd={markerEnd}
 				stroke={isHover ? "#0ff" : "black"}
+			/>
+			<path
+				d={edgePath}
+				fill="none"
+				strokeOpacity={0}
+				strokeWidth={20}
+				className="react-flow__edge-interaction"
+				onMouseOver={() => hoverEdge(true)}
+				onMouseLeave={() => hoverEdge(false)}
 			/>
 			{!hideCloseButton && (
 				<foreignObject
