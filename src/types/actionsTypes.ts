@@ -52,7 +52,7 @@ export interface ProcessActions {
     getAllSessions: (env?: string) => Promise<any>;
     deleteSession: (sessionId: string) => Promise<string>;
     cloneProcess: (processName: string, newName?: string) => Promise<boolean>;
-    saveProcess: () => Promise<boolean>;
+    saveProcess: (newProcessName?: string) => Promise<boolean>;
     publishProcess: () => Promise<boolean>;
     addProcess: (processName: string) => void | any;
     updateProcess: (payload: { processIndex: number; process: WorkflowProcess }) => void;

@@ -21,14 +21,14 @@ export const processActions = (set: any, get: () => MainStore): ProcessActions =
 
         return successMessage || 'Something went wrong';
     },
-    saveProcess: async () => {
+    saveProcess: async (newProcessName?: string) => {
         // handle for success/failure, return message?
         const { activeProcess, activeRole, setActiveProcess } = get();
         if (!activeProcess) return false;
 
         // not necessary to include globals in payload
         const { globals, ...activeProcessWithoutGlobals } = activeProcess;
-        const savePayload = { ...activeProcessWithoutGlobals }
+        const savePayload = { ...activeProcessWithoutGlobals, ...(newProcessName && { processName: newProcessName}) }
 
         const saved = await saveProcess(savePayload);
         const success = !!saved?.sessionId;

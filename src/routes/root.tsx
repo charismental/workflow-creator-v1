@@ -4,7 +4,7 @@ import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
 import { Button, Input, Layout, Space, Spin, Typography } from "antd";
 import { blue, grey } from "@ant-design/colors";
-import { SaveTwoTone, SendOutlined, ShareAltOutlined } from "@ant-design/icons";
+import { SaveTwoTone, SendOutlined, ShareAltOutlined, EditOutlined } from "@ant-design/icons";
 import isEqual from "lodash.isequal";
 
 // store
@@ -18,6 +18,10 @@ import { CustomControls } from "components/Controls/";
 import { SelectBox } from "components/Inputs";
 import { Sidebar } from "components/Layout";
 import { ModalType, ModalInstance, ToggleRoleActiveState } from "components/Modals";
+import {
+	CloneProcessComponent,
+	DeleteProcessComponent,
+} from "components/Inputs";
 
 // utils
 import { copyToClipboard, roleColor } from "utils";
@@ -28,8 +32,6 @@ import { MainStore, Nullable, WorkflowProcess, WorkflowState } from "types";
 
 // api
 import { getSessionProcess } from "api";
-import { CloneProcessComponent } from "components/Inputs/CloneProcessComponent";
-import { DeleteProcessComponent } from "components/Inputs/DeleteProcessComponent";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -292,7 +294,7 @@ const WorkflowCreator = () => {
 	}
 	const canPublish = !unsavedChanges && !!activeProcess?.sessionId;
 
-	const saveProcessHandler = async () => {
+	const saveProcessHandler = async (newProcessName?: string) => {
 		topMessage({
 			type: 'loading',
 			content: 'Saving process',
@@ -300,7 +302,7 @@ const WorkflowCreator = () => {
 			key: "saveProcess"
 		})
 
-		const success = await saveProcess();
+		const success = await saveProcess(newProcessName);
 
 		topMessage({
 			type: success ? 'success' : 'error',
@@ -366,6 +368,38 @@ const WorkflowCreator = () => {
 		ModalInstance(modalOptions)
 	}
 
+	const editProcessNameHandler = async () => {
+		const type: ModalType = "confirm";
+		let newSessionName = activeProcess?.processName || '';
+
+		const modalOptions = {
+			open: true,
+			title: "Rename Process",
+			okText: "Save",
+			closeable: true,
+			type,
+			content: (
+				<div>
+					<Input
+						style={{ marginTop: '10px', marginBottom: '10px' }}
+						placeholder="Enter new process name"
+						defaultValue={newSessionName}
+						onChange={(e: any) => newSessionName = e.target.value}
+					/>
+				</div>
+			),
+			onOk() {
+				// TODO: ensure name is updated in sessions list
+				saveProcessHandler(newSessionName)
+					.then((success) => success && (newSessionName = ''))
+			},
+			onCancel() {
+				newSessionName = '';
+			}
+		};
+		ModalInstance(modalOptions)
+	}
+
 	const deleteSessionHandler = async (sessionName: string) => {
 		const type: ModalType = "confirm";
 
@@ -415,7 +449,8 @@ const WorkflowCreator = () => {
 								hasColorInput={false}
 								iconComponents={iconComponents}
 							/>
-							<Button disabled={!unsavedChanges} onClick={saveProcessHandler} style={{ marginLeft: '4px' }} size="large" type="text" icon={<SaveTwoTone twoToneColor={unsavedChanges ? blue.primary : grey[0]} />} />
+							<Button onClick={editProcessNameHandler} style={{ marginLeft: '4px' }} size="large" type="text" icon={<EditOutlined style={{ color: 'green' }} />} />
+							<Button disabled={!unsavedChanges} onClick={() => saveProcessHandler()} style={{ marginLeft: '4px' }} size="large" type="text" icon={<SaveTwoTone twoToneColor={unsavedChanges ? blue.primary : grey[0]} />} />
 							<Button disabled={!canPublish} onClick={publishProcessHandler} style={{ marginLeft: '2px' }} size="large" type="text" icon={<SendOutlined style={{ color: canPublish ? blue.primary : grey[0] }} />} />
 							<Button disabled={!roleIsToggled} onClick={shareRoleWorkflow} style={{ marginLeft: '2px' }} size="large" type="text" icon={<ShareAltOutlined style={{ color: roleIsToggled ? blue.primary : grey[0] }} />} />
 						</div>
