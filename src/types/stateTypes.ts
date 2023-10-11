@@ -7,6 +7,7 @@ export interface MainState {
     activeRole: string;
     _hasHydrated: boolean;
     activeProcess: WorkflowProcess | null;
+    activeProcessDiffOriginal: WorkflowProcess | null;
     reactFlowInstance: ReactFlowInstance | undefined;
     showMinimap: boolean;
     showAllRoles: boolean;

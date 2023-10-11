@@ -2,7 +2,7 @@ import { Modal } from "antd";
 import { LegacyButtonType } from "antd/es/button/button";
 import { ReactNode } from "react";
 
-export type ModalType = "error" | "confirm" | "warning" | "success";
+export type ModalType = "error" | "confirm" | "warning" | "success" | "info";
 
 export interface ModalProps {
 	type: ModalType;
@@ -14,6 +14,7 @@ export interface ModalProps {
 	okText?: string;
 	onOk?: () => void;
 	cancelText?: string;
+	width?: number;
 }
 
 const ModalInstance = (props: ModalProps) => {
@@ -27,6 +28,7 @@ const ModalInstance = (props: ModalProps) => {
 		okText,
 		onOk,
 		cancelText,
+		width,
 	} = props;
 	
 	const okType: LegacyButtonType = 'primary';
@@ -46,6 +48,7 @@ const ModalInstance = (props: ModalProps) => {
 		...(cancelText && { cancelText }),
 		...(onOk && { onOk }),
 		...(onCancel && { onCancel }),
+		...(width && { width }),
 	}
 	
 	Modal[type](modalOptions);	

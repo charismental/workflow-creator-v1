@@ -8,6 +8,7 @@ export const mainState: MainState = {
     hoveredEdgeNodes: [],
     contextMenuNodeId: undefined,
     activeProcess: null,
+    activeProcessDiffOriginal: null,
     globalLoading: false,
     _hasHydrated: false,
     states: [],
