@@ -143,7 +143,7 @@ export const processActions = (set: any, get: () => MainStore): ProcessActions =
 
         const activeRole = role || sortRoles(activeProcessRoles)?.[0]?.roleName || sortRoles(roles)?.[0]?.roleName || "";
 
-        set({ activeProcess: process, states, roles: sortRoles(roles), companies, activeRole },
+        set({ activeProcess: process, activeProcessDiffOriginal: { ...process }, states, roles: sortRoles(roles), companies, activeRole },
             false,
             'setActiveProcess',
         );

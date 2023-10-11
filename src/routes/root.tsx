@@ -2,9 +2,9 @@ import "reactflow/dist/style.css";
 import "../css/style.css";
 import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
-import { Button, Input, Layout, Space, Spin, Typography } from "antd";
+import { Button, Input, Layout, Space, Spin, Tooltip, Typography } from "antd";
 import { blue, grey } from "@ant-design/colors";
-import { SaveTwoTone, SendOutlined, ShareAltOutlined, EditOutlined } from "@ant-design/icons";
+import { SaveTwoTone, SendOutlined, ShareAltOutlined, EditOutlined, DiffOutlined } from "@ant-design/icons";
 import isEqual from "lodash.isequal";
 
 // store
@@ -22,6 +22,8 @@ import {
 	CloneProcessComponent,
 	DeleteProcessComponent,
 } from "components/Inputs";
+import { DiffViewer } from "components/DiffViewer";
+
 
 // utils
 import { copyToClipboard, roleColor } from "utils";
@@ -61,6 +63,7 @@ const storeSelector = (state: MainStore) => ({
 	unsavedChanges: state.unsavedChanges,
 	sessions: state.sessions,
 	activeProcess: state.activeProcess,
+	activeProcessDiffOriginal: state.activeProcessDiffOriginal,
 	activeRole: state.activeRole,
 	roles: state.roles,
 	currentStates: state.states,
@@ -99,6 +102,7 @@ const WorkflowCreator = () => {
 		unsavedChanges,
 		sessions,
 		activeProcess,
+		activeProcessDiffOriginal,
 		activeRole,
 		roles,
 		currentStates,
@@ -424,6 +428,23 @@ const WorkflowCreator = () => {
 		ModalInstance(modalOptions)
 	}
 
+	const checkProcessDiffHandler = async () => {
+		const type: ModalType = "info";
+
+		const modalOptions = {
+			open: true,
+			title: "Process Changes",
+			okText: "Done",
+			closeable: true,
+			type,
+			width: 2000,
+			content: (
+				<DiffViewer oldValue={JSON.stringify(activeProcessDiffOriginal, null, 2)} newValue={JSON.stringify(activeProcess, null, 2)} />
+			),
+		};
+		ModalInstance(modalOptions)
+	}
+
 	const iconComponents = (el: string) => [
 		CloneProcessComponent({ item: el, handler: cloneProcessHandler, validProcesses: publishedSessions }),
 		DeleteProcessComponent({ item: el, handler: deleteSessionHandler }),
@@ -449,10 +470,40 @@ const WorkflowCreator = () => {
 								hasColorInput={false}
 								iconComponents={iconComponents}
 							/>
-							<Button onClick={editProcessNameHandler} style={{ marginLeft: '4px' }} size="large" type="text" icon={<EditOutlined style={{ color: 'green' }} />} />
-							<Button disabled={!unsavedChanges} onClick={() => saveProcessHandler()} style={{ marginLeft: '4px' }} size="large" type="text" icon={<SaveTwoTone twoToneColor={unsavedChanges ? blue.primary : grey[0]} />} />
-							<Button disabled={!canPublish} onClick={publishProcessHandler} style={{ marginLeft: '2px' }} size="large" type="text" icon={<SendOutlined style={{ color: canPublish ? blue.primary : grey[0] }} />} />
-							<Button disabled={!roleIsToggled} onClick={shareRoleWorkflow} style={{ marginLeft: '2px' }} size="large" type="text" icon={<ShareAltOutlined style={{ color: roleIsToggled ? blue.primary : grey[0] }} />} />
+							<Tooltip
+								placement="bottomRight"
+								title={"Edit Process Name"}
+							>
+								<Button onClick={editProcessNameHandler} style={{ marginLeft: '4px' }} size="large" type="text" icon={<EditOutlined style={{ color: 'green' }} />} />
+							</Tooltip>
+							<Tooltip
+								placement="bottomRight"
+								title={"Save Process"}
+							>
+								<Button disabled={!unsavedChanges} onClick={() => saveProcessHandler()} style={{ marginLeft: '4px' }} size="large" type="text" icon={<SaveTwoTone twoToneColor={unsavedChanges ? blue.primary : grey[0]} />} />
+							</Tooltip>
+							<Tooltip
+								placement="bottomRight"
+								title={"Publish Process"}
+							>
+								<Button disabled={!canPublish} onClick={publishProcessHandler} style={{ marginLeft: '2px' }} size="large" type="text" icon={<SendOutlined style={{ color: canPublish ? blue.primary : grey[0] }} />} />
+
+							</Tooltip>
+							<Tooltip
+								placement="bottomRight"
+								title={"Create Share Link for Role"}
+							>
+								<Button disabled={!roleIsToggled} onClick={shareRoleWorkflow} style={{ marginLeft: '2px' }} size="large" type="text" icon={<ShareAltOutlined style={{ color: roleIsToggled ? blue.primary : grey[0] }} />} />
+
+							</Tooltip>
+							<Tooltip
+								placement="bottomRight"
+								title={"Check Process Diff"}
+							>
+								<Button onClick={checkProcessDiffHandler} style={{ marginLeft: '2px' }} size="large" type="text" icon={<DiffOutlined style={{ color: blue.primary }} />} />
+
+							</Tooltip>
+
 						</div>
 						<Title
 							level={2}
