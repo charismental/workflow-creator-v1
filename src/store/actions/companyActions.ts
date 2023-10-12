@@ -2,7 +2,7 @@ import { CompanyActions, MainStore, NumberBoolean } from "types"
 
 export const companyActions = (set: any, get: () => MainStore): CompanyActions => ({
     toggleCompanyForProcess: (company: string) => {
-        const { activeProcess } = get();
+        const { activeProcess, setSnapshot } = get();
         if (activeProcess) {
             const { companies = [] } = activeProcess;
 
@@ -22,8 +22,13 @@ export const companyActions = (set: any, get: () => MainStore): CompanyActions =
 
                 updatedCompanies = companies.concat(newCompany);
             }
+
+            const updatedActiveProcess = { ...activeProcess, companies: updatedCompanies };
+            
+            setSnapshot({ ...updatedActiveProcess });
+
             set(
-                { activeProcess: { ...activeProcess, companies: updatedCompanies } },
+                { activeProcess: updatedActiveProcess },
                 false,
                 'toggleCompanyForProcess',
             );

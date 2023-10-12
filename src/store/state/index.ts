@@ -22,4 +22,6 @@ export const mainState: MainState = {
     reactFlowInstance: undefined,
     showPortsAndCloseButtons: true,
     showMinimap: true,
+    snapshots: [],
+    snapshotIndex: 0,
 };

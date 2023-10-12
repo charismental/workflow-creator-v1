@@ -3,7 +3,7 @@ import { EdgeActions, MainStore } from "types"
 import { simplifySVGPath, transformNewConnectionToTransition } from "utils";
 
 export const edgeActions = (set: any, get: () => MainStore): EdgeActions => ({
-    setPathForEdge: ({ path, role, source, target }) => {
+    setPathForEdge: ({ path, role, source, target, snapshot = false }) => {
         const { activeProcess, selectedEdge } = get();
         const { source: selectedSource, target: selectedTarget, role: selectedRole } = selectedEdge || {};
 
@@ -30,7 +30,7 @@ export const edgeActions = (set: any, get: () => MainStore): EdgeActions => ({
                 const updatedRoles = roles.map((r, i) => {
                     return i === foundRoleIndex ? { ...r, transitions: updatedTransitions } : r;
                 });
-
+                // TODO: create snapshot if snapshot = true in future
                 set(
                     {
                         activeProcess: {
@@ -57,7 +57,7 @@ export const edgeActions = (set: any, get: () => MainStore): EdgeActions => ({
     },
     setEdgeType: (type) => set({ edgeType: type }, false, 'setEdgeType'),
     onConnect: (connection: Connection) => {
-        const { activeRole, activeProcess, showAllRoles, states, setSelectedEdge } = get();
+        const { activeRole, activeProcess, showAllRoles, states, setSelectedEdge, setSnapshot } = get();
         const { source, target } = connection;
         let roleForSelectedEdge = activeRole;
         const { roles = [] } = activeProcess || {};
@@ -118,9 +118,13 @@ export const edgeActions = (set: any, get: () => MainStore): EdgeActions => ({
 
             source && target && setTimeout(() => setSelectedEdge({ source, target, role: roleForSelectedEdge }), 10)
 
+            const updatedActiveProcess = { ...activeProcess, roles: updatedRoles };
+
+            setSnapshot({ ...updatedActiveProcess });
+
             set(
                 {
-                    activeProcess: { ...activeProcess, roles: updatedRoles },
+                    activeProcess: updatedActiveProcess,
                 },
                 false,
                 'onConnect',
@@ -136,7 +140,7 @@ export const edgeActions = (set: any, get: () => MainStore): EdgeActions => ({
         }, false, 'setShowAllConnectedStates');
     },
     removeTransition: ({ source, target }: { source: string; target: string }) => {
-        const { activeRole, activeProcess, showAllRoles, setSelectedEdge } = get();
+        const { activeRole, activeProcess, showAllRoles, setSelectedEdge, setSnapshot } = get();
 
         const { roles = [] } = activeProcess || {};
         let roleIndexStr = "";
@@ -176,9 +180,13 @@ export const edgeActions = (set: any, get: () => MainStore): EdgeActions => ({
                 i === foundRoleIndex ? { ...r, transitions: updatedTransitions } : r
             );
 
+            const updatedActiveProcess = { ...activeProcess, roles: updatedRoles };
+
+            setSnapshot({ ...updatedActiveProcess });
+
             set(
                 {
-                    activeProcess: { ...activeProcess, roles: updatedRoles },
+                    activeProcess: updatedActiveProcess,
                 },
                 false,
                 'removeTransition',

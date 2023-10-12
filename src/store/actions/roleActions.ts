@@ -9,7 +9,7 @@ export const roleActions = (set: any, get: () => MainStore): RoleActions => ({
     },
     setActiveRole: (role) => set({ activeRole: role }, false, 'setActiveRole'),
     toggleRoleForProcess: (role, color) => {
-        const { activeProcess, roles: globalRoles } = get();
+        const { activeProcess, roles: globalRoles, setSnapshot } = get();
 
         if (activeProcess) {
             const { roles = [] } = activeProcess;
@@ -37,9 +37,13 @@ export const roleActions = (set: any, get: () => MainStore): RoleActions => ({
                 updatedRoles = roles.concat(newRole);
             }
 
+            const updatedActiveProcess = { ...activeProcess, roles: updatedRoles };
+
+            setSnapshot({ ...updatedActiveProcess });
+
             set(
                 {
-                    activeProcess: { ...activeProcess, roles: updatedRoles },
+                    activeProcess: updatedActiveProcess,
                 },
                 false,
                 'toggleRoleForProcess',
@@ -47,7 +51,7 @@ export const roleActions = (set: any, get: () => MainStore): RoleActions => ({
         }
     },
     updateRoleProperty: ({ role, property, value }) => {
-        const { activeProcess } = get();
+        const { activeProcess, setSnapshot } = get();
 
         if (activeProcess) {
             const { roles = [] } = activeProcess;
@@ -63,9 +67,13 @@ export const roleActions = (set: any, get: () => MainStore): RoleActions => ({
                     )
                     : roles;
 
+            const updatedActiveProcess = { ...activeProcess, roles: updatedRoles };
+
+            setSnapshot({ ...updatedActiveProcess });
+
             set(
                 {
-                    activeProcess: { ...activeProcess, roles: updatedRoles },
+                    activeProcess: updatedActiveProcess,
                 },
                 false,
                 'updateRoleProperty',
@@ -73,7 +81,7 @@ export const roleActions = (set: any, get: () => MainStore): RoleActions => ({
         }
     },
     setColorForActiveRole: (color: string) => {
-        const { activeProcess, activeRole } = get();
+        const { activeProcess, activeRole, setSnapshot } = get();
 
         if (activeProcess) {
             const { roles = [] } = activeProcess;
@@ -87,10 +95,15 @@ export const roleActions = (set: any, get: () => MainStore): RoleActions => ({
                         ? r
                         : { ...foundRole, properties: { ...foundRole.properties, color } }
                 );
+                
+
+                const updatedActiveProcess = { ...activeProcess, roles: updatedRoles };
+
+                setSnapshot({ ...updatedActiveProcess });
 
                 set(
                     {
-                        activeProcess: { ...activeProcess, roles: updatedRoles },
+                        activeProcess: updatedActiveProcess,
                     },
                     false,
                     'setColorForActiveRole',

@@ -218,7 +218,8 @@ const ReactFlowBase: FC<ReactFlowBaseProps> = (props): JSX.Element => {
 			};
 
 			const updatedStates = activeProcessStates.concat(newState);
-			setStatesForActiveProcess(updatedStates);
+
+			setStatesForActiveProcess(updatedStates, true);
 		},
 		[reactFlowInstance, setStatesForActiveProcess, activeRole, nodes]
 	);

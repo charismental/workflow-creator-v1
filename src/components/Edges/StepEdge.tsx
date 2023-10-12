@@ -49,8 +49,7 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 	const rounded = (num: number) => Math.round(num);
 
 	const updateEdge = useCallback(debounce((path) => {
-		// console.log('updateEdge', path)
-		setPath({ source, target, path, role })
+		setPath({ source, target, path, role, snapshot: true })
 	}, 10), [])
 
 	const hideCloseButton = !selected || showAllConnections || !showPortsAndCloseButtons || isDragging;

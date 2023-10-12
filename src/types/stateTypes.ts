@@ -2,6 +2,8 @@ import { ReactFlowInstance } from "reactflow";
 import { Nullable, WorkflowCompany, WorkflowProcess, WorkflowRole, WorkflowSession, WorkflowState } from "types";
 
 export interface MainState {
+    snapshots: WorkflowProcess[];
+    snapshotIndex: number;
     selectedEdge: Nullable<{ source: string; target: string; role: string; }>;
     globalLoading: boolean;
     activeRole: string;

@@ -2,7 +2,7 @@ import { OnNodesChange, OnConnect, ReactFlowInstance } from "reactflow";
 import { MainState, Nullable, WorkflowProcess, WorkflowState } from ".";
 
 export interface EdgeActions {
-    setPathForEdge: (payload: { path: string; role: string; source: string; target: string }) => void;
+    setPathForEdge: (payload: { path: string; role: string; source: string; target: string; snapshot?: boolean }) => void;
     setSelectedEdge: (payload: Nullable<{ target: string; source: string; role?: string }>) => void;
     setEdgeType: (type: string) => void;
     onConnect: OnConnect;
@@ -17,7 +17,7 @@ export interface NodeActions {
         stateName: string;
         properties: { x?: number; y?: number; h?: number; w?: number };
     }) => void;
-    setStatesForActiveProcess: (States: WorkflowState[]) => void;
+    setStatesForActiveProcess: (states: WorkflowState[], snapshot?: boolean) => void;
     removeState: (stateName: string) => void;
     updateStateProperty: (payload: { state: string; property: string; value: any }) => void;
     filteredStates: (existingStates: WorkflowState[]) => string[];
@@ -55,11 +55,13 @@ export interface ProcessActions {
     saveProcess: (newProcessName?: string) => Promise<boolean>;
     publishProcess: () => Promise<boolean>;
     addProcess: (processName: string) => void | any;
-    updateProcess: (payload: { processIndex: number; process: WorkflowProcess }) => void;
     setActiveProcess: (process: WorkflowProcess, role?: string) => void;
     setUnsavedChanges: (status: boolean) => void;
 }
 
-export interface MainActions extends EdgeActions, NodeActions, ReactFlowActions, RoleActions, CompanyActions, ProcessActions {}
+export interface MainActions extends EdgeActions, NodeActions, ReactFlowActions, RoleActions, CompanyActions, ProcessActions {
+    setSnapshot: (snapshot: WorkflowProcess) => void;
+    updateSnapshotIndex: (increment: 1 | -1) => void;
+}
 
 export type MainStore = MainActions & MainState

@@ -4,8 +4,10 @@ import Icon, {
 	LockFilled,
 	MinusOutlined,
 	PlusOutlined,
-	ReloadOutlined,
-	SaveOutlined,
+	// ReloadOutlined,
+	// SaveOutlined,
+	UndoOutlined,
+	RedoOutlined,
 	SwapOutlined,
 	TableOutlined,
 	UnlockOutlined,
@@ -29,16 +31,20 @@ import { MapSvg, CustomControlButtonWithTooltip, DownloadButton } from "./";
 interface CustomControlsProps {
 	getCurrentEdges: (() => Edge[]) | undefined;
 	getCurrentNodes: (() => Node[]) | undefined;
+	undo: () => void;
+	redo: () => void;
 	roleIsToggled: boolean;
 	toggleShowAllRoles: any;
 	setShowAllConnectedStates: any;
 	setEdgeType: any;
 	edgeType: string;
-	saveStateSnapshot: any;
-	revertToSnapshot: any;
+	// saveStateSnapshot: any;
+	// revertToSnapshot: any;
 	setShowPortsAndCloseButtons: any;
 	showPortsAndCloseButtons: boolean;
 	setShowMinimap: any;
+	canUndo: boolean;
+	canRedo: boolean;
 }
 
 const isInteractiveSelector = (s: ReactFlowState) =>
@@ -48,13 +54,17 @@ const CustomControls = ({
 	getCurrentEdges,
 	getCurrentNodes,
 	onInteractiveChange,
+	undo,
+	redo,
+	canUndo,
+	canRedo,
 	roleIsToggled,
 	toggleShowAllRoles,
 	setShowAllConnectedStates,
 	setEdgeType,
 	edgeType,
-	saveStateSnapshot,
-	revertToSnapshot,
+	// saveStateSnapshot,
+	// revertToSnapshot,
 	showPortsAndCloseButtons,
 	setShowPortsAndCloseButtons,
 	setShowMinimap,
@@ -158,7 +168,7 @@ const CustomControls = ({
 					clickEvent={() => onToggleInteractivity()}
 					isDisabled={!roleIsToggled}
 				/>
-				<CustomControlButtonWithTooltip
+				{/* <CustomControlButtonWithTooltip
 					title={"Save Progress to Local Storage"}
 					icon={<SaveOutlined />}
 					clickEvent={saveStateSnapshot}
@@ -168,7 +178,7 @@ const CustomControls = ({
 					icon={<ReloadOutlined />}
 					clickEvent={revertToSnapshot}
 				/>
-				{/* <CustomControlButtonWithTooltip
+				<CustomControlButtonWithTooltip
 					title={"Delete Progress"}
 					icon={<DeleteOutlined />}
 					clickEvent={() => console.log("you deleted a thing!")}
@@ -216,6 +226,18 @@ const CustomControls = ({
 						/>
 					</Tooltip>
 				</Dropdown>
+				<CustomControlButtonWithTooltip
+					title={"Undo"}
+					icon={<UndoOutlined />}
+					clickEvent={undo}
+					isDisabled={!canUndo}
+				/>
+				<CustomControlButtonWithTooltip
+					title={"Redo"}
+					icon={<RedoOutlined />}
+					clickEvent={redo}
+					isDisabled={!canRedo}
+				/>
 				<EdgeModal
 					allCurrentEdgesInCanvas={currentEdges}
 					edgeModalOpen={edgeModalOpen}

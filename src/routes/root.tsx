@@ -72,6 +72,9 @@ const storeSelector = (state: MainStore) => ({
 	companies: state.companies,
 	edgeType: state.edgeType,
 	showPortsAndCloseButtons: state.showPortsAndCloseButtons,
+	snapshotsLength: state.snapshots.length,
+	snapshotIndex: state.snapshotIndex,
+	updateSnapshotIndex: state.updateSnapshotIndex,
 	setEdgeType: state.setEdgeType,
 	setShowAllConnectedStates: state.setShowAllConnectedStates,
 	toggleShowAllRoles: state.toggleShowAllRoles,
@@ -111,6 +114,9 @@ const WorkflowCreator = () => {
 		companies,
 		edgeType,
 		showPortsAndCloseButtons,
+		snapshotsLength,
+		snapshotIndex,
+		updateSnapshotIndex,
 		setShowMinimap,
 		setShowPortsAndCloseButtons,
 		setEdgeType,
@@ -132,8 +138,8 @@ const WorkflowCreator = () => {
 		cloneProcess,
 		saveProcess,
 		publishProcess,
-		saveStateSnapshot,
-		revertToSnapshot,
+		// saveStateSnapshot,
+		// revertToSnapshot,
 	} = useMainStore(storeSelector, shallow);
 	const [toggleInactiveModal, setToggleInactiveModal] = useState(false);
 
@@ -143,6 +149,18 @@ const WorkflowCreator = () => {
 
 	useEffect(() => {
 		getAllSessions();
+
+		const handleUndoRedo = (e: KeyboardEvent) => {
+			if (!e.ctrlKey || !['z', 'Z', 'y', 'Y'].includes(e?.key)) return;
+			const increment = ['z', 'Z'].includes(e.key) ? 1 : -1;
+			updateSnapshotIndex(increment);
+		};
+
+		document.addEventListener('keydown', handleUndoRedo);
+
+		return () => {
+			document.removeEventListener('keydown', handleUndoRedo);
+		};
 	}, []);
 
 	const usePreviousProcess = (value: Nullable<WorkflowProcess>) => {
@@ -182,19 +200,12 @@ const WorkflowCreator = () => {
 						You have unsaved changes. Would you like to save before continuing?
 					</div>
 				),
-				// async/await?
+
 				onOk() {
 					setUnsavedChanges(false);
 					getSessionProcess(sessionId)
 						.then((res) => setActiveProcess(res))
 						.catch((err) => console.error(err))
-					// saveProcessHandler()
-					// 	.then(async (success) => {
-					// 		if (!success) throw new Error('Error saving process');
-					// 		const fetchedProcess = await getSessionProcess(sessionId)
-					// 		setActiveProcess(fetchedProcess)
-					// 	})
-					// 	.catch((err) => console.error(err))
 
 				},
 			};
@@ -539,15 +550,19 @@ const WorkflowCreator = () => {
 							toggleShowAllRoles={toggleShowAllRoles}
 							setShowAllConnectedStates={setShowAllConnectedStates}
 							setEdgeType={setEdgeType}
-							edgeType={edgeType}
-							saveStateSnapshot={saveStateSnapshot}
-							revertToSnapshot={revertToSnapshot}
-							showPortsAndCloseButtons={showPortsAndCloseButtons}
 							setShowPortsAndCloseButtons={setShowPortsAndCloseButtons}
 							setShowMinimap={setShowMinimap}
-							roleIsToggled={roleIsToggled}
 							getCurrentEdges={reactFlowInstance?.getEdges}
 							getCurrentNodes={reactFlowInstance?.getNodes}
+							undo={() => updateSnapshotIndex(1)}
+							redo={() => updateSnapshotIndex(-1)}
+							// saveStateSnapshot={saveStateSnapshot}
+							// revertToSnapshot={revertToSnapshot}
+							edgeType={edgeType}
+							showPortsAndCloseButtons={showPortsAndCloseButtons}
+							roleIsToggled={roleIsToggled}
+							canUndo={snapshotIndex < snapshotsLength - 1}
+							canRedo={snapshotIndex > 0 && snapshotsLength > 1}
 						/>
 					</ReactFlowProvider>
 				</Layout>

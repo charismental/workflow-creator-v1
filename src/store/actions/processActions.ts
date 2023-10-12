@@ -133,6 +133,7 @@ export const processActions = (set: any, get: () => MainStore): ProcessActions =
         }
     },
     setActiveProcess: (process: WorkflowProcess, role) => {
+        const { setSnapshot } = get();
         const sortRoles = (roles: WorkflowRole[]) => [...roles].sort((a, b) => a.roleName.localeCompare(b.roleName));
 
         const { globals } = process;
@@ -143,23 +144,12 @@ export const processActions = (set: any, get: () => MainStore): ProcessActions =
 
         const activeRole = role || sortRoles(activeProcessRoles)?.[0]?.roleName || sortRoles(roles)?.[0]?.roleName || "";
 
+        setSnapshot({ ...process });
+
         set({ activeProcess: process, activeProcessDiffOriginal: { ...process }, states, roles: sortRoles(roles), companies, activeRole },
             false,
             'setActiveProcess',
         );
-    },
-    updateProcess: ({
-        processIndex,
-        process,
-    }: {
-        processIndex: number;
-        process: WorkflowProcess;
-    }) => {
-        const { processes } = get();
-
-        const updatedProcesses = processes.map((p, i) => (i === processIndex ? process : p));
-
-        set({ processes: updatedProcesses }, false, 'updateProcess');
     },
     addProcess: async (name: string) => {
         const newProcess = await createProcess(name);

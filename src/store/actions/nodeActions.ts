@@ -2,7 +2,10 @@ import { NodeChange, applyNodeChanges } from "reactflow";
 import { MainStore, NodeActions, WorkFlowTransition, WorkflowState } from "types"
 import { getHelperLinePositions, nodeByState, stateByNode } from "utils";
 import { defaultColors } from "data";
+import isEqual from "lodash.isequal";
 
+let isDragging = false;
+let isResizing = false;
 export const nodeActions = (set: any, get: () => MainStore): NodeActions => ({
     setHoveredEdgeNodes: (nodes: string[]) => {
         set({ hoveredEdgeNodes: nodes }, false, 'setHoveredEdgeNodes');
@@ -14,8 +17,10 @@ export const nodeActions = (set: any, get: () => MainStore): NodeActions => ({
             showAllRoles,
             edgeType,
             helperLines,
+            setSnapshot,
         } = get();
         const isStraightEdge = edgeType === 'straight';
+        let shouldSetSnapshot = false;
 
         const removeIndexPrefix = (prefixedString: string): string => {
             const prefix = !showAllRoles ? "" : prefixedString.match(/\d+/g)?.[0] || "";
@@ -48,9 +53,10 @@ export const nodeActions = (set: any, get: () => MainStore): NodeActions => ({
         if (changes.length === 1) {
             const [selectedNode] = changes;
 
-            const { id, dragging, type } = selectedNode;
+            const { id, dragging, type, resizing } = selectedNode;
 
             if (dragging) {
+                isDragging = true;
                 const helperLines = getHelperLinePositions({ nodeId: id });
 
                 set({ helperLines }, false, 'onNodesChange/helperLines');
@@ -109,6 +115,18 @@ export const nodeActions = (set: any, get: () => MainStore): NodeActions => ({
 
                 set({ helperLines: [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined] }, false, 'onNodesChange/helperLines')
             }
+
+            if (type === 'dimensions') isResizing = true;
+
+            if (dragging === false && isDragging) {
+                shouldSetSnapshot = true;
+                isDragging = false;
+            }
+
+            if (resizing === false && isResizing) {
+                shouldSetSnapshot = true;
+                isResizing = false;
+            }
         }
 
         if (activeProcess) {
@@ -141,12 +159,13 @@ export const nodeActions = (set: any, get: () => MainStore): NodeActions => ({
                 })
             )
 
+            const updatedActiveProcess = { ...activeProcess, states: updatedStates };
+
+            shouldSetSnapshot && setSnapshot({ ...updatedActiveProcess });
+
             set(
                 {
-                    activeProcess: {
-                        ...activeProcess,
-                        states: updatedStates,
-                    },
+                    activeProcess: updatedActiveProcess,
                 },
                 false,
                 'onNodesChange',
@@ -179,13 +198,17 @@ export const nodeActions = (set: any, get: () => MainStore): NodeActions => ({
             );
         }
     },
-    setStatesForActiveProcess: (states: WorkflowState[]) => {
-        const { activeProcess } = get();
-
+    setStatesForActiveProcess: (states: WorkflowState[], snapshot = false) => {
+        const { activeProcess, setSnapshot } = get();
+        
         if (activeProcess) {
+            const updatedActiveProcess = { ...activeProcess, states };
+
+            snapshot && setSnapshot({ ...updatedActiveProcess });
+
             set(
                 {
-                    activeProcess: { ...activeProcess, states },
+                    activeProcess: updatedActiveProcess,
                 },
                 false,
                 'setStatesForActiveProcess',
@@ -193,7 +216,7 @@ export const nodeActions = (set: any, get: () => MainStore): NodeActions => ({
         }
     },
     removeState: (stateNameToRemove: string) => {
-        const { activeProcess } = get();
+        const { activeProcess, setSnapshot } = get();
 
         const { roles = [] } = activeProcess || {};
 
@@ -210,10 +233,13 @@ export const nodeActions = (set: any, get: () => MainStore): NodeActions => ({
             }));
 
             const updatedStates = activeProcess.states?.filter((s) => s.stateName !== stateNameToRemove);
+            const updatedActiveProcess = { ...activeProcess, roles: updatedRoles, states: updatedStates };
+
+            setSnapshot({ ...updatedActiveProcess });
 
             set(
                 {
-                    activeProcess: { ...activeProcess, roles: updatedRoles, states: updatedStates },
+                    activeProcess: updatedActiveProcess,
                 },
                 false,
                 'removeState',
@@ -221,7 +247,7 @@ export const nodeActions = (set: any, get: () => MainStore): NodeActions => ({
         }
     },
     updateStateProperty: ({ state, property, value }) => {
-        const { activeProcess } = get();
+        const { activeProcess, setSnapshot } = get();
 
         if (activeProcess) {
             const { states = [] } = activeProcess;
@@ -236,10 +262,14 @@ export const nodeActions = (set: any, get: () => MainStore): NodeActions => ({
                         i !== stateInProcessIndex ? s : { ...foundState, [property]: value }
                     )
                     : states;
+            
+            const updatedActiveProcess = { ...activeProcess, states: updatedStates };
+            
+            setSnapshot({ ...updatedActiveProcess });
 
             set(
                 {
-                    activeProcess: { ...activeProcess, states: updatedStates },
+                    activeProcess: updatedActiveProcess,
                 },
                 false,
                 'updateStateProperty',
