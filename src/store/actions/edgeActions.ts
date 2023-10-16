@@ -4,7 +4,7 @@ import { simplifySVGPath, transformNewConnectionToTransition } from "utils";
 
 export const edgeActions = (set: any, get: () => MainStore): EdgeActions => ({
     setPathForEdge: ({ path, role, source, target, snapshot = false }) => {
-        const { activeProcess, selectedEdge } = get();
+        const { activeProcess, selectedEdge, setSnapshot } = get();
         const { source: selectedSource, target: selectedTarget, role: selectedRole } = selectedEdge || {};
 
         if (activeProcess && selectedSource === source && selectedTarget === target && selectedRole === role) {
@@ -30,13 +30,14 @@ export const edgeActions = (set: any, get: () => MainStore): EdgeActions => ({
                 const updatedRoles = roles.map((r, i) => {
                     return i === foundRoleIndex ? { ...r, transitions: updatedTransitions } : r;
                 });
-                // TODO: create snapshot if snapshot = true in future
+
+                const updatedActiveProcess = { ...activeProcess, roles: updatedRoles };
+
+                snapshot && setSnapshot({ ...updatedActiveProcess });
+
                 set(
                     {
-                        activeProcess: {
-                            ...activeProcess,
-                            roles: updatedRoles,
-                        },
+                        activeProcess: updatedActiveProcess,
                     },
                     false,
                     'setPathForEdge',

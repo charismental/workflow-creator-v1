@@ -6,7 +6,7 @@ import { roleActions } from "./roleActions";
 import { processActions } from "./processActions";
 import { companyActions } from "./companyActions";
 
-const MAX_SNAPSHOTS = 11;
+const MAX_SNAPSHOTS = 21;
 
 export const mainActions = (set: any, get: () => MainStore): MainActions => ({
     ...edgeActions(set, get),
