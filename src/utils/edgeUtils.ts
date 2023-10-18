@@ -6,6 +6,7 @@ import {
 	WorkflowState,
 } from "../types";
 import { pathFromPoints } from "./pointsHelpers";
+import { all } from "axios";
 
 export function edgeIdByNodes({ source, target, sourceHandle, targetHandle }: { source: string; target: string; sourceHandle?: string | null; targetHandle?: string | null }): string {
 	return `reactflow__edge-${source}${sourceHandle || ''}-${target}${targetHandle || ''}`;
@@ -22,6 +23,7 @@ export function transformTransitionsToEdges({
 	removeTransition,
 	setHoveredEdgeNodes,
 	showPortsAndCloseButtons,
+	showAllRoles = false,
 }: {
 	showAllConnections?: boolean;
 	// todo
@@ -34,6 +36,7 @@ export function transformTransitionsToEdges({
 	removeTransition: any;
 	setHoveredEdgeNodes: any;
 	showPortsAndCloseButtons: boolean;
+	showAllRoles?: boolean;
 }): Edge[] {
 	const mapper = (transition: WorkFlowTransition): Edge | any => {
 		const { stateName: source, toStateName: target, properties = {} } = transition;
@@ -73,9 +76,9 @@ export function transformTransitionsToEdges({
 				setHoveredEdgeNodes,
 				showPortsAndCloseButtons,
 				removeTransition,
+				showAllRoles,
 				...(roleName && { role: roleName }),
 				...(points && { points }),
-
 			},
 			id: edgeIdByNodes({ source: `${idPrefix}${source}`, target: `${idPrefix}${target}`, sourceHandle, targetHandle }),
 		};
@@ -173,9 +176,10 @@ export function computedEdges({
 				removeTransition,
 				setHoveredEdgeNodes,
 				showPortsAndCloseButtons,
+				showAllRoles,
 			}));
 		});
-
+		
 		return allEdges;
 	} else if (showAllConnections) {
 		const allTransitions: WorkFlowTransition[] = [];

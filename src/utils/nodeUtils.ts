@@ -211,7 +211,6 @@ export function computedNodes({
 
 	const startingY = Math.min(...mappedStates.map(({ y = 0 }) => y));
 	const startingX = Math.min(...mappedStates.map(({ x = 0 }) => x));
-
 	const totalSetHeight = Math.max(
 		...mappedStates.map(({ h = 30, y = 0 }) => {
 			return h + y - startingY;
@@ -233,7 +232,7 @@ export function computedNodes({
 
 		roles.forEach(({ roleName }, i) => {
 			nodes.push(
-				labelNode({ name: roleName, x: -360, y: yOffset * i + (totalSetHeight / 2 - 20) })
+				labelNode({ name: roleName, x: startingX - 320, y: yOffset * i + (yOffset / 2 - 20) })
 			);
 
 			[...states]

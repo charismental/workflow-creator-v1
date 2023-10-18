@@ -35,6 +35,7 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 		removeTransition,
 		setHoveredEdgeNodes,
 		showPortsAndCloseButtons,
+		showAllRoles,
 	} = data || {};
 
 	const [isHover, setIsHover] = useState<Nullable<boolean>>(null);
@@ -117,8 +118,8 @@ const StepEdge: FunctionComponent<EdgeProps> = ({
 
 	// redo/undo set local path if path changes
 	useEffect(() => {
-		path && setLocalPath(path)
-	}, [path, setLocalPath])
+		!showAllRoles && path && setLocalPath(path)
+	}, [path, setLocalPath, showAllRoles])
 
 
 	return (
