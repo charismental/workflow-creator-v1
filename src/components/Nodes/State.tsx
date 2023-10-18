@@ -108,7 +108,7 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 			...(right && { left: 'unset', right: 24 }),
 		};
 
-		if ((isSource && !isTarget) || (!isSource && isTarget)) (style.zIndex = 1500);
+		if ((isSource && !isTarget) || (!isSource && isTarget)) Object.assign(style, { zIndex: 1500 });
 		else (style.opacity = 0);
 
 		return style;

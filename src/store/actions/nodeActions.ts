@@ -1,5 +1,5 @@
 import { NodeChange, applyNodeChanges } from "reactflow";
-import { MainStore, NodeActions, WorkFlowTransition, WorkflowState } from "types"
+import { MainStore, NodeActions, WorkFlowTransition, WorkflowRole, WorkflowState } from "types"
 import { getHelperLinePositions, nodeByState, stateByNode } from "utils";
 import { defaultColors } from "data";
 import isEqual from "lodash.isequal";
@@ -28,7 +28,7 @@ export const nodeActions = (set: any, get: () => MainStore): NodeActions => ({
             return prefixedString.slice(prefix.length);
         };
 
-        const { states = [] } = activeProcess || {};
+        const { states = [], roles = [] } = activeProcess || {};
 
         // todo: forEach instead of map, handle additional position changes
         // via nodeShouldSnapTo
@@ -50,6 +50,8 @@ export const nodeActions = (set: any, get: () => MainStore): NodeActions => ({
             return updated
         });
 
+        const updatedRoles: WorkflowRole[] = [];
+        
         if (changes.length === 1) {
             const [selectedNode] = changes;
 
@@ -127,6 +129,22 @@ export const nodeActions = (set: any, get: () => MainStore): NodeActions => ({
                 shouldSetSnapshot = true;
                 isResizing = false;
             }
+
+            roles.forEach((role) => {
+                const { transitions = [] } = role;
+                const updatedTransitions = transitions.map((transition) => {
+                    const { stateName, toStateName, properties } = transition;
+                    const { points, ...remainingProperties } = properties || {};
+
+                    if (([stateName, toStateName].includes(id)) && points) {
+                        return { ...transition, properties: { ...remainingProperties } }
+                    }
+
+                    return transition;
+                });
+
+                updatedRoles.push({ ...role, transitions: updatedTransitions })
+            })
         }
 
         if (activeProcess) {
@@ -159,7 +177,7 @@ export const nodeActions = (set: any, get: () => MainStore): NodeActions => ({
                 })
             )
 
-            const updatedActiveProcess = { ...activeProcess, states: updatedStates };
+            const updatedActiveProcess = { ...activeProcess, states: updatedStates, ...(updatedRoles.length && { roles: updatedRoles })};
 
             shouldSetSnapshot && setSnapshot({ ...updatedActiveProcess });
 
