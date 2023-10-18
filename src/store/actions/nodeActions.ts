@@ -2,7 +2,6 @@ import { NodeChange, applyNodeChanges } from "reactflow";
 import { MainStore, NodeActions, WorkFlowTransition, WorkflowRole, WorkflowState } from "types"
 import { getHelperLinePositions, nodeByState, stateByNode } from "utils";
 import { defaultColors } from "data";
-import isEqual from "lodash.isequal";
 
 let isDragging = false;
 let isResizing = false;

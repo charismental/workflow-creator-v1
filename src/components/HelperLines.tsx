@@ -30,7 +30,7 @@ const HelperLines: React.FC<HelperLinesProps> = ({
 			left: `${left || 0}px`,
 			borderLeft: `2.5px dashed ${color}`,
 			width: "2.5px",
-			height: "100%",
+			height: "calc(100% - 80px)", // 80px is the height of the header TODO: set global value for header height
 			opacity: typeof left === 'number' ? 1 : 0,
 		}} />
 	</>
