@@ -87,13 +87,13 @@ const State: FunctionComponent<NodeProps> = ({ id, isConnectable, data }): JSX.E
 				<Form.Item colon={false} label="Requires Role Assignment">
 					<Checkbox
 						checked={!!details?.requiresRoleAssignment}
-						onChange={() => updateStateProperty({ state: id, property: 'requiresRoleAssignment', value: !details?.requiresRoleAssignment })}
+						onChange={() => updateStateProperty({ state: id, property: 'requiresRoleAssignment', value: details.requiresRoleAssignment ? 0 : 1 })}
 					/>
 				</Form.Item>
 				<Form.Item colon={false} label="Requires User Assignment">
 					<Checkbox
 						checked={!!details?.requiresUserAssignment}
-						onChange={() => updateStateProperty({ state: id, property: 'requiresUserAssignment', value: !details?.requiresUserAssignment })}
+						onChange={() => updateStateProperty({ state: id, property: 'requiresUserAssignment', value: details.requiresUserAssignment ? 0 : 1 })}
 					/>
 				</Form.Item>
 			</Form>
