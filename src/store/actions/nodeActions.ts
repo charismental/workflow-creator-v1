@@ -130,7 +130,8 @@ export const nodeActions = (set: any, get: () => MainStore): NodeActions => ({
             }
 
             roles.forEach((role) => {
-                const { transitions = [] } = role;
+                let { transitions = [] } = role;
+                if (transitions === null) transitions = [];
                 const updatedTransitions = transitions.map((transition) => {
                     const { stateName, toStateName, properties } = transition;
                     const { points, ...remainingProperties } = properties || {};
@@ -169,7 +170,7 @@ export const nodeActions = (set: any, get: () => MainStore): NodeActions => ({
 
             const updatedNodes = applyNodeChanges(mappedChanges, nodes);
 
-            const updatedStates = updatedNodes.map((node) =>
+            const updatedStates = updatedNodes.map((node: any) =>
                 stateByNode({
                     node: { ...node, data: { ...node.data, color: nodeColor } },
                     allStates,
